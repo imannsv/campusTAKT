@@ -6,6 +6,8 @@ import { assessmentSummary, timedAssessment } from "./assessment";
 
 export default function AssessmentBoard({
   plan,
+  view,
+  query,
   hasStructure,
   zone,
   refresh,
@@ -13,6 +15,8 @@ export default function AssessmentBoard({
   onEdit,
 }: {
   plan?: Row;
+  view: "requirements" | "deadlines";
+  query: string;
   hasStructure: boolean;
   zone: string;
   refresh: number;
@@ -25,12 +29,11 @@ export default function AssessmentBoard({
     [message, setMessage] = useState("");
   const [busy, setBusy] = useState(false),
     [loading, setLoading] = useState(true);
-  const [tab, setTab] = useState("timed");
+  const tab = view === "requirements" ? "timed" : "deadlines";
   const activePlan = useRef(plan?.id);
   activePlan.current = plan?.id;
   useEffect(() => {
     setMessage("");
-    setTab("timed");
   }, [plan?.id]);
   useEffect(() => {
     let active = true;
@@ -107,18 +110,33 @@ export default function AssessmentBoard({
   }
   const timed = rows.filter((row) => timedAssessment(row.assessment_type));
   const deadlines = rows.filter((row) => !timedAssessment(row.assessment_type));
-  const visible = (tab === "timed" ? timed : deadlines).sort(
-    (a, b) =>
-      (a.due_at || "9999").localeCompare(b.due_at || "9999") ||
-      a.name.localeCompare(b.name, "de"),
-  );
+  const visible = (tab === "timed" ? timed : deadlines)
+    .filter((row) =>
+      `${row.name} ${row.assessment_notes || ""}`
+        .toLocaleLowerCase("de")
+        .includes(query.trim().toLocaleLowerCase("de")),
+    )
+    .sort(
+      (a, b) =>
+        (a.due_at || "9999").localeCompare(b.due_at || "9999") ||
+        a.name.localeCompare(b.name, "de"),
+    );
   return (
     <section
       className="assessment-board"
       aria-label="Prüfungsanforderungen des Semesterplans"
     >
       <div className="assessment-heading">
-        <h2>Prüfungsanforderungen</h2>
+        <div>
+          <h2>
+            {tab === "timed" ? "Prüfungsanforderungen" : "Abgaben & Fristen"}
+          </h2>
+          <p className="assessment-intro">
+            {tab === "timed"
+              ? "Vorgaben aus dem Lehrplan. Daraus lassen sich Prüfungen anlegen."
+              : "Hausarbeiten, Projekte und weitere Leistungen mit Abgabefrist."}
+          </p>
+        </div>
         <button
           className="button secondary"
           disabled={!plan || !hasStructure || busy || loading}
@@ -128,12 +146,13 @@ export default function AssessmentBoard({
           Lehrplan übernehmen
         </button>
       </div>
-      {!hasStructure && (
+      {(!plan || !hasStructure) && (
         <p className="assessment-structure-note">
           <Info size={16} aria-hidden="true" />
           <span>
-            Kein freigegebener Lehrplan zugeordnet. Prüfungen können unten
-            manuell angelegt werden.
+            {plan
+              ? "Kein freigegebener Lehrplan zugeordnet. Prüfungen lassen sich im Bereich „Prüfungen“ manuell hinzufügen."
+              : "Lege zuerst einen Semesterplan in der Studienstruktur an."}
           </span>
         </p>
       )}
@@ -147,28 +166,6 @@ export default function AssessmentBoard({
           {message}
         </p>
       )}
-      <div
-        className="resource-tabs"
-        role="group"
-        aria-label="Prüfungsleistungen anzeigen"
-      >
-        <button
-          className={tab === "timed" ? "active" : ""}
-          aria-pressed={tab === "timed"}
-          onClick={() => setTab("timed")}
-        >
-          <GraduationCap size={16} />
-          Vorlagen & Prüfungen ({timed.length})
-        </button>
-        <button
-          className={tab === "deadlines" ? "active" : ""}
-          aria-pressed={tab === "deadlines"}
-          onClick={() => setTab("deadlines")}
-        >
-          <FileText size={16} />
-          Abgaben & Fristen ({deadlines.length})
-        </button>
-      </div>
       {loading ? (
         <p role="status">Prüfungsanforderungen laden …</p>
       ) : !visible.length ? (
@@ -179,9 +176,15 @@ export default function AssessmentBoard({
             <FileText size={20} aria-hidden="true" />
           )}
           <p>
-            {tab === "timed"
-              ? "Keine Prüfungsvorlagen vorhanden."
-              : "Keine Abgaben oder Fristen vorhanden."}
+            {query.trim()
+              ? "Keine passenden Leistungen gefunden."
+              : tab === "timed"
+                ? hasStructure
+                  ? "Keine Anforderungen vorhanden. Übernimm sie aus dem Lehrplan."
+                  : "Noch keine Prüfungsanforderungen zugeordnet."
+                : hasStructure
+                  ? "Keine Abgaben vorhanden. Übernimm die Vorgaben aus dem Lehrplan."
+                  : "Noch keine Abgaben oder Fristen zugeordnet."}
           </p>
         </div>
       ) : (
@@ -198,52 +201,62 @@ export default function AssessmentBoard({
               !!due && due < DateTime.now().setZone(zone) && !waived;
             return (
               <article key={row.id} aria-label={row.name}>
-                <div className="assessment-card-heading">
-                  <h3>{row.name}</h3>
-                  <span
-                    className={
-                      "badge " +
-                      (overdue
-                        ? "assessment-overdue"
-                        : exam || due
-                          ? "success"
-                          : "")
-                    }
-                  >
-                    {waived
-                      ? "Entfällt"
-                      : exam
-                        ? "Prüfung angelegt"
-                        : overdue
-                          ? "Frist verstrichen"
-                          : due
-                            ? "Frist gesetzt"
-                            : tab === "timed"
-                              ? "Vorlage offen"
-                              : "Frist offen"}
-                  </span>
+                <div className="assessment-card-body">
+                  <div className="assessment-card-heading">
+                    <h3>{row.name}</h3>
+                    <span
+                      className={
+                        "badge " +
+                        (overdue
+                          ? "assessment-overdue"
+                          : exam || due
+                            ? "success"
+                            : "")
+                      }
+                    >
+                      {waived
+                        ? "Entfällt"
+                        : exam
+                          ? "Prüfung angelegt"
+                          : overdue
+                            ? "Frist verstrichen"
+                            : due
+                              ? "Frist gesetzt"
+                              : tab === "timed"
+                                ? "Vorlage offen"
+                                : "Frist offen"}
+                    </span>
+                  </div>
+                  <p>{assessmentSummary(row)}</p>
+                  {row.assessment_notes && (
+                    <details className="assessment-notes">
+                      <summary>Hinweise</summary>
+                      <p className="study-assessment-notes">
+                        {row.assessment_notes}
+                      </p>
+                    </details>
+                  )}
+                  {exam && (
+                    <p>
+                      Prüfungszeitraum:{" "}
+                      {DateTime.fromISO(exam.window_start).toFormat(
+                        "dd.MM.yyyy",
+                      )}{" "}
+                      –{" "}
+                      {DateTime.fromISO(exam.window_end).toFormat("dd.MM.yyyy")}{" "}
+                      · {exam.duration_minutes} Minuten · {exam.learners.length}{" "}
+                      Teilnehmer
+                    </p>
+                  )}
+                  {due && (
+                    <p className="assessment-due">
+                      Abgabe:{" "}
+                      <strong>
+                        {fmt(row.due_at, zone, "dd.MM.yyyy · HH:mm")}
+                      </strong>
+                    </p>
+                  )}
                 </div>
-                <p>{assessmentSummary(row)}</p>
-                {row.assessment_notes && (
-                  <p className="study-assessment-notes">
-                    {row.assessment_notes}
-                  </p>
-                )}
-                {exam && (
-                  <p>
-                    Prüfungszeitraum: {exam.window_start} – {exam.window_end} ·{" "}
-                    {exam.duration_minutes} Minuten · {exam.learners.length}{" "}
-                    Teilnehmer
-                  </p>
-                )}
-                {due && (
-                  <p className="assessment-due">
-                    Abgabe:{" "}
-                    <strong>
-                      {fmt(row.due_at, zone, "dd.MM.yyyy · HH:mm")}
-                    </strong>
-                  </p>
-                )}
                 <div className="study-inline-actions">
                   <button
                     className="button secondary"

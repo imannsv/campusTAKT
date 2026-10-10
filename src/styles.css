@@ -2288,69 +2288,6 @@ tbody tr:hover {
   color: var(--theme-accent, #214b76);
   box-shadow: 0 1px 4px #17395a0a;
 }
-.room-header {
-  display: grid;
-  min-width: 0;
-  gap: 20px;
-  margin-bottom: 20px;
-}
-.room-actions {
-  display: flex;
-  align-items: center;
-  justify-content: flex-start;
-  flex-wrap: wrap;
-  gap: 12px;
-  margin: 0;
-}
-.room-actions .button {
-  min-height: 40px;
-}
-.room-area-tabs,
-.room-floor-tabs {
-  display: flex;
-  gap: 12px;
-  flex-wrap: wrap;
-}
-.room-area-tabs {
-  min-width: 0;
-}
-.room-area-tabs button {
-  border: 1px solid var(--theme-border, #eaeaea);
-  border-radius: 12px;
-  padding: 10px 16px;
-  min-height: 40px;
-  background: var(--theme-surface, #fff);
-  color: var(--ink);
-  font-weight: 600;
-  font-size: 14px;
-}
-.room-area-tabs button.active {
-  background: var(--blue);
-  outline: 1px solid var(--navy);
-}
-.room-floor-bar {
-  display: flex;
-  gap: 16px;
-  align-items: center;
-  flex-wrap: wrap;
-  margin-bottom: 24px;
-}
-.room-floor-tabs {
-  flex: 1 1 500px;
-  min-width: 0;
-}
-.room-floor-tabs button {
-  border: 1px solid var(--theme-border, #eaeaea);
-  border-radius: 8px;
-  padding: 9px 12px;
-  background: var(--theme-surface, #fff);
-  color: var(--muted);
-  font-size: 13px;
-}
-.room-floor-tabs button.active {
-  color: var(--theme-accent, var(--navy));
-  background: var(--blue);
-}
 .text-button {
   border: 0;
   background: transparent;
@@ -2488,28 +2425,6 @@ tbody tr:hover {
   }
 }
 @media (max-width: 600px) {
-  .room-header {
-    gap: 20px;
-  }
-  .room-actions {
-    display: grid;
-    width: 100%;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 12px;
-  }
-  .room-actions button {
-    min-width: 0;
-    min-height: 40px;
-    white-space: normal;
-    padding: 9px;
-  }
-  .room-actions .primary {
-    grid-column: 1 / -1;
-  }
-  .room-area-tabs button {
-    flex: 1 1 auto;
-    padding: 12px 14px;
-  }
   .room-tile-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 10px;
@@ -2787,7 +2702,99 @@ tbody tr:hover {
   border: 1px solid var(--line);
   border-radius: 12px;
 }
+.exams-page-heading {
+  margin-bottom: 20px;
+}
+.exam-table-panel table {
+  font-size: 14px;
+}
+.exam-table-panel th {
+  font-size: 12px;
+}
+.exam-table-panel .table-name {
+  white-space: normal;
+  min-width: 180px;
+  max-width: 400px;
+}
+.exam-table-panel .empty-state {
+  padding: 32px 24px;
+}
+.assessment-empty {
+  margin-top: 16px;
+}
+.exams-page-heading h1 {
+  margin: 0;
+  font-size: 26px;
+}
+.exams-workspace .assessment-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  gap: 16px 24px;
+}
+.exams-workspace .assessment-plan-select {
+  flex: 1 1 320px;
+  max-width: 620px;
+}
+.exams-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-left: auto;
+}
+.exams-view-switch {
+  display: flex;
+  gap: 24px;
+  margin-bottom: 20px;
+  border-bottom: 1px solid var(--line);
+}
+.exams-view-switch button {
+  min-height: 44px;
+  padding: 10px 0;
+  color: var(--muted);
+  font-size: 14px;
+  font-weight: 600;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  background: transparent;
+  cursor: pointer;
+}
+.exams-view-switch button:hover {
+  color: var(--ink);
+}
+.exams-view-switch button[aria-pressed="true"] {
+  color: var(--theme-accent, #214b76);
+  border-bottom-color: var(--theme-accent, #214b76);
+}
+.exams-view-switch button:focus-visible {
+  outline: 2px solid var(--theme-accent, #214b76);
+  outline-offset: 2px;
+}
+.assessment-intro {
+  margin: 6px 0 0;
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.5;
+}
+.assessment-notes {
+  margin-top: 8px;
+  font-size: 13px;
+  color: var(--muted);
+}
+.assessment-notes summary {
+  width: fit-content;
+  cursor: pointer;
+  color: var(--theme-accent, #214b76);
+}
+.assessment-notes summary:focus-visible {
+  outline: 2px solid var(--theme-accent, #214b76);
+  outline-offset: 3px;
+}
 .assessment-board {
+  container-type: inline-size;
   margin-bottom: 24px;
   border: 1px solid var(--line);
   border-radius: 12px;
@@ -2845,51 +2852,44 @@ tbody tr:hover {
   line-height: 1.6;
 }
 .assessment-cards .study-inline-actions {
-  gap: 12px;
-  margin-top: auto;
-  padding-top: 14px;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  align-self: center;
 }
 .assessment-cards .study-inline-actions .button {
   max-width: 100%;
   white-space: normal;
 }
-.assessment-board .resource-tabs {
-  margin: 18px 0 16px;
-  flex-wrap: wrap;
-  gap: 12px;
-}
-.assessment-board .resource-tabs button {
-  display: flex;
-  align-items: center;
-  gap: 7px;
-}
 .assessment-cards {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(310px, 100%), 1fr));
-  gap: 14px;
+  grid-template-columns: minmax(0, 1fr);
+  margin-top: 20px;
 }
 .assessment-cards article {
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: start;
+  gap: 16px 24px;
   min-width: 0;
-  padding: 18px;
-  border: 1px solid var(--line);
-  border-radius: 10px;
+  padding: 18px 0;
+  border: 0;
+  border-top: 1px solid var(--line);
   overflow-wrap: anywhere;
 }
 .assessment-card-heading {
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
-  justify-content: space-between;
+  justify-content: flex-start;
   align-items: flex-start;
 }
 .assessment-card-heading h3 {
   font-size: 15px;
 }
 .assessment-cards p {
-  margin: 10px 0;
-  font-size: 12px;
+  margin: 8px 0 0;
+  font-size: 14px;
   color: var(--muted);
   line-height: 1.6;
 }
@@ -2923,7 +2923,73 @@ tbody tr:hover {
 .assessment-toolbar > .button {
   min-height: 40px;
 }
+@container (max-width: 720px) {
+  .assessment-cards article {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
 @media (max-width: 720px) {
+  .exam-table-panel thead {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+  }
+  .exam-table-panel tbody {
+    display: block;
+  }
+  .exam-table-panel tbody tr {
+    display: block;
+    border-bottom: 1px solid var(--line);
+    padding: 8px 0;
+  }
+  .exam-table-panel td {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 6px 16px;
+    border: 0;
+    white-space: normal;
+  }
+  .exam-table-panel td[data-label]::before {
+    content: attr(data-label);
+    color: var(--muted);
+    flex-shrink: 0;
+    font-weight: 400;
+    font-size: 12px;
+  }
+  .exam-table-panel td.table-name {
+    display: block;
+    min-width: 0;
+    max-width: none;
+    padding: 10px 16px;
+  }
+  .exam-table-panel td.table-name::before {
+    content: none;
+  }
+  .exam-table-panel td:last-child {
+    padding-top: 0;
+  }
+  .exams-view-switch {
+    gap: 12px;
+  }
+  .exams-view-switch button {
+    flex: 1;
+    font-size: 13px;
+  }
+  .exams-actions {
+    margin-left: 0;
+    width: 100%;
+  }
+  .exams-actions .button {
+    flex: 1;
+    white-space: normal;
+    min-height: 44px;
+  }
+  .assessment-cards article {
+    grid-template-columns: minmax(0, 1fr);
+  }
   .assessment-toolbar {
     grid-template-columns: minmax(0, 1fr);
     gap: 12px;
@@ -2933,8 +2999,8 @@ tbody tr:hover {
     width: 100%;
   }
   .assessment-cards .study-inline-actions {
-    flex-direction: column;
-    align-items: stretch;
+    flex-wrap: wrap;
+    align-items: center;
   }
   .assessment-board {
     padding: 14px;

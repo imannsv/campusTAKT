@@ -14,7 +14,7 @@
     "section": "Erste Schritte",
     "parentId": null,
     "summary": "Öffne Einrichtung & Studienstruktur. Der Ablauf ist: 1. Räume mit Kapazität und Ausstattung, 2. Lehrende mit abgestimmten Verfügbarkeiten, 3. Studiengang und Lehrplanversion, 4. Module und Lehrveranstaltungen, 5. Jahrgang mit Gruppen und Studierenden, 6. Semesterplan und Zeitraum. Erst danach werden konkrete Termine geplant und veröffentlicht.",
-    "updatedAt": "2026-10-08",
+    "updatedAt": "2026-10-10",
     "related": [
       "rooms",
       "study",
@@ -116,13 +116,16 @@
       "raumbelegung",
       "tagesübersicht",
       "heute",
-      "kalender"
+      "kalender",
+      "struktur verwalten",
+      "weitere filter",
+      "dropdown"
     ],
     "page": "map",
     "section": "Räume und Personen",
     "parentId": null,
-    "summary": "Unter Räume legst du zuerst einen Bereich an, dann Stockwerke und darin Räume. Jeder Raum braucht eine Bezeichnung, Kapazität und bei Bedarf Ausstattung wie PC oder Beamer. Die Planung berücksichtigt diese Angaben und Raumblockierungen. Ein ausreichend großer und ausgestatteter Raum ist erst dann für einen Termin geeignet, wenn er zu dieser Zeit verfügbar ist. Räume → Raumbelegung zeigt alle Raumzeilen für genau einen Tag und startet mit heute. Kalender und Tagespfeile wählen andere Tage; Heute setzt zurück. Bereich, Stockwerk und Suche grenzen Räume ein. Aktuelle Planung enthält Entwürfe, Nur freigegebene Pläne den veröffentlichten Stand. Raumblockierungen stehen in beiden Ansichten. Ein Klick öffnet Details als Popup. Die Belegung aktualisiert sich alle 30 Sekunden. Beim Öffnen von Räume erscheint zuerst die heutige Raumbelegung. Über Raumverwaltung wechselst du zu Raumkacheln und Anlageaktionen.",
-    "updatedAt": "2026-10-09",
+    "summary": "Unter Räume legst du zuerst einen Bereich an, dann Stockwerke und darin Räume. Jeder Raum braucht eine Bezeichnung, Kapazität und bei Bedarf Ausstattung wie PC oder Beamer. Die Planung berücksichtigt diese Angaben und Raumblockierungen. Ein ausreichend großer und ausgestatteter Raum ist erst dann für einen Termin geeignet, wenn er zu dieser Zeit verfügbar ist. Räume → Raumbelegung zeigt alle Raumzeilen für genau einen Tag und startet mit heute. Kalender und Tagespfeile wählen andere Tage; Heute setzt zurück. Bereich, Stockwerk und Suche grenzen Räume ein. Aktuelle Planung enthält Entwürfe, Nur freigegebene Pläne den veröffentlichten Stand. Raumblockierungen stehen in beiden Ansichten. Ein Klick öffnet Details als Popup. Die Belegung aktualisiert sich alle 30 Sekunden. Beim Öffnen von Räume erscheint zuerst die heutige Raumbelegung. Über Raumverwaltung wechselst du zu Raumkacheln und Anlageaktionen. Bereich und Stockwerk werden über beschriftete Dropdowns gewählt. Weitere Filter enthält Planungsstand und Nur mit Belegung; eine Zahl zählt Abweichungen vom Standard. In Raumverwaltung bündelt Struktur verwalten die Anlage und Bearbeitung von Bereichen und Stockwerken. Raum hinzufügen bleibt die Hauptaktion.",
+    "updatedAt": "2026-10-10",
     "related": [
       "blocks",
       "teachers"
@@ -374,8 +377,8 @@
     "page": "exams",
     "section": "Prüfungen",
     "parentId": null,
-    "summary": "Unter Prüfungen wählst du den Semesterplan und Prüfungsanforderungen übernehmen. Vorgaben werden im letzten zum Modul gehörenden Fachsemester vorgeschlagen; bestehende Vorlagen bleiben erhalten. Prüfung anlegen übernimmt Art, Dauer und Hinweise. Prüfe Teilnehmer, Zeitraum und Aufsichten. Wahlpflichtprüfungen verwenden erfasste Belegungen. Hausarbeiten stehen unter Abgaben & Fristen und erhalten dort Datum und Uhrzeit ohne Raumtermin. Fristen sind derzeit nur intern sichtbar. Nachschreiber werden separat mit eigener Teilnehmerliste angelegt.",
-    "updatedAt": "2026-10-08",
+    "summary": "Wähle auf der Prüfungsseite den Semesterplan. Unter Prüfungen findest du angelegte Klausuren und Nachschreiber; Prüfung hinzufügen erfasst eine manuelle Prüfung, Automatisch planen erstellt einen Vorschlag. Unter Anforderungen lassen sich über Lehrplan übernehmen Vorlagen vorbereiten und daraus Prüfungen anlegen. Prüfe Dauer, Zeitraum, Teilnehmer und Aufsichten. Abgaben & Fristen enthält Hausarbeiten und andere Leistungen ohne Raumtermin; dort kannst du Lehrplanvorgaben übernehmen und interne Fristen setzen. Bestehende Vorlagen und Fristen bleiben erhalten. Zusätzliche Hinweise sind aufklappbar.",
+    "updatedAt": "2026-10-10",
     "related": [
       "study",
       "publication"

@@ -1,3 +1,5 @@
+import "./rooms-toolbar";
+import "./exams-layout";
 import { test, expect } from "@playwright/test";
 import { studyFlow } from "./study-flow";
 import { progressionFlow } from "./progression-flow";
@@ -118,7 +120,7 @@ test("Einrichtungsmenü wechselt Raumbereiche und legt neue Bereiche direkt an",
   await page.goto("/");
   const card = page.getByRole("button", { name: /^Einrichtungsmenü:/ });
   const options = page.locator("#institution-options");
-  const areas = page.getByRole("group", { name: "Bereiche", exact: true });
+  const areas = page.getByLabel("Bereich", { exact: true });
   await card.click();
   await options
     .getByRole("button", { name: "Seminarzentrum", exact: true })
@@ -127,9 +129,7 @@ test("Einrichtungsmenü wechselt Raumbereiche und legt neue Bereiche direkt an",
   await page
     .getByRole("button", { name: "Raumverwaltung", exact: true })
     .click();
-  await expect(
-    areas.getByRole("button", { name: "Seminarzentrum", exact: true }),
-  ).toHaveAttribute("aria-pressed", "true");
+  await expect(areas.locator("option:checked")).toHaveText("Seminarzentrum");
   await expect(page.locator(".room-result-count")).toContainText(
     "Seminarzentrum",
   );
@@ -151,9 +151,7 @@ test("Einrichtungsmenü wechselt Raumbereiche und legt neue Bereiche direkt an",
   await expect(page.locator(".room-result-count")).toContainText(
     "Hauptgebäude",
   );
-  await areas
-    .getByRole("button", { name: "Projektforum", exact: true })
-    .click();
+  await areas.selectOption({ label: "Projektforum" });
   await card.click();
   await expect(
     options.getByRole("button", { name: "Projektforum", exact: true }),
@@ -170,9 +168,7 @@ test("Einrichtungsmenü wechselt Raumbereiche und legt neue Bereiche direkt an",
   await dialog.getByLabel(/^Name/).fill("Westflügel Test");
   await dialog.getByRole("button", { name: "Speichern", exact: true }).click();
   await expect(dialog).toHaveCount(0);
-  await expect(
-    areas.getByRole("button", { name: "Westflügel Test", exact: true }),
-  ).toHaveAttribute("aria-pressed", "true");
+  await expect(areas.locator("option:checked")).toHaveText("Westflügel Test");
   await expect(page.locator(".room-empty")).toContainText(
     "Lege zuerst ein Stockwerk",
   );
@@ -184,9 +180,7 @@ test("Einrichtungsmenü wechselt Raumbereiche und legt neue Bereiche direkt an",
     .getByRole("navigation", { name: "Arbeitsbereiche" })
     .getByRole("button", { name: "Räume", exact: true })
     .click();
-  await expect(
-    areas.getByRole("button", { name: "Westflügel Test", exact: true }),
-  ).toHaveAttribute("aria-pressed", "true");
+  await expect(areas.locator("option:checked")).toHaveText("Westflügel Test");
   await page
     .getByRole("button", { name: "Seitenleiste einklappen", exact: true })
     .click();
@@ -549,17 +543,15 @@ test("Demo funktioniert ohne Backend, Raumänderungen bleiben im Browser", async
     page.getByRole("button", { name: "Hörsaal H.101", exact: true }),
   ).toContainText("62 Plätze");
   await page
-    .getByRole("button", { name: "1. Obergeschoss", exact: true })
-    .click();
+    .getByLabel("Stockwerk", { exact: true })
+    .selectOption({ label: "1. Obergeschoss" });
   await expect(
     page.getByRole("button", { name: "Hörsaal H.101", exact: true }),
   ).toHaveCount(0);
   await expect(
     page.getByRole("button", { name: "Labor H.201", exact: true }),
   ).toBeVisible();
-  await page
-    .getByRole("button", { name: "Alle Stockwerke", exact: true })
-    .click();
+  await page.getByLabel("Stockwerk", { exact: true }).selectOption("");
   await page
     .getByRole("button", { name: "Raum hinzufügen", exact: true })
     .click();

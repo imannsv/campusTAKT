@@ -6,6 +6,10 @@ export async function assessmentFlow(page: Page) {
     .getByRole("navigation")
     .getByRole("button", { name: "Prüfungen", exact: true })
     .click();
+  await page
+    .getByRole("group", { name: "Prüfungsbereich wählen" })
+    .getByRole("button", { name: "Anforderungen", exact: true })
+    .click();
   const board = page.getByRole("region", {
     name: "Prüfungsanforderungen des Semesterplans",
   });
@@ -85,8 +89,9 @@ export async function assessmentFlow(page: Page) {
       exact: true,
     })
     .click();
-  await board
-    .getByRole("button", { name: "Abgaben & Fristen (1)", exact: true })
+  await page
+    .getByRole("group", { name: "Prüfungsbereich wählen" })
+    .getByRole("button", { name: "Abgaben & Fristen", exact: true })
     .click();
   const paper = board.getByRole("article", {
     name: "Datenbanken",
@@ -126,8 +131,9 @@ export async function assessmentFlow(page: Page) {
   await page
     .getByLabel("Semesterplan für Prüfungen", { exact: true })
     .selectOption({ label: "Testsemester 2" });
-  await board
-    .getByRole("button", { name: "Abgaben & Fristen (1)", exact: true })
+  await page
+    .getByRole("group", { name: "Prüfungsbereich wählen" })
+    .getByRole("button", { name: "Abgaben & Fristen", exact: true })
     .click();
   await expect(paper).toContainText("20.10.2028 · 23:59");
   await expect(

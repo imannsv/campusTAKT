@@ -30,7 +30,7 @@ Kontrolliere Name, Einrichtungsart, Zeitzone und die Länge einer Unterrichtsein
 
 **Öffnen:** Räume → Raumverwaltung.
 
-Wähle Bereich hinzufügen und erfasse beispielsweise Standort Nord. Lege über Stockwerk hinzufügen das Erdgeschoss und weitere Etagen an. Öffne Raum hinzufügen und erfasse vorhandene Bezeichnung, Stockwerk, Kapazität und Ausstattung.
+Wähle **Struktur verwalten → Bereich hinzufügen** und erfasse beispielsweise Standort Nord. Lege über **Struktur verwalten → Stockwerk hinzufügen** das Erdgeschoss und weitere Etagen an. Öffne **Raum hinzufügen** und erfasse vorhandene Bezeichnung, Stockwerk, Kapazität und Ausstattung.
 
 **Schritt abgeschlossen:** Jeder nutzbare Raum gehört zu einem Stockwerk und Bereich. Seine Kapazität und Ausstattung sind hinterlegt.
 
