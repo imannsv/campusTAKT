@@ -227,7 +227,7 @@
       "portfolio"
     ],
     "page": "exams",
-    "answer": "Unter Prüfungen wählst du den Semesterplan und Prüfungsanforderungen übernehmen. Vorgaben werden im letzten zum Modul gehörenden Fachsemester vorgeschlagen; bestehende Vorlagen bleiben erhalten. Prüfung anlegen übernimmt Art, Dauer und Hinweise. Prüfe Teilnehmer, Zeitraum und Aufsichten. Wahlpflichtprüfungen verwenden erfasste Belegungen. Hausarbeiten stehen unter Abgaben & Fristen und erhalten dort Datum und Uhrzeit ohne Raumtermin. Fristen sind derzeit nur intern sichtbar. Nachschreiber werden separat mit eigener Teilnehmerliste angelegt."
+    "answer": "Wähle auf der Prüfungsseite den Semesterplan. Unter Prüfungen findest du angelegte Klausuren und Nachschreiber; Prüfung hinzufügen erfasst eine manuelle Prüfung, Automatisch planen erstellt einen Vorschlag. Unter Anforderungen lassen sich über Lehrplan übernehmen Vorlagen vorbereiten und daraus Prüfungen anlegen. Prüfe Dauer, Zeitraum, Teilnehmer und Aufsichten. Abgaben & Fristen enthält Hausarbeiten und andere Leistungen ohne Raumtermin; dort kannst du Lehrplanvorgaben übernehmen und interne Fristen setzen. Bestehende Vorlagen und Fristen bleiben erhalten. Zusätzliche Hinweise sind aufklappbar."
   },
   {
     "id": "display",

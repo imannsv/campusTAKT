@@ -351,8 +351,10 @@ function DataTable({
   query = "",
   filters = {},
   data,
+  hideActions = false,
 }: {
   resource: string;
+  hideActions?: boolean;
   schema: Field[];
   onEdit: (r: Row) => void;
   onAdd: () => void;
@@ -392,19 +394,32 @@ function DataTable({
       active = false;
     };
   }, [resource, page, query, refresh, filterQuery]);
-  const columns = schema
-    .filter(
-      (f) =>
-        !["json", "many", "file"].includes(f.type) &&
-        !["geometry", "polygon", "color", "longitude", "latitude"].includes(
-          f.name,
-        ) &&
-        !(
-          resource === "exams" &&
-          ["assessment_template", "assessment_notes"].includes(f.name)
-        ),
-    )
-    .slice(0, 6);
+  const columns =
+    resource === "exams"
+      ? [
+          "name",
+          "assessment_type",
+          "duration_minutes",
+          "window_start",
+          "resit",
+        ].flatMap((name) => schema.filter((field) => field.name === name))
+      : schema
+          .filter(
+            (f) =>
+              !["json", "many", "file"].includes(f.type) &&
+              ![
+                "geometry",
+                "polygon",
+                "color",
+                "longitude",
+                "latitude",
+              ].includes(f.name) &&
+              !(
+                resource === "exams" &&
+                ["assessment_template", "assessment_notes"].includes(f.name)
+              ),
+          )
+          .slice(0, 6);
   const cell = (field: Field, row: Row) => {
     const value = row[field.name];
     if (field.type === "relation")
@@ -412,6 +427,18 @@ function DataTable({
         data[field.resource!]?.find((r) => r.id === value)?.name ||
         `#${value || "—"}`
       );
+    if (
+      resource === "exams" &&
+      ["window_start", "window_end"].includes(field.name)
+    )
+      return value
+        ? DateTime.fromISO(value).toFormat("dd.MM.yyyy") +
+            (row.window_end && row.window_end !== value
+              ? ` – ${DateTime.fromISO(row.window_end).toFormat("dd.MM.yyyy")}`
+              : "")
+        : "—";
+    if (resource === "exams" && field.name === "duration_minutes")
+      return `${value} Min.`;
     if (field.type === "boolean")
       return value ? (
         <span className="table-check">
@@ -427,12 +454,30 @@ function DataTable({
       return value ? fmt(value, "Europe/Berlin", "dd.MM. HH:mm") : "—";
     return String(value ?? "—");
   };
+  const columnLabel = (field: Field) =>
+    (resource === "exams"
+      ? (
+          {
+            window_start: "Zeitraum",
+            duration_minutes: "Dauer",
+            assessment_type: "Art",
+          } as Record<string, string>
+        )[field.name]
+      : undefined) ||
+    labels[field.name] ||
+    field.name;
   return (
-    <div className="data-panel">
+    <div
+      className={`data-panel${resource === "exams" ? " exam-table-panel" : ""}`}
+    >
       <div className="data-panel-heading">
         <div>
-          <h2>{labels[resource]}</h2>
-          <span>{count} Einträge</span>
+          <h2>
+            {resource === "exams" ? "Prüfungen im Semester" : labels[resource]}
+          </h2>
+          <span>
+            {count} {resource === "exams" ? "Prüfungen" : "Einträge"}
+          </span>
         </div>
         <div>
           <button
@@ -448,50 +493,57 @@ function DataTable({
             <Upload size={15} />
             Importieren
           </button>
-          <button className="button primary" onClick={onAdd}>
-            <Plus size={16} />
-            Hinzufügen
-          </button>
+          {!hideActions && (
+            <button className="button primary" onClick={onAdd}>
+              <Plus size={16} />
+              Hinzufügen
+            </button>
+          )}
         </div>
       </div>
       {error && <div className="error-box">{error}</div>}
       <div className="table-wrap">
-        <table>
-          <thead>
-            <tr>
-              {columns.map((f) => (
-                <th key={f.name}>{labels[f.name] || f.name}</th>
-              ))}
-              <th />
-            </tr>
-          </thead>
-          <tbody>
-            {rows.map((row) => (
-              <tr key={row.id} onClick={() => onEdit(row)}>
+        {(resource !== "exams" || rows.length > 0) && (
+          <table>
+            <thead>
+              <tr>
                 {columns.map((f) => (
-                  <td
-                    key={f.name}
-                    className={f.name === "name" ? "table-name" : ""}
-                  >
-                    {cell(f, row)}
-                  </td>
+                  <th key={f.name}>{columnLabel(f)}</th>
                 ))}
-                <td>
-                  <button
-                    className="icon-button"
-                    aria-label={`${row.name} bearbeiten`}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onEdit(row);
-                    }}
-                  >
-                    <ArrowUpRight size={16} />
-                  </button>
-                </td>
+                <th />
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {rows.map((row) => (
+                <tr key={row.id} onClick={() => onEdit(row)}>
+                  {columns.map((f) => (
+                    <td
+                      key={f.name}
+                      className={f.name === "name" ? "table-name" : ""}
+                      data-label={
+                        resource === "exams" ? columnLabel(f) : undefined
+                      }
+                    >
+                      {cell(f, row)}
+                    </td>
+                  ))}
+                  <td>
+                    <button
+                      className="icon-button"
+                      aria-label={`${row.name} bearbeiten`}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onEdit(row);
+                      }}
+                    >
+                      <ArrowUpRight size={16} />
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
         {busy && (
           <div className="table-loading">
             <LoaderCircle size={20} className="spin" />
@@ -502,46 +554,56 @@ function DataTable({
           <div className="empty-state">
             <Layers size={30} />
             <h3>
-              {query ? "Keine passenden Einträge" : "Noch keine Einträge"}
+              {query
+                ? "Keine passenden Einträge"
+                : resource === "exams"
+                  ? "Noch keine Prüfungen"
+                  : "Noch keine Einträge"}
             </h3>
             <p>
               {query
                 ? "Versuche einen anderen Suchbegriff."
-                : "Lege den ersten Eintrag an oder importiere eine Datei."}
+                : resource === "exams"
+                  ? "Füge eine Prüfung hinzu oder erstelle sie aus den Anforderungen."
+                  : "Lege den ersten Eintrag an oder importiere eine Datei."}
             </p>
-            <button className="button secondary" onClick={onAdd}>
-              <Plus size={15} />
-              Eintrag hinzufügen
-            </button>
+            {!hideActions && (
+              <button className="button secondary" onClick={onAdd}>
+                <Plus size={15} />
+                Eintrag hinzufügen
+              </button>
+            )}
           </div>
         )}
       </div>
-      <div className="table-footer">
-        <span>
-          {count
-            ? `${(page - 1) * 100 + 1}–${Math.min(page * 100, count)} von ${count}`
-            : "0 Einträge"}
-        </span>
-        <div>
-          <button
-            className="icon-button"
-            disabled={page === 1}
-            aria-label="Vorherige Seite"
-            onClick={() => setPage((p) => p - 1)}
-          >
-            <ChevronLeft size={18} />
-          </button>
-          <span>Seite {page}</span>
-          <button
-            className="icon-button"
-            disabled={page * 100 >= count}
-            aria-label="Nächste Seite"
-            onClick={() => setPage((p) => p + 1)}
-          >
-            <ChevronRight size={18} />
-          </button>
+      {(resource !== "exams" || count > 0) && (
+        <div className="table-footer">
+          <span>
+            {count
+              ? `${(page - 1) * 100 + 1}–${Math.min(page * 100, count)} von ${count}`
+              : "0 Einträge"}
+          </span>
+          <div>
+            <button
+              className="icon-button"
+              disabled={page === 1}
+              aria-label="Vorherige Seite"
+              onClick={() => setPage((p) => p - 1)}
+            >
+              <ChevronLeft size={18} />
+            </button>
+            <span>Seite {page}</span>
+            <button
+              className="icon-button"
+              disabled={page * 100 >= count}
+              aria-label="Nächste Seite"
+              onClick={() => setPage((p) => p + 1)}
+            >
+              <ChevronRight size={18} />
+            </button>
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 }
@@ -844,6 +906,9 @@ function Workspace() {
   const sidebarToggle = useRef<HTMLButtonElement>(null);
   const [followNow, setFollowNow] = useState(true);
   const [setupStep, setSetupStep] = useState(0);
+  const [assessmentView, setAssessmentView] = useState<
+    "exams" | "deadlines" | "requirements"
+  >("exams");
   const [studyContext, setStudyContext] = useState<Row>({});
   const [roomContext, setRoomContext] = useState<Row>({});
   const [areaId, setAreaId] = useState<number | null>(null);
@@ -1986,45 +2051,95 @@ function Workspace() {
           ) : (
             <>
               {page === "exams" && (
-                <div className="assessment-toolbar">
-                  <label className="assessment-plan-select">
-                    Semesterplan für Prüfungen
-                    <select
-                      aria-label="Semesterplan für Prüfungen"
-                      value={planId || ""}
-                      onChange={(event) =>
-                        setPlanId(Number(event.target.value))
-                      }
-                    >
-                      {data.plans?.map((item) => (
-                        <option key={item.id} value={item.id}>
-                          {item.name}
-                        </option>
-                      ))}
-                    </select>
-                  </label>
-                  <button
-                    className="button primary"
-                    disabled={!plan}
-                    onClick={() => setModal({ type: "solver", kind: "exams" })}
+                <section
+                  className="exams-workspace"
+                  aria-label="Prüfungen verwalten"
+                >
+                  <div className="exams-page-heading">
+                    <h1>Prüfungen</h1>
+                  </div>
+                  <div className="assessment-toolbar">
+                    <label className="assessment-plan-select">
+                      Semesterplan
+                      <select
+                        aria-label="Semesterplan für Prüfungen"
+                        value={planId || ""}
+                        onChange={(event) =>
+                          setPlanId(Number(event.target.value))
+                        }
+                      >
+                        {!data.plans?.length && (
+                          <option value="">Kein Semesterplan vorhanden</option>
+                        )}
+                        {data.plans?.map((item) => (
+                          <option key={item.id} value={item.id}>
+                            {item.name}
+                          </option>
+                        ))}
+                      </select>
+                    </label>
+                    {assessmentView === "exams" && (
+                      <div className="exams-actions">
+                        <button
+                          className="button secondary"
+                          disabled={!plan}
+                          aria-label="Prüfungen planen"
+                          onClick={() =>
+                            setModal({ type: "solver", kind: "exams" })
+                          }
+                        >
+                          <Sparkles size={16} /> Automatisch planen
+                        </button>
+                        <button
+                          className="button primary"
+                          disabled={!plan}
+                          onClick={() =>
+                            edit("exams", undefined, { plan: planId })
+                          }
+                        >
+                          <Plus size={16} /> Prüfung hinzufügen
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                  <div
+                    className="exams-view-switch"
+                    role="group"
+                    aria-label="Prüfungsbereich wählen"
                   >
-                    <Sparkles size={16} />
-                    Prüfungen planen
-                  </button>
-                </div>
-              )}
-              {page === "exams" && (
-                <AssessmentBoard
-                  plan={plan}
-                  hasStructure={
-                    !!data.cohorts?.find((item) => item.id === plan?.cohort)
-                      ?.study_version
-                  }
-                  zone={zone}
-                  refresh={refresh}
-                  onChanged={reload}
-                  onEdit={edit}
-                />
+                    {(
+                      [
+                        ["exams", "Prüfungen"],
+                        ["deadlines", "Abgaben & Fristen"],
+                        ["requirements", "Anforderungen"],
+                      ] as const
+                    ).map(([value, label]) => (
+                      <button
+                        key={value}
+                        type="button"
+                        aria-pressed={assessmentView === value}
+                        onClick={() => setAssessmentView(value)}
+                      >
+                        {label}
+                      </button>
+                    ))}
+                  </div>
+                  {assessmentView !== "exams" && (
+                    <AssessmentBoard
+                      plan={plan}
+                      view={assessmentView}
+                      query={search}
+                      hasStructure={
+                        !!data.cohorts?.find((item) => item.id === plan?.cohort)
+                          ?.study_version
+                      }
+                      zone={zone}
+                      refresh={refresh}
+                      onChanged={reload}
+                      onEdit={edit}
+                    />
+                  )}
+                </section>
               )}
               {page === "data" && (
                 <div className="resource-tabs">
@@ -2136,8 +2251,9 @@ function Workspace() {
               {page !== "exams" && (
                 <p className="resource-description">{descriptions[resource]}</p>
               )}
-              {boot && (
+              {boot && (page !== "exams" || assessmentView === "exams") && (
                 <DataTable
+                  hideActions={page === "exams"}
                   resource={resource}
                   schema={boot.schema[resource]}
                   onAdd={() =>

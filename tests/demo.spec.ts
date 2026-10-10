@@ -1,3 +1,4 @@
+import "./exams-layout";
 import { test, expect } from "@playwright/test";
 import { studyFlow } from "./study-flow";
 import { progressionFlow } from "./progression-flow";
