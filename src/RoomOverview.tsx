@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { DateTime } from "luxon";
 import { api, fmt, Row } from "./api";
 import ResourceOverview from "./ResourceOverview";
+import ToolbarPopover from "./ToolbarPopover";
 
 type Props = {
   areaId: number | null;
@@ -94,8 +95,48 @@ export default function RoomOverview({
     setRoomId(null);
   }
 
+  const selectionControls = (
+    <div className="room-selection-controls">
+      <label>
+        Bereich
+        <select
+          aria-label="Bereich"
+          value={area?.id || ""}
+          disabled={!areas.length}
+          onChange={(event) => chooseArea(Number(event.target.value))}
+        >
+          {!areas.length && <option value="">Kein Bereich</option>}
+          {areas.map((item) => (
+            <option key={item.id} value={item.id}>
+              {item.name}
+            </option>
+          ))}
+        </select>
+      </label>
+      <label>
+        Stockwerk
+        <select
+          aria-label="Stockwerk"
+          value={currentFloor?.id || ""}
+          disabled={!floors.length}
+          onChange={(event) => {
+            setFloorId(event.target.value ? Number(event.target.value) : null);
+            setRoomId(null);
+          }}
+        >
+          <option value="">Alle Stockwerke</option>
+          {floors.map((floor) => (
+            <option key={floor.id} value={floor.id}>
+              {floor.name}
+            </option>
+          ))}
+        </select>
+      </label>
+    </div>
+  );
   return (
     <section className="room-overview" aria-label="Raumverwaltung">
+      <h1 className="room-page-title">Räume</h1>
       <div className="room-view-switch" role="group" aria-label="Raumansicht">
         <button
           aria-pressed={view === "occupancy"}
@@ -110,103 +151,76 @@ export default function RoomOverview({
           Raumverwaltung
         </button>
       </div>
-      <div className="room-header">
-        <div
-          className="room-actions"
-          role="group"
-          aria-label="Räume verwalten"
-          hidden={view !== "catalog"}
-        >
-          <button
-            className="button secondary"
-            onClick={() => onEdit("buildings")}
-          >
-            Bereich hinzufügen
-          </button>
-          <button
-            className="button secondary"
-            disabled={!area}
-            onClick={() => onEdit("floors", undefined, { building: area.id })}
-          >
-            Stockwerk hinzufügen
-          </button>
-          <button
-            className="button primary"
-            disabled={!floors.length}
-            onClick={() =>
-              onEdit("rooms", undefined, {
-                floor: currentFloor?.id || floors[0]?.id,
-              })
-            }
-          >
-            Raum hinzufügen
-          </button>
-        </div>
-        {areas.length > 0 && (
-          <div className="room-area-tabs" role="group" aria-label="Bereiche">
-            {areas.map((item) => (
-              <button
-                key={item.id}
-                className={area.id === item.id ? "active" : ""}
-                aria-pressed={area.id === item.id}
-                onClick={() => chooseArea(item.id)}
-              >
-                {item.name}
-              </button>
-            ))}
+      {view === "catalog" && (
+        <div className="room-catalog-toolbar">
+          {selectionControls}
+          <div className="room-catalog-actions">
+            <ToolbarPopover label="Struktur verwalten" menu>
+              {(close) => (
+                <>
+                  <button
+                    role="menuitem"
+                    onClick={() => {
+                      close();
+                      onEdit("buildings");
+                    }}
+                  >
+                    Bereich hinzufügen
+                  </button>
+                  <button
+                    role="menuitem"
+                    disabled={!area}
+                    onClick={() => {
+                      close();
+                      onEdit("buildings", area);
+                    }}
+                  >
+                    Bereich bearbeiten
+                  </button>
+                  <button
+                    role="menuitem"
+                    disabled={!area}
+                    onClick={() => {
+                      close();
+                      onEdit("floors", undefined, { building: area.id });
+                    }}
+                  >
+                    Stockwerk hinzufügen
+                  </button>
+                  <button
+                    role="menuitem"
+                    disabled={!currentFloor}
+                    onClick={() => {
+                      close();
+                      onEdit("floors", currentFloor);
+                    }}
+                  >
+                    Stockwerk bearbeiten
+                  </button>
+                </>
+              )}
+            </ToolbarPopover>
+            <button
+              className="button primary"
+              disabled={!floors.length}
+              onClick={() =>
+                onEdit("rooms", undefined, {
+                  floor: currentFloor?.id || floors[0]?.id,
+                })
+              }
+            >
+              Raum hinzufügen
+            </button>
           </div>
-        )}
-      </div>
+        </div>
+      )}
       {areas.length ? (
         <>
-          <div className="room-floor-bar">
-            <div
-              className="room-floor-tabs"
-              role="group"
-              aria-label="Stockwerke"
-            >
-              <button
-                className={!currentFloor ? "active" : ""}
-                aria-pressed={!currentFloor}
-                onClick={() => {
-                  setFloorId(null);
-                  setRoomId(null);
-                }}
-              >
-                Alle Stockwerke
-              </button>
-              {floors.map((floor) => (
-                <button
-                  key={floor.id}
-                  className={currentFloor?.id === floor.id ? "active" : ""}
-                  aria-pressed={currentFloor?.id === floor.id}
-                  onClick={() => {
-                    setFloorId(floor.id);
-                    setRoomId(null);
-                  }}
-                >
-                  {floor.name}
-                </button>
-              ))}
-            </div>
-            <button
-              className="text-button"
-              onClick={() => onEdit("buildings", area)}
-            >
-              Bereich bearbeiten
-            </button>
-            {currentFloor && (
-              <button
-                className="text-button"
-                onClick={() => onEdit("floors", currentFloor)}
-              >
-                Stockwerk bearbeiten
-              </button>
-            )}
-          </div>
           {view === "occupancy" ? (
             <ResourceOverview
               kind="rooms"
+              compactRooms
+              headerControls={selectionControls}
               zone={zone}
               data={data}
               revision={revision}
@@ -366,6 +380,11 @@ export default function RoomOverview({
         <div className="room-empty">
           Noch keine Bereiche angelegt. Beginne mit einem Bereich, zum Beispiel
           „Hauptgebäude“ oder „Trakt A“.
+          {view === "occupancy" && (
+            <button className="text-button" onClick={() => setView("catalog")}>
+              Raumverwaltung öffnen
+            </button>
+          )}
         </div>
       )}
     </section>

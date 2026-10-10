@@ -260,7 +260,7 @@ test("Raumbelegung bleibt eine Tagesansicht und zeigt Blockierungen und Freigabe
     exact: true,
   });
   await expect(overview.locator(".resource-day-header")).toHaveCount(1);
-  await expect(overview.locator(".resource-period-summary")).toContainText(
+  await expect(overview.locator(".resource-date-controls")).toContainText(
     "09. Okt",
   );
   await expect(
@@ -274,14 +274,17 @@ test("Raumbelegung bleibt eine Tagesansicht und zeigt Blockierungen und Freigabe
     .fill("Testräumlichkeit");
   await expect(overview.locator(".resource-timeline-row")).toHaveCount(1);
   await expect(overview.locator(".resource-event")).toHaveCount(4);
-  const areas = page.getByRole("group", { name: "Bereiche", exact: true });
-  if ((await areas.getByRole("button").count()) > 1) {
-    await areas.getByRole("button").nth(1).click();
+  const areas = page.getByLabel("Bereich", { exact: true });
+  const originalArea = await areas.inputValue();
+  if ((await areas.locator("option").count()) > 1) {
+    await areas.selectOption(
+      (await areas.locator("option").nth(1).getAttribute("value")) || "",
+    );
     await expect(overview).toBeVisible();
-    await expect(overview.locator(".resource-period-summary")).toContainText(
+    await expect(overview.locator(".resource-date-controls")).toContainText(
       "09. Okt",
     );
-    await areas.getByRole("button").first().click();
+    await areas.selectOption(originalArea);
     await expect(overview.locator(".resource-event")).toHaveCount(4);
   }
   await overview.getByRole("button", { name: /Bauarbeiten/ }).click();
@@ -289,9 +292,11 @@ test("Raumbelegung bleibt eine Tagesansicht und zeigt Blockierungen und Freigabe
     page.getByRole("dialog", { name: "Raumblockierung", exact: true }),
   ).toContainText("Blockiert");
   await page.keyboard.press("Escape");
+  await overview.getByRole("button", { name: /Weitere Filter/ }).click();
   await overview
     .getByLabel("Planungsstand", { exact: true })
     .selectOption("published");
+  await page.keyboard.press("Escape");
   await expect(overview.locator(".resource-event")).toHaveCount(2);
   await overview
     .getByRole("button", { name: "Datum auswählen", exact: true })
@@ -302,9 +307,11 @@ test("Raumbelegung bleibt eine Tagesansicht und zeigt Blockierungen und Freigabe
     .click();
   await expect(overview.locator(".resource-day-header")).toHaveCount(1);
   await expect(overview).toContainText("Keine Belegung im gewählten Zeitraum.");
+  await overview.getByRole("button", { name: /Weitere Filter/ }).click();
   await overview
     .getByLabel("Planungsstand", { exact: true })
     .selectOption("planning");
+  await page.keyboard.press("Escape");
   await expect(overview.locator(".resource-event")).toHaveCount(1);
   await expect(overview.locator(".resource-event")).toContainText(
     "Samstagstermin",

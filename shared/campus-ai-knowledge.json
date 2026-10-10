@@ -66,10 +66,13 @@
       "raumbelegung",
       "tagesübersicht",
       "heute",
-      "kalender"
+      "kalender",
+      "struktur verwalten",
+      "weitere filter",
+      "dropdown"
     ],
     "page": "map",
-    "answer": "Unter Räume legst du zuerst einen Bereich an, dann Stockwerke und darin Räume. Jeder Raum braucht eine Bezeichnung, Kapazität und bei Bedarf Ausstattung wie PC oder Beamer. Die Planung berücksichtigt diese Angaben und Raumblockierungen. Ein ausreichend großer und ausgestatteter Raum ist erst dann für einen Termin geeignet, wenn er zu dieser Zeit verfügbar ist. Räume → Raumbelegung zeigt alle Raumzeilen für genau einen Tag und startet mit heute. Kalender und Tagespfeile wählen andere Tage; Heute setzt zurück. Bereich, Stockwerk und Suche grenzen Räume ein. Aktuelle Planung enthält Entwürfe, Nur freigegebene Pläne den veröffentlichten Stand. Raumblockierungen stehen in beiden Ansichten. Ein Klick öffnet Details als Popup. Die Belegung aktualisiert sich alle 30 Sekunden. Beim Öffnen von Räume erscheint zuerst die heutige Raumbelegung. Über Raumverwaltung wechselst du zu Raumkacheln und Anlageaktionen."
+    "answer": "Unter Räume legst du zuerst einen Bereich an, dann Stockwerke und darin Räume. Jeder Raum braucht eine Bezeichnung, Kapazität und bei Bedarf Ausstattung wie PC oder Beamer. Die Planung berücksichtigt diese Angaben und Raumblockierungen. Ein ausreichend großer und ausgestatteter Raum ist erst dann für einen Termin geeignet, wenn er zu dieser Zeit verfügbar ist. Räume → Raumbelegung zeigt alle Raumzeilen für genau einen Tag und startet mit heute. Kalender und Tagespfeile wählen andere Tage; Heute setzt zurück. Bereich, Stockwerk und Suche grenzen Räume ein. Aktuelle Planung enthält Entwürfe, Nur freigegebene Pläne den veröffentlichten Stand. Raumblockierungen stehen in beiden Ansichten. Ein Klick öffnet Details als Popup. Die Belegung aktualisiert sich alle 30 Sekunden. Beim Öffnen von Räume erscheint zuerst die heutige Raumbelegung. Über Raumverwaltung wechselst du zu Raumkacheln und Anlageaktionen. Bereich und Stockwerk werden über beschriftete Dropdowns gewählt. Weitere Filter enthält Planungsstand und Nur mit Belegung; eine Zahl zählt Abweichungen vom Standard. In Raumverwaltung bündelt Struktur verwalten die Anlage und Bearbeitung von Bereichen und Stockwerken. Raum hinzufügen bleibt die Hauptaktion."
   },
   {
     "id": "teachers",
