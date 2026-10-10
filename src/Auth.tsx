@@ -1,6 +1,7 @@
 import { useState, FormEvent } from "react";
 import { ArrowRight, LockKeyhole, LoaderCircle } from "lucide-react";
 import { api, Row } from "./api";
+import { ThemePicker } from "./Theme";
 
 export function notifyAuthChange() {
   try {
@@ -85,6 +86,9 @@ export function Login({ onLogin }: { onLogin: (s: SessionState) => void }) {
         </div>
       </section>
       <section className="login-form-area">
+        <div className="login-appearance">
+          <ThemePicker />
+        </div>
         <form onSubmit={submit}>
           <span className="login-icon">
             <LockKeyhole size={25} />

@@ -7,9 +7,9 @@
   white-space: nowrap;
 }
 .week-nav .follow-now-button[aria-pressed="true"] {
-  background: #e7effa;
-  border-color: #b8ccdf;
-  color: #214b76;
+  background: var(--theme-blue-bg, #e7effa);
+  border-color: var(--theme-blue-border, #b8ccdf);
+  color: var(--theme-accent, #214b76);
 }
 .timetable.with-current-time .calendar-body {
   isolation: isolate;
@@ -19,7 +19,7 @@
   left: 0;
   right: 0;
   height: 1px;
-  background: #c63838;
+  background: var(--theme-now-line, #c63838);
   z-index: 6;
   pointer-events: none;
 }
@@ -28,8 +28,8 @@
   left: 0;
   display: block;
   width: 58px;
-  background: white;
-  color: #b32626;
+  background: var(--theme-surface, white);
+  color: var(--theme-red-text, #b32626);
   font-size: 10px;
   font-weight: 600;
   text-align: center;

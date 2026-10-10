@@ -1,5 +1,6 @@
 import { useEffect, useState, type ReactNode } from "react";
 import { DateTime } from "luxon";
+import { ThemePicker } from "./Theme";
 import {
   ChevronLeft,
   ChevronRight,
@@ -124,6 +125,7 @@ export default function StudentOverview({
               : "Freigegebene Stundenpläne"}
           </p>
         </div>
+        <ThemePicker />
         <div className="public-status">
           <span className={error ? "status-dot error-dot" : "status-dot"} />
           {error

@@ -26,7 +26,7 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  color: #84662f;
+  color: var(--theme-amber-text, #84662f);
   text-decoration: underline;
   text-underline-offset: 3px;
 }

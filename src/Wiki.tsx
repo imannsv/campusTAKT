@@ -15,6 +15,7 @@ import { api, DEMO_MODE } from "./api";
 import { Brand, Login, SessionState } from "./Auth";
 import { Modal } from "./components";
 import { wikiLink } from "./wiki-links";
+import { ThemePicker } from "./Theme";
 import "./wiki.css";
 
 type Article = {
@@ -404,6 +405,7 @@ export default function Wiki() {
             </button>
           )}
         </div>
+        <ThemePicker />
         <a className="button wiki-back" href="/">
           <ArrowLeft size={16} />
           <span>Zur Anwendung</span>

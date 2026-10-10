@@ -44,7 +44,7 @@
 }
 .campus-ai-calendar-context span {
   display: block;
-  color: #64778b;
+  color: var(--theme-text-muted, #64778b);
 }
 .campus-ai-sources {
   display: block;
@@ -62,8 +62,8 @@
 .campus-ai-stop,
 .campus-ai-error button {
   border: 1px solid var(--line);
-  background: white;
-  color: var(--navy);
+  background: var(--theme-surface, white);
+  color: var(--theme-accent, var(--navy));
   min-height: 44px;
   padding: 8px 12px;
   border-radius: 8px;
@@ -120,6 +120,6 @@
 }
 .campus-ai-guide > a {
   font-size: 13px;
-  color: #234f7c;
+  color: var(--theme-accent, #234f7c);
   padding: 8px 0;
 }
