@@ -1,4 +1,11 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import {
+  ReactNode,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { DateTime } from "luxon";
 import { ChevronLeft, ChevronRight, RefreshCw, Search } from "lucide-react";
 import { api, Row } from "./api";
@@ -7,6 +14,7 @@ import MiniCalendar from "./MiniCalendar";
 import TeacherAvailabilityDialog from "./TeacherAvailabilityDialog";
 import { dayAxis, resourceSegments, timelineHours } from "./resource-timeline";
 import "./resource-overview.css";
+import ToolbarPopover from "./ToolbarPopover";
 
 type Props = {
   kind: "teachers" | "rooms";
@@ -15,6 +23,8 @@ type Props = {
   revision: number;
   query?: string;
   roomIds?: number[];
+  headerControls?: ReactNode;
+  compactRooms?: boolean;
   onEdit: (resource: string, record?: Row, defaults?: Row) => void;
   onChanged?: () => void;
 };
@@ -36,6 +46,8 @@ export default function ResourceOverview({
   revision,
   query = "",
   roomIds,
+  headerControls,
+  compactRooms = false,
   onEdit,
   onChanged,
 }: Props) {
@@ -205,18 +217,46 @@ export default function ResourceOverview({
     scroller.current.scrollLeft =
       mode === "week" ? Math.max(0, days.indexOf(date)) * dayWidth : 0;
   }, [date, mode, source, !!currentResult, days, dayWidth]);
+  const compact = kind === "rooms" && compactRooms;
+  const advancedFilters = (
+    <>
+      <label>
+        Planungsstand
+        <select
+          aria-label="Planungsstand"
+          value={source}
+          onChange={(event) => setSource(event.target.value)}
+        >
+          <option value="planning">Aktuelle Planung</option>
+          <option value="published">Nur freigegebene Pläne</option>
+        </select>
+      </label>
+      <label className="resource-occupied">
+        <input
+          type="checkbox"
+          checked={onlyOccupied}
+          onChange={(event) => setOnlyOccupied(event.target.checked)}
+        />
+        Nur mit Belegung
+      </label>
+    </>
+  );
   return (
     <section
-      className={`resource-overview ${mode === "week" ? "resource-week" : "resource-day"}`}
+      className={`resource-overview ${compact ? "resource-rooms-compact" : ""} ${mode === "week" ? "resource-week" : "resource-day"}`}
       aria-label={kind === "teachers" ? "Lehrendenübersicht" : "Raumbelegung"}
     >
-      <div className="resource-overview-title">
-        <h1>{kind === "teachers" ? "Lehrendenübersicht" : "Raumbelegung"}</h1>
-        <span>
-          {mode === "week" ? "Woche" : "Tag"} ·{" "}
-          {source === "planning" ? "Aktuelle Planung" : "Veröffentlichte Pläne"}
-        </span>
-      </div>
+      {!compact && (
+        <div className="resource-overview-title">
+          <h1>{kind === "teachers" ? "Lehrendenübersicht" : "Raumbelegung"}</h1>
+          <span>
+            {mode === "week" ? "Woche" : "Tag"} ·{" "}
+            {source === "planning"
+              ? "Aktuelle Planung"
+              : "Veröffentlichte Pläne"}
+          </span>
+        </div>
+      )}
       <div className="resource-overview-card">
         {notice && (
           <p className="resource-empty" role="status">
@@ -273,6 +313,7 @@ export default function ResourceOverview({
               <ChevronRight size={18} />
             </button>
           </div>
+          {headerControls}
           {kind === "teachers" && (
             <label className="resource-mode-label">
               Ansicht
@@ -306,25 +347,16 @@ export default function ResourceOverview({
               onChange={(event) => setSearch(event.target.value)}
             />
           </label>
-          <label>
-            Planungsstand
-            <select
-              aria-label="Planungsstand"
-              value={source}
-              onChange={(event) => setSource(event.target.value)}
+          {compact ? (
+            <ToolbarPopover
+              label="Weitere Filter"
+              count={Number(source !== "planning") + Number(onlyOccupied)}
             >
-              <option value="planning">Aktuelle Planung</option>
-              <option value="published">Nur freigegebene Pläne</option>
-            </select>
-          </label>
-          <label className="resource-occupied">
-            <input
-              type="checkbox"
-              checked={onlyOccupied}
-              onChange={(event) => setOnlyOccupied(event.target.checked)}
-            />
-            Nur mit Belegung
-          </label>
+              {() => advancedFilters}
+            </ToolbarPopover>
+          ) : (
+            advancedFilters
+          )}
           <button
             className="icon-button"
             aria-label="Belegung aktualisieren"
@@ -335,7 +367,7 @@ export default function ResourceOverview({
           </button>
         </div>
         <div className="resource-period-summary">
-          <strong aria-live="polite">{dateLabel}</strong>
+          {!compact && <strong aria-live="polite">{dateLabel}</strong>}
           <span>
             {displayed.length} {kind === "teachers" ? "Lehrende" : "Räume"}
           </span>
