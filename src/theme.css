@@ -44,26 +44,68 @@
 .theme-picker {
   position: relative;
   display: inline-flex;
-  align-items: center;
   flex-shrink: 0;
-  gap: 6px;
-  color: var(--theme-text-muted, #64778b);
 }
-.theme-picker > svg {
-  position: absolute;
-  left: 10px;
-  pointer-events: none;
-}
-.theme-picker select {
+.theme-trigger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
   height: 36px;
-  min-width: 115px;
-  padding: 0 8px 0 34px;
-  font-size: 13px;
-  background: var(--theme-surface, white);
-  color: var(--theme-text, #24374c);
-  border: 1px solid var(--line);
-  border-radius: 7px;
+  padding: 0;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--theme-text-muted, #64778b);
   cursor: pointer;
+}
+.theme-trigger:hover,
+.theme-trigger[aria-expanded="true"] {
+  background: var(--theme-hover, #eaf1f8);
+  color: var(--theme-accent, #214b76);
+}
+.theme-trigger:focus-visible,
+.theme-menu button:focus-visible {
+  outline: 2px solid var(--theme-accent, #214b76);
+  outline-offset: 2px;
+}
+.theme-menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  z-index: 100;
+  width: 168px;
+  padding: 6px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--theme-surface, white);
+  box-shadow: 0 8px 24px rgb(0 0 0 / 14%);
+}
+.theme-menu button {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  min-height: 36px;
+  padding: 8px 10px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--ink);
+  font-size: 14px;
+  text-align: left;
+  cursor: pointer;
+}
+.theme-menu button span {
+  flex: 1;
+}
+.theme-menu button:hover,
+.theme-menu button:focus-visible {
+  background: var(--theme-hover, #f1f5fa);
+}
+.theme-menu button[aria-checked="true"] {
+  color: var(--theme-accent, #214b76);
+  background: var(--theme-blue-bg, #eaf1f8);
 }
 :root[data-theme="dark"] input::placeholder,
 :root[data-theme="dark"] textarea::placeholder {
@@ -118,19 +160,12 @@
   width: fit-content;
 }
 @media (max-width: 720px) {
-  .theme-picker select {
+  .theme-trigger,
+  .theme-menu button {
     min-height: 44px;
-    min-width: 44px;
+  }
+  .theme-trigger {
     width: 44px;
-    color: transparent;
-    padding: 0;
-  }
-  .theme-picker option {
-    color: var(--theme-text, #24374c);
-  }
-  .theme-picker > svg {
-    left: 13px;
-    z-index: 1;
   }
   .wiki-header .theme-picker {
     margin-left: auto;
