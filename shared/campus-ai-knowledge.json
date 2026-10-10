@@ -306,10 +306,15 @@
       "benutzerkonto",
       "mobile",
       "ki",
-      "freddy"
+      "freddy",
+      "darkmode",
+      "dunkel",
+      "hell",
+      "darstellung",
+      "system"
     ],
     "page": "settings",
-    "answer": "Einstellungen enthalten Einrichtungsdaten, Zeitzone, Unterrichtseinheiten und Prüfungsgrenzen. Die Browser-Demo speichert Änderungen nur im jeweiligen Browser und bietet weder automatische Terminplanung noch Dateiimporte oder ein lokales Sprachmodell. Die lokale Anwendung kann Ollama nutzen; es entstehen dafür keine Modell-API-Kosten. Persönliche Lernendenkonten, eine eigene Handy-App, Fremdsystemanbindungen und automatische Online-Abrechnung sind spätere Erweiterungen. Hosting, kundeneigene Domains und Anmeldesysteme sind kein bereits fertiger Verwaltungsdialog. Freddy erklärt die vorhandenen Funktionen, stellt bei fehlenden Angaben Rückfragen und schlägt nächste Schritte vor. Nur eindeutige Navigationsbefehle werden automatisch ausgeführt; empfohlene Schritte öffnest du über Schaltflächen, Datensätze speicherst du selbst."
+    "answer": "Darstellung: Hell, Dunkel oder System. Die Auswahl wird sofort auf diesem Gerät gespeichert und gilt auch in Wiki und Studierendenübersicht. Einstellungen enthalten Einrichtungsdaten, Zeitzone, Unterrichtseinheiten und Prüfungsgrenzen. Die Browser-Demo speichert Änderungen nur im jeweiligen Browser und bietet weder automatische Terminplanung noch Dateiimporte oder ein lokales Sprachmodell. Die lokale Anwendung kann Ollama nutzen; es entstehen dafür keine Modell-API-Kosten. Persönliche Lernendenkonten, eine eigene Handy-App, Fremdsystemanbindungen und automatische Online-Abrechnung sind spätere Erweiterungen. Hosting, kundeneigene Domains und Anmeldesysteme sind kein bereits fertiger Verwaltungsdialog. Freddy erklärt die vorhandenen Funktionen, stellt bei fehlenden Angaben Rückfragen und schlägt nächste Schritte vor. Nur eindeutige Navigationsbefehle werden automatisch ausgeführt; empfohlene Schritte öffnest du über Schaltflächen, Datensätze speicherst du selbst."
   },
   {
     "id": "freddy",

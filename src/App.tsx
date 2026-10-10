@@ -53,6 +53,7 @@ import StudySetup from "./StudySetup";
 import StudentOverview from "./StudentOverview";
 import AssessmentBoard from "./AssessmentBoard";
 import CampusAI from "./CampusAI";
+import { ThemePicker, ThemeSettings } from "./Theme";
 import { campusActions } from "./campus-ai-actions";
 import { Brand, Login, SessionState, notifyAuthChange } from "./Auth";
 const Wiki = lazy(() => import("./Wiki"));
@@ -1442,6 +1443,7 @@ function Workspace() {
             />
             <kbd>Ctrl K</kbd>
           </div>
+          <ThemePicker />
           <span className="top-avatar">
             {session.user
               .split(" ")
@@ -1926,6 +1928,7 @@ function Workspace() {
                   <p>Gemeinsame Vorgaben für Unterricht und Prüfungen.</p>
                 </div>
               </div>
+              <ThemeSettings />
               <div className="settings-panel">
                 <h2>{session.institution.name}</h2>
                 <div className="form-grid">

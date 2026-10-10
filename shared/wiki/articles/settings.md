@@ -5,6 +5,8 @@ Einstellungen enthalten Einrichtungsdaten, Zeitzone, Unterrichtseinheiten und Pr
 ## Einstellungen prüfen
 Öffne **Einstellungen**. Prüfe Einrichtungsname, Einrichtungsart, Zeitzone und Minuten je Unterrichtseinheit. Die Zeitzone wirkt unter anderem auf Datumswechsel und öffentliche Heute-/Morgen-Anzeigen.
 Verwaltungszugänge können die freigegebenen Einrichtungsangaben ändern. Ein Planungsverantwortlicher erhält nicht automatisch dieselben Einstellungsrechte. Speichere erst nach Kontrolle der Auswirkungen auf Planung und Soll.
+## Darstellung wählen
+Über den Schalter **Darstellung** oben rechts oder den Abschnitt **Darstellung** in den Einstellungen kannst du zwischen **Hell**, **Dunkel** und **System** wählen. System folgt automatisch der Hell-/Dunkel-Einstellung deines Betriebssystems. Die Auswahl wird sofort übernommen und auf diesem Gerät im Browser gespeichert; du musst die Einrichtungseinstellungen dafür nicht speichern. Auch andere geöffnete CampusZeit-Tabs übernehmen die Auswahl, einschließlich Wiki und Studierendenübersicht. Die Darstellung verändert keine Daten oder Einstellungen der Hochschule.
 ## Zugänge und Lizenz
 Der Betreiber stellt Zugänge bereit; es gibt derzeit keine Selbstregistrierung oder integrierte Zahlung. Kundenkonten sind einer Einrichtung zugeordnet. Die Einstellungen zeigen die vorhandene Lizenzlaufzeit.
 Bei abgelaufener Lizenz bleiben lesende Zugriffe und öffentliche Anzeigen verfügbar; schreibende Kundenaktionen sind gesperrt. Wende dich zur Verlängerung an den Betreiber. Ein automatisches Abo- und Zahlungssystem ist noch keine vorhandene Funktion.

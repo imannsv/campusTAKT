@@ -1,0 +1,176 @@
+/* Light values stay in the original rules as fallbacks. Dark values are shared
+   by the application, public schedules and the separately loaded Wiki. */
+:root {
+  color-scheme: light;
+  --text: var(--ink);
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --theme-page: #121a24;
+  --theme-surface: #1b2633;
+  --theme-surface-muted: #202e3d;
+  --theme-hover: #2a3b4f;
+  --theme-selected-hover: #314a64;
+  --theme-border: #3a4a5d;
+  --theme-grid: #2b3949;
+  --theme-text: #e3eaf2;
+  --theme-text-muted: #adbbcd;
+  --theme-accent: #9ec7f0;
+  --theme-blue-bg: #263d56;
+  --theme-green-bg: #203e35;
+  --theme-violet-bg: #382f4b;
+  --theme-amber-bg: #443820;
+  --theme-red-bg: #4a2b34;
+  --theme-blue-text: #b4d3f2;
+  --theme-green-text: #a5dfc5;
+  --theme-violet-text: #d4bdf0;
+  --theme-amber-text: #f0d19a;
+  --theme-red-text: #ffb5be;
+  --theme-blue-border: #7095bd;
+  --theme-green-border: #619a84;
+  --theme-violet-border: #a58cc8;
+  --theme-amber-border: #b99653;
+  --theme-red-border: #cd7c8c;
+  --theme-now-line: #f27076;
+  --ink: var(--theme-text);
+  --muted: var(--theme-text-muted);
+  --line: var(--theme-border);
+  --blue: var(--theme-blue-bg);
+  --mint: var(--theme-green-bg);
+  --violet: var(--theme-violet-bg);
+  --amber: var(--theme-amber-bg);
+  --rose: var(--theme-red-bg);
+}
+.theme-picker {
+  position: relative;
+  display: inline-flex;
+  flex-shrink: 0;
+}
+.theme-trigger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--theme-text-muted, #64778b);
+  cursor: pointer;
+}
+.theme-trigger:hover,
+.theme-trigger[aria-expanded="true"] {
+  background: var(--theme-hover, #eaf1f8);
+  color: var(--theme-accent, #214b76);
+}
+.theme-trigger:focus-visible,
+.theme-menu button:focus-visible {
+  outline: 2px solid var(--theme-accent, #214b76);
+  outline-offset: 2px;
+}
+.theme-menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  z-index: 100;
+  width: 168px;
+  padding: 6px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--theme-surface, white);
+  box-shadow: 0 8px 24px rgb(0 0 0 / 14%);
+}
+.theme-menu button {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  min-height: 36px;
+  padding: 8px 10px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--ink);
+  font-size: 14px;
+  text-align: left;
+  cursor: pointer;
+}
+.theme-menu button span {
+  flex: 1;
+}
+.theme-menu button:hover,
+.theme-menu button:focus-visible {
+  background: var(--theme-hover, #f1f5fa);
+}
+.theme-menu button[aria-checked="true"] {
+  color: var(--theme-accent, #214b76);
+  background: var(--theme-blue-bg, #eaf1f8);
+}
+:root[data-theme="dark"] input::placeholder,
+:root[data-theme="dark"] textarea::placeholder {
+  color: var(--theme-text-muted);
+  opacity: 1;
+}
+.theme-settings {
+  margin-bottom: 20px;
+}
+.theme-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 16px 0;
+}
+.theme-options button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 8px 16px;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  background: var(--theme-surface, white);
+  color: var(--ink);
+}
+.theme-options button:hover {
+  background: var(--theme-hover, #f1f5fa);
+}
+.theme-options button[aria-pressed="true"] {
+  color: var(--theme-accent, #214b76);
+  border-color: var(--theme-blue-border, #81b3e8);
+  background: var(--theme-blue-bg, #eaf1f8);
+}
+.login-form-area {
+  position: relative;
+}
+.login-appearance {
+  position: absolute;
+  right: 24px;
+  top: 24px;
+}
+.topbar .global-search {
+  min-width: 0;
+}
+:root[data-theme="dark"] .brand {
+  /* Keep all four original logo colors and the wordmark on a light plate. */
+  background: white;
+  border-radius: 6px;
+  box-shadow: 0 0 0 6px white;
+  width: fit-content;
+}
+@media (max-width: 720px) {
+  .theme-trigger,
+  .theme-menu button {
+    min-height: 44px;
+  }
+  .theme-trigger {
+    width: 44px;
+  }
+  .wiki-header .theme-picker {
+    margin-left: auto;
+  }
+  .wiki-header .wiki-back {
+    margin-left: 0;
+  }
+}

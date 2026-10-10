@@ -7,6 +7,7 @@ import { campusAIFlow } from "./campus-ai-flow";
 import "./planning-workspace";
 import "./freddy-improvements";
 import "./resource-overviews";
+import "./theme";
 test.use({ actionTimeout: 10000 });
 
 test("Wiki bleibt in der öffentlichen Demo gesperrt, auch über direkte Artikellinks", async ({
@@ -499,6 +500,7 @@ test("Bestehende Browser-Demo wird ohne Verlust von Raumänderungen ergänzt", a
 test("Demo funktioniert ohne Backend, Raumänderungen bleiben im Browser", async ({
   page,
 }) => {
+  await page.clock.install({ time: new Date("2026-10-09T08:00:00Z") });
   const apiRequests: string[] = [];
   page.on("request", (request) => {
     if (new URL(request.url()).pathname.startsWith("/api/"))
