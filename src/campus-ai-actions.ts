@@ -77,6 +77,7 @@ export function pageContext(selection: Row) {
     exams: "Prüfungen",
     displays: "Öffentliche Anzeigen",
     students: "Studierendenübersicht",
+    "student-app": "Studierenden-App",
     settings: "Einstellungen",
   };
   const labels: Row = {
@@ -93,6 +94,7 @@ export function pageContext(selection: Row) {
     exams: ["exams", "add_exam"],
     displays: ["displays", "schedule"],
     students: ["students", "displays"],
+    "student-app": ["student_app", "students"],
     settings: ["settings", "setup"],
     data: ["courses", "blocks"],
   };

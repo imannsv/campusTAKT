@@ -446,3 +446,54 @@ class ImportBatch(models.Model):
     revision = models.PositiveIntegerField()
     created = models.DateTimeField(default=timezone.now)
     committed = models.BooleanField(default=False)
+
+
+class StudentAccess(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    institution = models.ForeignKey(Institution, on_delete=models.CASCADE)
+    group = models.ForeignKey(Group, null=True, blank=True, on_delete=models.PROTECT)
+    cohort = models.ForeignKey(Cohort, null=True, blank=True, on_delete=models.PROTECT)
+    code = models.CharField(max_length=24, unique=True)
+    password_hash = models.CharField(max_length=256)
+    qr_hash = models.CharField(max_length=64)
+    active = models.BooleanField(default=True)
+    created = models.DateTimeField(default=timezone.now)
+
+    @property
+    def is_authenticated(self):
+        return True
+
+    class Meta:
+        constraints = [
+            models.CheckConstraint(
+                condition=(
+                    models.Q(group__isnull=False, cohort__isnull=True)
+                    | models.Q(group__isnull=True, cohort__isnull=False)
+                ),
+                name="student_access_one_scope",
+            )
+        ]
+
+
+class StudentDeviceSession(models.Model):
+    access = models.ForeignKey(StudentAccess, on_delete=models.CASCADE)
+    token_hash = models.CharField(max_length=64, unique=True)
+    expires = models.DateTimeField()
+
+
+class StudentNotice(models.Model):
+    institution = models.ForeignKey(Institution, on_delete=models.CASCADE)
+    group = models.ForeignKey(Group, null=True, blank=True, on_delete=models.PROTECT)
+    cohort = models.ForeignKey(Cohort, null=True, blank=True, on_delete=models.PROTECT)
+    title = models.CharField(max_length=160)
+    body = models.TextField(max_length=5000)
+    active = models.BooleanField(default=True)
+    created = models.DateTimeField(default=timezone.now)
+
+    class Meta:
+        constraints = [
+            models.CheckConstraint(
+                condition=models.Q(group__isnull=True) | models.Q(cohort__isnull=True),
+                name="student_notice_at_most_one_scope",
+            )
+        ]

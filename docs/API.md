@@ -128,6 +128,10 @@ Semesterzuordnung. Bereits übernommene Veranstaltungen können durch den
 Jahrgangsverlauf nicht verschoben werden. Grenzen sind weich; Verletzungen
 der Voraussetzungen, ungültige Zuordnungen und veraltete Stände sind Fehler.
 
+## Studierenden-App
+
+Die separate, ausschließlich lesende App-API und die Verwaltung gemeinsamer Gruppenzugänge stehen in [Studierenden-App / API v1](STUDENT_APP.md#api-v1). Gerätezugänge sind keine Verwaltungskonten.
+
 ## campusAI (intern, nur lesend)
 
 - `GET /api/campusai/status/`: lokaler Modellstatus und expliziter Verfügbarkeitsgrund.

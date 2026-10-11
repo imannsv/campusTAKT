@@ -43,6 +43,7 @@ import {
   SlidersHorizontal,
   X,
   ClipboardList,
+  Smartphone,
 } from "lucide-react";
 import { api, all, Row, Field, labels, fmt, DEMO_MODE } from "./api";
 import { Modal, RecordForm, ImportModal, Relation } from "./components";
@@ -52,6 +53,7 @@ import ResourceOverview from "./ResourceOverview";
 import StudySetup from "./StudySetup";
 import StudentOverview from "./StudentOverview";
 import AssessmentBoard from "./AssessmentBoard";
+import StudentAppAdmin from "./StudentAppAdmin";
 import CampusAI from "./CampusAI";
 import { ThemePicker, ThemeSettings } from "./Theme";
 import { campusActions } from "./campus-ai-actions";
@@ -90,6 +92,12 @@ const nav = [
     id: "students",
     label: "Studierendenübersicht",
     icon: Users,
+    group: "Veröffentlichung",
+  },
+  {
+    id: "student-app",
+    label: "Studierenden-App",
+    icon: Smartphone,
     group: "Veröffentlichung",
   },
 ];
@@ -1928,6 +1936,8 @@ function Workspace() {
               onEdit={edit}
               revision={refresh}
             />
+          ) : page === "student-app" ? (
+            <StudentAppAdmin data={data} />
           ) : page === "students" ? (
             <>
               <div className="page-actions">

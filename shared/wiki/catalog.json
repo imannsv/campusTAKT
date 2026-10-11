@@ -565,6 +565,31 @@
     ]
   },
   {
+    "id": "student-app",
+    "title": "Studierenden-App und Gruppenzugänge",
+    "section": "Verwaltung und Hilfe",
+    "parentId": "accounts",
+    "page": "student-app",
+    "keywords": [
+      "app",
+      "iphone",
+      "qr",
+      "gruppenzugang",
+      "zugangscode",
+      "mitteilung"
+    ],
+    "summary": "Öffne Studierenden-App. Erstelle einen Zugang für eine Gruppe oder einen Jahrgang und gib die erreichbare HTTPS-Serveradresse an. Speichere den einmalig angezeigten QR-Code oder kopiere die Zugangsdaten und teile sie ausschließlich mit dieser Zielgruppe. Die App zeigt freigegebene Stundenpläne, Prüfungen und veröffentlichte Mitteilungen. Sperren beendet alle verbundenen Gerätesitzungen. Die iPhone-App benötigt vor dem ersten Gerätetest noch den iOS-Build und die Signierung; Android folgt später.",
+    "updatedAt": "2026-10-11",
+    "related": [
+      "students",
+      "publication",
+      "accounts"
+    ],
+    "images": [
+      "student-app.png"
+    ]
+  },
+  {
     "id": "troubleshooting",
     "title": "Probleme beheben",
     "section": "Verwaltung und Hilfe",

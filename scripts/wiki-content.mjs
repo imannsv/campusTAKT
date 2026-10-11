@@ -17,6 +17,7 @@ const guidePages = new Set([
   "displays",
   "overview",
   "students",
+  "student-app",
   "settings",
 ]);
 const images = new Set();

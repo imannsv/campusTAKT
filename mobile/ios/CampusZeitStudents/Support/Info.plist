@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0"><dict>
+  <key>CFBundleDisplayName</key><string>CampusZeit</string>
+  <key>CFBundleDevelopmentRegion</key><string>de</string>
+  <key>NSCameraUsageDescription</key><string>Scanne den QR-Code deiner Verwaltung, um deinen Gruppenstundenplan zu öffnen.</string>
+  <key>NSLocalNetworkUsageDescription</key><string>Verbinde dich beim lokalen Test mit dem CampusZeit-Server im selben Netzwerk.</string>
+  <key>NSAppTransportSecurity</key><dict><key>NSAllowsLocalNetworking</key><true/></dict>
+</dict></plist>

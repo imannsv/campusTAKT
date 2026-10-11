@@ -1,0 +1,4 @@
+version: 1
+bundleID: de.campuszeit.students
+infoPath: Support/Info.plist
+iconPath: Support/Icon.png

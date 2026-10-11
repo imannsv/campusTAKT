@@ -87,6 +87,7 @@ def proactive_context(context, selection):
         "exams": "Prüfungen",
         "displays": "Öffentliche Anzeigen",
         "students": "Studierendenübersicht",
+        "student-app": "Studierenden-App",
         "settings": "Einstellungen",
     }
     steps = [
@@ -104,6 +105,7 @@ def proactive_context(context, selection):
         "exams": ["exams", "add_exam"],
         "displays": ["displays", "schedule"],
         "students": ["students", "displays"],
+        "student-app": ["student_app", "students"],
         "settings": ["settings", "setup"],
         "data": ["courses", "blocks"],
     }

@@ -198,6 +198,18 @@
     "guides": ["periods"]
   },
   {
+    "id": "student_app",
+    "label": "Studierenden-App öffnen",
+    "page": "student-app",
+    "targets": [
+      "studierenden app",
+      "studenten app",
+      "gruppenzugänge",
+      "app zugänge"
+    ],
+    "guides": ["student-app"]
+  },
+  {
     "id": "teacher_overview",
     "label": "Lehrendenübersicht öffnen",
     "page": "teachers",

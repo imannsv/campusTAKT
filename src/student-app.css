@@ -1,0 +1,98 @@
+.student-app-admin {
+  display: grid;
+  gap: 24px;
+}
+.student-app-admin > .resource-description {
+  margin: -12px 0 0;
+}
+.student-admin-section {
+  border: 1px solid var(--line);
+  background: var(--theme-surface, white);
+  border-radius: 12px;
+  padding: 24px;
+}
+.student-admin-section h2 {
+  font-size: 20px;
+  margin: 0;
+}
+.student-admin-section .page-actions {
+  justify-content: space-between;
+}
+.student-admin-section p {
+  color: var(--muted);
+}
+.student-admin-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 16px 0;
+  border-top: 1px solid var(--line);
+}
+.student-admin-row > div {
+  min-width: 0;
+}
+.student-admin-row > button {
+  flex-shrink: 0;
+}
+.student-admin-row p {
+  margin: 8px 0 0;
+  overflow-wrap: anywhere;
+}
+.student-notice-body {
+  white-space: pre-wrap;
+}
+.student-app-form {
+  display: grid;
+  gap: 20px;
+  padding: 24px;
+}
+.student-app-form label {
+  display: grid;
+  gap: 8px;
+}
+.student-app-form input,
+.student-app-form select,
+.student-app-form textarea {
+  width: 100%;
+}
+.student-app-form p {
+  margin: 0;
+  color: var(--muted);
+}
+.student-app-form dl {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 12px;
+  margin: 0;
+}
+.student-app-form dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+.student-access-qr {
+  width: 240px;
+  max-width: 100%;
+  justify-self: center;
+  background: white;
+}
+.student-app-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 12px;
+}
+@media (max-width: 767px) {
+  .student-admin-section,
+  .student-app-form {
+    padding: 16px;
+  }
+  .student-admin-row {
+    align-items: start;
+    flex-direction: column;
+  }
+  .student-app-form dl {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+}

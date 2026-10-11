@@ -1,0 +1,70 @@
+# Studierenden-App
+
+Native iPhone-App unter `mobile/ios/CampusZeitStudents`, angelegt mit Xtool 1.21.0. Mindestversion iOS 17. Die App ist ausschließlich lesend; Stundenplan, Prüfungstermine und Mitteilungen kommen aus der eigenen CampusZeit-Instanz. Android folgt nach dem iPhone-Gerätetest und kann dieselbe API verwenden.
+
+## Verwaltung und Backend
+
+1. Python-Abhängigkeiten installieren: `.venv/Scripts/python.exe -m pip install -r requirements.txt`.
+2. Additive Migration anwenden: `.venv/Scripts/python.exe backend/manage.py migrate`.
+3. Verwaltung öffnen und unter **Veröffentlichung → Studierenden-App** einen Zugang für eine Gruppe oder einen Jahrgang erstellen.
+4. Die von Geräten erreichbare Serveradresse angeben. QR-Code speichern oder Zugangsdaten kopieren; sie werden nur bei Erstellung ausgegeben. Für einen Ersatz alten Zugang sperren und neuen erstellen.
+5. Erst veröffentlichte Pläne werden ausgeliefert. Mitteilungen werden hier gesondert erstellt und veröffentlicht.
+
+Die Migration fügt ausschließlich Tabellen für Zugänge, Gerätesitzungen und Mitteilungen hinzu. Vorhandene Planungsdaten werden nicht verändert. Der neue Menüpunkt ist in der statischen Browser-Demo sichtbar, aber die Zugangsverwaltung dort deaktiviert.
+
+## Xtool unter WSL
+
+Grundlage: [offizielle Installation](https://xtool.sh/documentation/xtool/installation-linux/) und [erstes Projekt](https://xtool.sh/tutorials/xtool/first-app/). Apple-Zugangsdaten ausschließlich interaktiv in Xtool eingeben, niemals ins Repository oder in den Chat.
+
+```bash
+cd /mnt/c/Users/imann/Documents/Codex/2026-10-03/wir-planen-jetzt-gemeinsam-eine-plattform/mobile/ios/CampusZeitStudents
+. /home/imann/.local/share/swiftly/env.sh
+swift --version
+xtool sdk status
+xtool sdk install /vollstaendiger/pfad/Xcode.xip
+xtool dev build -c release --ipa
+```
+
+Ein Linux-Swift-Compiler ersetzt das Apple-SDK nicht. Die aktuell eingerichtete Ubuntu-26.04-Umgebung nutzt Swift 6.4.0 für Ubuntu 24.04; für lokale Swift-Tests wurden kompatible Bibliotheken separat unter `/home/imann/.local/share/campuszeit-swift-libs` extrahiert. Dort zusätzlich:
+
+```bash
+export LD_LIBRARY_PATH=/home/imann/.local/share/campuszeit-swift-libs/usr/lib/x86_64-linux-gnu
+swift test
+```
+
+Für andere Rechner eine von Swift unterstützte Linux-Version gemäß offizieller Anleitung verwenden. `swift test` prüft den plattformunabhängigen API-Client, QR-Parser und Datumslogik. UIKit-/SwiftUI-Dateien werden ausschließlich im iOS-Build kompiliert.
+
+Für Installation auf einem iPhone sind die interaktive Xtool-Anmeldung/Signierung und die Geräteverbindung erforderlich. Danach aus dem Projektverzeichnis `xtool dev run` ausführen. Die Bundle-ID ist `de.campuszeit.students`; ihre Verfügbarkeit muss bei der Apple-Provisionierung bestätigt werden. Es wurde noch keine App-Store-Veröffentlichung eingerichtet.
+
+## Lokaler Gerätetest
+
+- Server und iPhone ins gleiche Netzwerk bringen. `127.0.0.1` im QR-Code zeigt auf das iPhone, nicht auf diesen PC.
+- Django für die Netzwerkadresse starten und diese in `ALLOWED_HOSTS` aufnehmen. Verwaltung und API müssen unter der eingetragenen Adresse erreichbar sein.
+- HTTP ist in der App nur für private IPv4-Adressen, `localhost` oder `.local` zugelassen; öffentlich HTTPS nutzen. Keine globale Abschaltung von App Transport Security.
+- Kamerazugriff, QR-Anmeldung, manuelle Anmeldung, Neustart mit Keychain-Sitzung, Abmeldung, Serverausfall und Sperren des Zugangs auf einem echten iPhone prüfen.
+- Für den Ersttest eine fiktive Einrichtung verwenden. Die Beispielbilder stammen aus einer separaten Testdatenbank.
+
+## API v1
+
+| Endpunkt | Zugriff | Zweck |
+|---|---|---|
+| `POST /api/student-app/v1/login/` | Ohne Verwaltungskonto | `{code,password}` oder `{access,key}` aus dem QR-Code; liefert Gerätesitzung und Einrichtung/Zielgruppe |
+| `GET /api/student-app/v1/feed/?start=2026-10-01&end=2026-11-01` | `Authorization: Bearer <token>` | Freigegebene Termine, Absagen und aktive Mitteilungen; `end` exklusiv, maximal 180 Tage |
+| `POST /api/student-app/v1/logout/` | Bearer | Eigene Gerätesitzung beenden |
+| `GET/POST /api/student-app/accesses/` | Verwaltungssitzung + CSRF beim POST | Zugänge auflisten/anlegen; POST mit `server` und genau einer `group` oder `cohort` |
+| `POST /api/student-app/accesses/<uuid>/disable/` | Verwaltung + CSRF | Zugang sperren, alle Gerätesitzungen widerrufen |
+| `GET/POST /api/student-app/notices/` | Verwaltung + CSRF beim POST | Mitteilungen verwalten; POST `{title,body,group?}` oder `{title,body,cohort?}`, ohne Zielgruppe für alle |
+| `POST /api/student-app/notices/<id>/withdraw/` | Verwaltung + CSRF | Veröffentlichung zurückziehen |
+
+Der QR-Code enthält JSON `{version:1,server,access,key}`. Die App bestätigt die Serveradresse vor Verbindung. QR-Schlüssel und Gerätetoken sind zufällig und nur als SHA-256-Hash gespeichert; Passwörter mit Djangos Passwort-Hasher. Gerätezugänge erlauben keine Verwaltungs-API und laufen nach 90 Tagen ab. Institution, Gruppe und Jahrgang werden serverseitig bestimmt; Clientfilter können den Zugriff nicht erweitern. Drittanbieter-Weiterleitungen erhalten keine Zugangsdaten.
+
+Die App aktualisiert im Vordergrund alle 60 Sekunden, bei Aktivierung und per Herunterziehen. Ein vorhandener Datenstand bleibt bei Verbindungsfehlern sichtbar; kein dauerhafter Offline-Cache. Mitteilungen sind In-App-Mitteilungen, keine Push-Nachrichten. Ohne Einzelkonten ist keine individuelle Wahlpflichtbelegung oder persönliche Prüfungszulassung möglich.
+
+## Prüfungen
+
+```powershell
+.venv/Scripts/python.exe backend/manage.py test planner.test_student_app planner.test_overview --noinput
+npm run test:wiki -- tests/student-app.spec.ts
+```
+
+Optional kann `STUDENT_APP_FIXTURE` für den Swift-Integrationstest auf eine ausschließlich lokale JSON-Datei mit `server`, `code` und `password` aus der wegwerfbaren Testeinrichtung zeigen. Keine echten Kundenzugänge dafür verwenden und die Datei nicht committen.

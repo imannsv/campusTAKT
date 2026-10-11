@@ -344,6 +344,20 @@
     "answer": "Dein Zugang wird von der Einrichtung bzw. dem Betreiber bereitgestellt. Melde dich mit Benutzername und Passwort an. Teile ein Verwaltungskonto nicht mit Lernenden; öffentliche Anzeigen und Studierendenübersichten haben ihre eigenen Links."
   },
   {
+    "id": "student-app",
+    "title": "Studierenden-App und Gruppenzugänge",
+    "keywords": [
+      "app",
+      "iphone",
+      "qr",
+      "gruppenzugang",
+      "zugangscode",
+      "mitteilung"
+    ],
+    "page": "student-app",
+    "answer": "Öffne Studierenden-App. Erstelle einen Zugang für eine Gruppe oder einen Jahrgang und gib die erreichbare HTTPS-Serveradresse an. Speichere den einmalig angezeigten QR-Code oder kopiere die Zugangsdaten und teile sie ausschließlich mit dieser Zielgruppe. Die App zeigt freigegebene Stundenpläne, Prüfungen und veröffentlichte Mitteilungen. Sperren beendet alle verbundenen Gerätesitzungen. Die iPhone-App benötigt vor dem ersten Gerätetest noch den iOS-Build und die Signierung; Android folgt später."
+  },
+  {
     "id": "troubleshooting",
     "title": "Probleme beheben",
     "keywords": [

@@ -29,6 +29,7 @@ class Selection(serializers.Serializer):
             "exams",
             "map",
             "students",
+            "student-app",
             "displays",
             "settings",
         ],

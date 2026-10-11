@@ -116,6 +116,7 @@ def help_for(question, history=None, context=None):
             "schedule": "schedule",
             "teachers": "teachers",
             "students": "display",
+            "student-app": "student-app",
             "displays": "display",
             "settings": "settings",
         }.get(page, "setup")
