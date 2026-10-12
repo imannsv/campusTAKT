@@ -99,7 +99,9 @@
   struct ContentView: View {
     @StateObject private var store = StudentStore()
     @Environment(\.scenePhase) private var scenePhase
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var account = false
+    @State private var appeared = false
     private let blue = Color(red: 33 / 255, green: 75 / 255, blue: 118 / 255)
 
     var body: some View {
@@ -112,6 +114,15 @@
           }
         } else {
           StudentLogin(store: store)
+        }
+      }
+      .opacity(appeared ? 1 : 0)
+      .offset(y: appeared || reduceMotion ? 0 : 10)
+      .onAppear {
+        if reduceMotion {
+          appeared = true
+        } else {
+          withAnimation(.easeOut(duration: 0.35)) { appeared = true }
         }
       }
       .tint(blue)

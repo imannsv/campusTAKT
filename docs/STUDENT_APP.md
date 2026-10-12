@@ -2,9 +2,11 @@
 
 Native iPhone-App unter `mobile/ios/CampusZeitStudents`, angelegt mit Xtool 1.21.0. Mindestversion iOS 17. Die App ist ausschließlich lesend; Stundenplan, Prüfungstermine und Mitteilungen kommen aus der eigenen CampusZeit-Instanz. Android folgt nach dem iPhone-Gerätetest und kann dieselbe API verwenden.
 
-Stand 12.10.2026: Der native Release-Build mit dem iPhoneOS-27.1-SDK aus `Xcode_27.1_Release_Candidate.xip` besteht ohne Compilerwarnungen. Xtool erzeugt die IPA unter `mobile/ios/CampusZeitStudents/xtool/CampusZeitStudents.ipa`. Paketintegrität, arm64-Executable, Mindestversion iOS 17, Kamera-Hinweis und unverändertes Logo wurden geprüft. Die lokale Testfassung ist inzwischen signiert; Signaturdateien, passendes eingebettetes Profil und dessen Gültigkeit wurden geprüft. Das Testprofil gilt bis 19.10.2026. Installation und Gerätetest stehen noch aus: Die direkte USB-Weiterleitung unter WSL scheitert am unten beschriebenen Paketgrößenfehler.
+Stand 12.10.2026: Der native Release-Build mit dem iPhoneOS-27.1-SDK aus `Xcode_27.1_Release_Candidate.xip` besteht ohne Compilerwarnungen. Xtool erzeugt die IPA unter `mobile/ios/CampusZeitStudents/xtool/CampusZeitStudents.ipa`. Paketintegrität, arm64-Executable, Mindestversion iOS 17, Kamera-Hinweis und unverändertes Logo wurden geprüft. Die lokale Testfassung ist inzwischen signiert; Signaturdateien, passendes eingebettetes Profil und dessen Gültigkeit wurden geprüft. Das Testprofil gilt bis 19.10.2026. Die Installation über Apples Windows-Geräteverbindung bestand einschließlich iOS-Verifizierung; der Anmeldebildschirm wurde auf dem iPhone geöffnet. QR-Anmeldung, Keychain-Sitzung und der vollständige Gerätetest stehen noch aus. Die direkte USB-Weiterleitung unter WSL scheitert weiterhin am unten beschriebenen Paketgrößenfehler.
 
 ## Verwaltung und Backend
+
+Die Anmeldung startet mit dem unveränderten Logo und „QR-Code scannen“. „Mit Zugangsdaten anmelden“ öffnet das getrennte Formular. Der Kamerabereich zeigt einen Scanrahmen und einen kurzen Hinweis; die Serverbestätigung bleibt vor der QR-Anmeldung erhalten. Beim App-Start wird der Inhalt kurz eingeblendet, ohne zusätzliche Wartezeit. Mit aktivierter iPhone-Einstellung „Bewegung reduzieren“ entfällt die Animation.
 
 1. Python-Abhängigkeiten installieren: `.venv/Scripts/python.exe -m pip install -r requirements.txt`.
 2. Additive Migration anwenden: `.venv/Scripts/python.exe backend/manage.py migrate`.
@@ -55,7 +57,7 @@ Unter Windows benötigt Xtool eine Verbindung zwischen WSL und dem iPhone. `usbi
 3. Apples lokalen Geräteanschluss auf Port 27015 ausschließlich für die WSL-Adresse weiterleiten. Dafür sind Windows-Administratorrechte nötig. Keine allgemeine Firewallfreigabe für alle Netzwerke einrichten.
 4. In WSL `USBMUXD_SOCKET_ADDRESS` auf die Windows-Hostadresse mit Port 27015 setzen und zunächst `ideviceinfo -k DeviceName` prüfen. Erst nach erfolgreicher Geräteabfrage Xtool installieren lassen.
 
-Die Weiterleitung wurde vorbereitet, aber noch nicht aktiviert: Apples Windows-Geräteanschluss muss zuerst verfügbar sein. Zertifikate, private Schlüssel, Geräteseriennummern und signierte Pakete bleiben außerhalb des Git-Repositories.
+Die auf die lokale Ubuntu-Adresse begrenzte Weiterleitung ist eingerichtet und wurde durch Geräteabfrage und erfolgreiche Installation geprüft. Das automatische Starten über Xtool meldet noch einen Debugserver-Fehler; die App lässt sich auf dem iPhone manuell öffnen. Zertifikate, private Schlüssel, Geräteseriennummern und signierte Pakete bleiben außerhalb des Git-Repositories.
 
 ## Lokaler Gerätetest
 

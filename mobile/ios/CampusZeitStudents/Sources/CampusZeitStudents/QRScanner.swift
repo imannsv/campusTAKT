@@ -27,6 +27,25 @@
     override func viewDidLoad() {
       super.viewDidLoad()
       view.backgroundColor = .black
+      let guide = UIView()
+      guide.isUserInteractionEnabled = false
+      guide.layer.borderColor = UIColor.white.cgColor
+      guide.layer.borderWidth = 2
+      guide.layer.cornerRadius = 20
+      guide.translatesAutoresizingMaskIntoConstraints = false
+      view.addSubview(guide)
+      let hint = UILabel()
+      hint.text = "QR-Code im Rahmen positionieren"
+      hint.font = .preferredFont(forTextStyle: .body)
+      hint.adjustsFontForContentSizeCategory = true
+      hint.textColor = .white
+      hint.numberOfLines = 0
+      hint.textAlignment = .center
+      hint.backgroundColor = UIColor.black.withAlphaComponent(0.65)
+      hint.layer.cornerRadius = 12
+      hint.clipsToBounds = true
+      hint.translatesAutoresizingMaskIntoConstraints = false
+      view.addSubview(hint)
       let close = UIButton(type: .system)
       close.setTitle("Abbrechen", for: .normal)
       close.tintColor = .white
@@ -35,7 +54,22 @@
       close.translatesAutoresizingMaskIntoConstraints = false
       close.addTarget(self, action: #selector(cancel), for: .touchUpInside)
       view.addSubview(close)
+      let guideWidth = guide.widthAnchor.constraint(
+        equalTo: view.safeAreaLayoutGuide.widthAnchor, multiplier: 0.65)
+      guideWidth.priority = .defaultHigh
       NSLayoutConstraint.activate([
+        guide.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+        guide.centerYAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerYAnchor),
+        guideWidth,
+        guide.widthAnchor.constraint(
+          lessThanOrEqualTo: view.safeAreaLayoutGuide.heightAnchor, multiplier: 0.45),
+        guide.heightAnchor.constraint(equalTo: guide.widthAnchor),
+        hint.topAnchor.constraint(equalTo: guide.bottomAnchor, constant: 24),
+        hint.leadingAnchor.constraint(
+          equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 24),
+        hint.trailingAnchor.constraint(
+          equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -24),
+        hint.heightAnchor.constraint(greaterThanOrEqualToConstant: 52),
         close.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 16),
         close.trailingAnchor.constraint(
           equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -16),
