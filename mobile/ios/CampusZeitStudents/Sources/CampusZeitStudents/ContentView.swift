@@ -225,7 +225,7 @@
       NavigationStack {
         List {
           Section { header }
-          if let feed = store.feed {
+          if store.feed != nil {
             let today = store.calendar.startOfDay(for: Date())
             let events = store.examRows.filter { $0.end >= today }
             Section("Freigegebene Prüfungstermine") {

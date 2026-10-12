@@ -16,7 +16,7 @@ Für einen lokalen Test müssen Server und iPhone im selben Netzwerk sein. **loc
 
 Öffne die installierte CampusZeit-App und wähle **QR-Code scannen**. Erlaube den Kamerazugriff, scanne den bereitgestellten Code und bestätige die angezeigte Serveradresse. Alternativ gib Serveradresse, Zugangscode und Passwort ein. Ein QR-Code ist ein Zugangsschlüssel; veröffentliche ihn nicht außerhalb der Zielgruppe.
 
-Die erste Version ist als native iPhone-App mit Xtool angelegt. Vor einem Gerätetest müssen das Apple-SDK, der iOS-Build und die Signierung abgeschlossen sein. Android ist der anschließende Schritt. Die Browser-Demo kann keine echten App-Zugänge bereitstellen.
+Die erste Version ist als native iPhone-App mit Xtool gebaut. Der unsignierte Release-Build besteht. Vor einem Gerätetest muss die App noch mit einem Apple-Zugang signiert und auf einem verbundenen iPhone installiert werden. Android ist der anschließende Schritt. Die Browser-Demo kann keine echten App-Zugänge bereitstellen.
 
 ## Was Studierende sehen
 

@@ -2,6 +2,8 @@
 
 Native iPhone-App unter `mobile/ios/CampusZeitStudents`, angelegt mit Xtool 1.21.0. Mindestversion iOS 17. Die App ist ausschließlich lesend; Stundenplan, Prüfungstermine und Mitteilungen kommen aus der eigenen CampusZeit-Instanz. Android folgt nach dem iPhone-Gerätetest und kann dieselbe API verwenden.
 
+Stand 12.10.2026: Der native Release-Build mit dem iPhoneOS-27.1-SDK aus `Xcode_27.1_Release_Candidate.xip` besteht ohne Compilerwarnungen. Xtool erzeugt die unsignierte IPA unter `mobile/ios/CampusZeitStudents/xtool/CampusZeitStudents.ipa`. Paketintegrität, arm64-Executable, Mindestversion iOS 17, Kamera-Hinweis und unverändertes Logo wurden geprüft. Die IPA benötigt vor der Installation noch die Apple-Signierung; ein Gerätetest steht aus.
+
 ## Verwaltung und Backend
 
 1. Python-Abhängigkeiten installieren: `.venv/Scripts/python.exe -m pip install -r requirements.txt`.
@@ -35,6 +37,14 @@ swift test
 Für andere Rechner eine von Swift unterstützte Linux-Version gemäß offizieller Anleitung verwenden. `swift test` prüft den plattformunabhängigen API-Client, QR-Parser und Datumslogik. UIKit-/SwiftUI-Dateien werden ausschließlich im iOS-Build kompiliert.
 
 Für Installation auf einem iPhone sind die interaktive Xtool-Anmeldung/Signierung und die Geräteverbindung erforderlich. Danach aus dem Projektverzeichnis `xtool dev run` ausführen. Die Bundle-ID ist `de.campuszeit.students`; ihre Verfügbarkeit muss bei der Apple-Provisionierung bestätigt werden. Es wurde noch keine App-Store-Veröffentlichung eingerichtet.
+
+```bash
+xtool auth login
+xtool devices --usb --no-wait
+xtool dev run
+```
+
+Die Apple-Anmeldung erfolgt interaktiv im Terminal. Kein Apple-Passwort in den Chat eingeben. Stand dieser Prüfung ist Xtool abgemeldet und erkennt kein angeschlossenes USB-iPhone. Die bestehende unsignierte IPA allein kann deshalb noch nicht installiert werden.
 
 ## Lokaler Gerätetest
 

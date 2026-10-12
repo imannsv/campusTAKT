@@ -127,7 +127,7 @@ Die Zuordnung zu `imannsv/campusTIME`, `imanabi/campustime` und Supabase sowie d
 
 ## Grenzen der ersten Version
 
-- Die native Studierenden-App für iPhones und ihre Gruppenzugänge sind unter [Studierenden-App](docs/STUDENT_APP.md) beschrieben. Ein installierbarer iOS-Build und der Gerätetest benötigen das Apple-SDK und Signierung; Android folgt anschließend.
+- Die native Studierenden-App für iPhones und ihre Gruppenzugänge sind unter [Studierenden-App](docs/STUDENT_APP.md) beschrieben. Der unsignierte iOS-Release-Build besteht; Installation und Gerätetest benötigen noch Apple-Signierung und ein verbundenes iPhone. Android folgt anschließend.
 - Konkrete Fremdsystemanbindungen, individuelle Lernendenzugänge mit persönlichen Belegungen, Regelbaukasten und automatische Online-Abrechnung sind spätere Erweiterungen.
 - Die Automatik besitzt ein zehnminütiges Standardbudget und eine Begrenzung auf 500.000 mögliche Startpositionen. Größere Aufgaben müssen in Teilbereiche aufgeteilt werden. Die Oberfläche zeigt Arbeitsstatus statt eines erfundenen Fortschrittsprozentsatzes.
 - Fehlerberichte benennen Eingabefehler, Konflikte und offensichtlich fehlende Ressourcen. Bei komplexer Unlösbarkeit gibt es noch keine minimale mathematische Konfliktursache.

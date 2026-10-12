@@ -578,8 +578,8 @@
       "zugangscode",
       "mitteilung"
     ],
-    "summary": "Öffne Studierenden-App. Erstelle einen Zugang für eine Gruppe oder einen Jahrgang und gib die erreichbare HTTPS-Serveradresse an. Speichere den einmalig angezeigten QR-Code oder kopiere die Zugangsdaten und teile sie ausschließlich mit dieser Zielgruppe. Die App zeigt freigegebene Stundenpläne, Prüfungen und veröffentlichte Mitteilungen. Sperren beendet alle verbundenen Gerätesitzungen. Die iPhone-App benötigt vor dem ersten Gerätetest noch den iOS-Build und die Signierung; Android folgt später.",
-    "updatedAt": "2026-10-11",
+    "summary": "Öffne Studierenden-App. Erstelle einen Zugang für eine Gruppe oder einen Jahrgang und gib die erreichbare HTTPS-Serveradresse an. Speichere den einmalig angezeigten QR-Code oder kopiere die Zugangsdaten und teile sie ausschließlich mit dieser Zielgruppe. Die App zeigt freigegebene Stundenpläne, Prüfungen und veröffentlichte Mitteilungen. Sperren beendet alle verbundenen Gerätesitzungen. Der unsignierte iPhone-Release-Build besteht; vor dem Gerätetest fehlen noch Apple-Signierung und Installation. Android folgt später.",
+    "updatedAt": "2026-10-12",
     "related": [
       "students",
       "publication",
