@@ -130,7 +130,7 @@ final class StudentCoreTests: XCTestCase {
     }
   }
 
-  func testDaySwipeDirectionIgnoresVerticalScrollingAndSmallDrags() {
+  func testWeekSwipeDirectionIgnoresVerticalScrollingAndSmallDrags() {
     XCTAssertEqual(scheduleSwipeStep(horizontal: -130, vertical: 20), 1)
     XCTAssertEqual(scheduleSwipeStep(horizontal: 130, vertical: -20), -1)
     XCTAssertEqual(scheduleSwipeStep(horizontal: 40, vertical: 0), 0)
@@ -139,10 +139,50 @@ final class StudentCoreTests: XCTestCase {
     let calendar = institutionCalendar("Europe/Berlin")
     let sunday = calendar.date(from: DateComponents(year: 2026, month: 10, day: 25, hour: 12))!
     let next = calendar.date(byAdding: .day,
-      value: scheduleSwipeStep(horizontal: -130, vertical: 0), to: sunday)!
-    XCTAssertEqual(calendar.component(.day, from: next), 26)
+      value: scheduleSwipeStep(horizontal: -130, vertical: 0) * 7, to: sunday)!
+    XCTAssertEqual(calendar.component(.day, from: next), 1)
     XCTAssertEqual(calendar.component(.hour, from: next), 12)
     XCTAssertNotEqual(calendar.dateInterval(of: .weekOfYear, for: sunday)?.start,
       calendar.dateInterval(of: .weekOfYear, for: next)?.start)
   }
+  func testWholeWeekHasSixDaysAndCommonTimeBounds() {
+    let calendar = institutionCalendar("Europe/Berlin")
+    let monday = calendar.date(from: DateComponents(year: 2026, month: 10, day: 12))!
+    let sunday = calendar.date(byAdding: .day, value: 6, to: monday)!
+    let hidden = StudentEvent(id: "sun", name: "Sonntag", start: sunday.addingTimeInterval(36000),
+      end: sunday.addingTimeInterval(39600), kind: "teaching", cancelled: false,
+      roomNames: [], groupNames: [], teacherNames: [])
+    let week = ScheduleWeek(events: [hidden], date: sunday,
+      now: monday.addingTimeInterval(19 * 3600 + 18 * 60), calendar: calendar)
+    XCTAssertEqual(week.days.count, 6)
+    XCTAssertEqual(calendar.component(.weekday, from: week.days.first!), 2)
+    XCTAssertEqual(calendar.component(.weekday, from: week.days.last!), 7)
+    XCTAssertTrue(week.placements.allSatisfy { $0.isEmpty })
+    XCTAssertEqual(week.startHour, 8)
+    XCTAssertEqual(week.endHour, 20)
+    XCTAssertEqual(scheduleShortTitle("Management von Projekten"), "MVP")
+    XCTAssertEqual(scheduleShortTitle("C++"), "C++")
+  }
+
+  func testCompactWeekHitTestingSelectsAdjacentAndParallelEvents() {
+    let calendar = institutionCalendar("Europe/Berlin")
+    let day = calendar.date(from: DateComponents(year: 2026, month: 10, day: 12))!
+    func event(_ id: String, _ start: Double, _ end: Double) -> StudentEvent {
+      StudentEvent(id: id, name: id, start: day.addingTimeInterval(start * 3600),
+        end: day.addingTimeInterval(end * 3600), kind: "teaching", cancelled: false,
+        roomNames: [], groupNames: [], teacherNames: [])
+    }
+    let rows = schedulePlacements([event("short", 8, 8.25), event("next", 8.25, 8.5),
+      event("left", 9, 10), event("right", 9, 10)], day: day, calendar: calendar)
+    func hit(_ hour: Double, _ x: Double) -> String? {
+      scheduleHit(rows, time: day.addingTimeInterval(hour * 3600), laneFraction: x,
+        tolerance: 15 * 60)?.id
+    }
+    XCTAssertEqual(hit(8.1, 0.5), "short")
+    XCTAssertEqual(hit(8.25, 0.5), "next")
+    XCTAssertEqual(hit(9.5, 0.25), "left")
+    XCTAssertEqual(hit(9.5, 0.75), "right")
+    XCTAssertNil(hit(12, 0.5))
+  }
+
 }

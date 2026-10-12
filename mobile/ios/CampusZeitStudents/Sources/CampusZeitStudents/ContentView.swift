@@ -108,10 +108,8 @@
     @State private var account = false
     @State private var appeared = false
     @State private var selectedEvent: StudentEvent?
-    @State private var focusNow = 0
-    @State private var weekView = false
+    @State private var daySummary: ScheduleDaySummary?
     @State private var calendarOpen = false
-    @ScaledMetric(relativeTo: .subheadline) private var dayWidth: CGFloat = 44
 
     var body: some View {
       Group {
@@ -180,11 +178,33 @@
             }
         }
       }
+      .sheet(item: $daySummary) { summary in
+        NavigationStack {
+          List {
+            if summary.events.isEmpty {
+              Text("Keine Veranstaltungen an diesem Tag").foregroundStyle(.secondary)
+            }
+            ForEach(summary.events) { event in
+              NavigationLink {
+                EventDetails(event: event)
+              } label: {
+                EventRow(event: event)
+              }
+            }
+          }.navigationTitle(
+            displayDate(summary.date, template: "EEEE, dd. MMM", zone: store.calendar.timeZone)
+          )
+          .navigationBarTitleDisplayMode(.inline)
+          .toolbar {
+            ToolbarItem(placement: .confirmationAction) { Button("Fertig") { daySummary = nil } }
+          }
+        }
+      }
       .onChange(of: store.credential?.login.token) { _, _ in
         selectedEvent = nil
         account = false
         calendarOpen = false
-        weekView = false
+        daySummary = nil
       }
       .task(id: store.credential?.login.token) {
         guard store.credential != nil else { return }
@@ -242,20 +262,17 @@
       if let url = Bundle.module.url(forResource: "Mark", withExtension: "png"),
         let mark = UIImage(contentsOfFile: url.path)
       {
-        Image(uiImage: mark).resizable().scaledToFit().frame(width: 60, height: 60)
+        Image(uiImage: mark).resizable().scaledToFit().frame(width: 52, height: 52)
           .frame(width: 44, height: 44).clipped().accessibilityLabel("CampusZeit")
       }
     }
     private var dateCaption: String {
       let calendar = store.calendar
-      if !weekView {
-        return displayDate(store.selectedDate, template: "dd. MMM yyyy", zone: calendar.timeZone)
-      }
       let monday = calendar.dateInterval(of: .weekOfYear, for: store.selectedDate)!.start
-      let sunday = calendar.date(byAdding: .day, value: 6, to: monday)!
-      let sameMonth = calendar.isDate(monday, equalTo: sunday, toGranularity: .month)
+      let saturday = calendar.date(byAdding: .day, value: 5, to: monday)!
+      let sameMonth = calendar.isDate(monday, equalTo: saturday, toGranularity: .month)
       return displayDate(monday, template: sameMonth ? "dd." : "dd. MMM", zone: calendar.timeZone)
-        + "–" + displayDate(sunday, template: "dd. MMM", zone: calendar.timeZone)
+        + "–" + displayDate(saturday, template: "dd. MMM", zone: calendar.timeZone)
     }
     private var dateButton: some View {
       Button {
@@ -270,150 +287,73 @@
         .accessibilityValue(
           displayDate(store.selectedDate, template: "dd. MMMM yyyy", zone: store.calendar.timeZone))
     }
-    private var currentDayButton: some View {
-      Button(weekView ? "Diese Woche" : "Heute") {
+    private var currentWeekButton: some View {
+      Button("Diese Woche") {
         store.selectedDate = Date()
-        focusNow += 1
-      }
-      .font(.subheadline.weight(.medium)).frame(minWidth: 44, minHeight: 44)
-      .accessibilityLabel(
-        weekView ? "Aktuelle Woche anzeigen" : "Heute und aktuelle Uhrzeit anzeigen")
+        Task { await store.refresh() }
+      }.font(.subheadline.weight(.medium)).frame(minHeight: 44)
     }
-    private var viewPicker: some View {
-      Picker("Stundenplanansicht", selection: $weekView) {
-        Text("Tag").tag(false)
-        Text("Woche").tag(true)
-      }.pickerStyle(.segmented).frame(width: 132, height: 44)
+    private func moveWeek(_ step: Int) {
+      store.selectedDate = store.calendar.date(
+        byAdding: .day, value: step * 7, to: store.selectedDate)!
+    }
+    private var weekNavigation: some View {
+      HStack(spacing: 4) {
+        Button {
+          moveWeek(-1)
+        } label: {
+          Image(systemName: "chevron.left").frame(width: 44, height: 44)
+        }
+        .accessibilityLabel("Vorherige Woche")
+        dateButton.frame(maxWidth: .infinity)
+        Button {
+          moveWeek(1)
+        } label: {
+          Image(systemName: "chevron.right").frame(width: 44, height: 44)
+        }
+        .accessibilityLabel("Nächste Woche")
+      }.buttonStyle(.plain)
     }
     private var weekControls: some View {
       ViewThatFits(in: .horizontal) {
         HStack(spacing: 8) {
-          dateButton
-          Spacer(minLength: 0)
-          currentDayButton
-          viewPicker
+          weekNavigation
+          currentWeekButton
         }
-        VStack(spacing: 4) {
-          HStack {
-            dateButton
-            Spacer()
-            currentDayButton
-          }
-          viewPicker.frame(maxWidth: .infinity, alignment: .trailing)
+        VStack(spacing: 0) {
+          weekNavigation
+          currentWeekButton
         }
-      }.padding(.horizontal, 16).padding(.vertical, 4)
-    }
-    private func weekdayButton(_ offset: Int, monday: Date) -> some View {
-      let day = store.calendar.date(byAdding: .day, value: offset, to: monday)!
-      let selected = store.calendar.isDate(day, inSameDayAs: store.selectedDate)
-      return Button {
-        store.selectedDate = day
-      } label: {
-        VStack(spacing: 6) {
-          Text(displayDate(day, template: "EE", zone: store.calendar.timeZone)).font(.caption)
-          Text(displayDate(day, template: "dd", zone: store.calendar.timeZone))
-            .font(.subheadline.weight(.semibold).monospacedDigit())
-        }.frame(maxWidth: .infinity).frame(minWidth: dayWidth, minHeight: 52)
-          .foregroundStyle(selected ? .white : campusInk)
-          .background(selected ? campusBlue : .clear, in: RoundedRectangle(cornerRadius: 10))
-          .overlay(alignment: .bottom) {
-            if store.calendar.isDateInToday(day) && !selected {
-              Circle().fill(campusBlue).frame(width: 4, height: 4).padding(.bottom, 2)
-            }
-          }
-      }.buttonStyle(.plain)
-        .accessibilityLabel(
-          displayDate(day, template: "EEEE, dd. MMMM", zone: store.calendar.timeZone)
-        )
-        .accessibilityAddTraits(selected ? .isSelected : [])
-    }
-    private var weekdays: some View {
-      let monday = store.calendar.dateInterval(of: .weekOfYear, for: store.selectedDate)!.start
-      return ViewThatFits(in: .horizontal) {
-        HStack(spacing: 4) { ForEach(0..<7, id: \.self) { weekdayButton($0, monday: monday) } }
-        LazyVGrid(columns: [GridItem(.adaptive(minimum: dayWidth), spacing: 4)], spacing: 4) {
-          ForEach(0..<7, id: \.self) { weekdayButton($0, monday: monday) }
-        }
-      }.padding(.horizontal, 16).padding(.vertical, 8)
-    }
-    private func weekCalendar(_ feed: StudentFeed) -> some View {
-      let monday = store.calendar.dateInterval(of: .weekOfYear, for: store.selectedDate)!.start
-      return GeometryReader { viewport in
-        ScrollViewReader { scroll in
-          ScrollView(.horizontal) {
-            HStack(spacing: 0) {
-              ForEach(0..<7, id: \.self) { offset in
-                let day = store.calendar.date(byAdding: .day, value: offset, to: monday)!
-                VStack(spacing: 0) {
-                  Text(displayDate(day, template: "EEEE, dd. MMM", zone: store.calendar.timeZone))
-                    .font(.subheadline.weight(.semibold)).foregroundStyle(campusBlue)
-                    .frame(maxWidth: .infinity, minHeight: 44)
-                    .background(
-                      campusBlue.opacity(store.calendar.isDateInToday(day) ? 0.08 : 0.025))
-                  StudentDayGrid(
-                    events: feed.rows, day: day, calendar: store.calendar,
-                    selectedEvent: $selectedEvent, focusRequest: 0, weekColumn: true,
-                    refresh: { await store.refresh() })
-                }.frame(width: max(260, viewport.size.width * 0.7), height: viewport.size.height)
-                  .overlay(alignment: .trailing) { Divider() }.id(offset)
-              }
-            }.scrollTargetLayout()
-          }.scrollTargetBehavior(.viewAligned)
-            .task(id: monday) {
-              let offset =
-                store.calendar.dateComponents(
-                  [.day], from: monday,
-                  to: store.calendar.startOfDay(for: store.selectedDate)
-                ).day ?? 0
-              scroll.scrollTo(offset, anchor: .leading)
-            }
-            .onChange(of: focusNow) { _, _ in
-              let offset =
-                store.calendar.dateComponents(
-                  [.day], from: monday,
-                  to: store.calendar.startOfDay(for: store.selectedDate)
-                ).day ?? 0
-              scroll.scrollTo(offset, anchor: .leading)
-            }
-        }
-      }
+      }.padding(.horizontal, 12).padding(.bottom, 4)
     }
     private var schedule: some View {
       NavigationStack {
         VStack(spacing: 0) {
           header
           weekControls
-          if !weekView { weekdays }
           if let feed = store.feed {
-            if weekView {
-              weekCalendar(feed)
-            } else {
-              StudentDayGrid(
-                events: feed.rows, day: store.selectedDate, calendar: store.calendar,
-                selectedEvent: $selectedEvent, focusRequest: focusNow,
-                refresh: { await store.refresh() }
-              )
-              .simultaneousGesture(
-                DragGesture(minimumDistance: 40).onEnded { drag in
-                  let step = scheduleSwipeStep(
-                    horizontal: Double(drag.translation.width),
-                    vertical: Double(drag.translation.height))
-                  if step != 0 {
-                    store.selectedDate = store.calendar.date(
-                      byAdding: .day, value: step,
-                      to: store.selectedDate)!
-                  }
-                })
-            }
+            StudentWeekGrid(
+              events: feed.rows, date: store.selectedDate, calendar: store.calendar,
+              selectedEvent: $selectedEvent,
+              openDay: { date, rows in
+                daySummary = ScheduleDaySummary(date: date, events: rows)
+              }
+            )
+            .simultaneousGesture(
+              DragGesture(minimumDistance: 40).onEnded { drag in
+                let step = scheduleSwipeStep(
+                  horizontal: Double(drag.translation.width),
+                  vertical: Double(drag.translation.height))
+                if step != 0 { moveWeek(step) }
+              })
           } else if store.busy {
             ProgressView().frame(maxWidth: .infinity, maxHeight: .infinity)
           } else {
-            ScrollView {
-              StudentEmptyState(
-                title: "Noch kein Stundenplan geladen", symbol: "calendar",
-                detail: "Ziehe die Ansicht nach unten zum Aktualisieren."
-              ).padding(24)
-            }.refreshable { await store.refresh() }
+            StudentEmptyState(
+              title: "Noch kein Stundenplan geladen", symbol: "calendar",
+              detail: "Tippe auf Diese Woche zum Aktualisieren."
+            ).padding(24)
+            Spacer()
           }
         }.background(campusCanvas).navigationTitle("").navigationBarTitleDisplayMode(.inline)
           .toolbarBackground(campusCanvas, for: .navigationBar, .tabBar)
@@ -430,86 +370,46 @@
         VStack(spacing: 0) {
           header
           TimelineView(.periodic(from: .now, by: 60)) { clock in
-            List {
-              if store.feed != nil {
-                let today = store.calendar.startOfDay(for: clock.date)
-                let events = store.examRows.filter { $0.end >= today }
-                Section {
+            ScrollView {
+              VStack(alignment: .leading, spacing: 16) {
+                Text("Prüfungen").font(.title2.weight(.semibold)).foregroundStyle(campusInk)
+                if store.feed != nil {
+                  let today = store.calendar.startOfDay(for: clock.date)
+                  let events = store.examRows.filter { $0.end >= today }
+                  let nextID = events.first { !$0.cancelled && $0.end >= clock.date }?.id
                   if events.isEmpty {
                     StudentEmptyState(
                       title: "Keine Prüfungstermine", symbol: "graduationcap",
-                      detail: "Im geladenen Zeitraum sind keine Prüfungen veröffentlicht."
-                    )
-                    .listRowBackground(campusCanvas).listRowSeparatorTint(campusBlue.opacity(0.12))
+                      detail: "Noch keine Prüfungen im geladenen Zeitraum veröffentlicht.")
                   }
                   ForEach(events) { event in
-                    NavigationLink {
-                      EventDetails(event: event)
+                    Button {
+                      selectedEvent = event
                     } label: {
-                      VStack(alignment: .leading, spacing: 4) {
-                        ViewThatFits(in: .horizontal) {
-                          HStack {
-                            Text(
-                              displayDate(
-                                event.start, template: "EEE, dd. MMM yyyy",
-                                zone: store.calendar.timeZone)
-                            )
-                            .font(.subheadline).foregroundStyle(.secondary)
-                            Spacer()
-                            Text(
-                              examCountdown(
-                                to: event.start, now: clock.date, calendar: store.calendar)
-                            )
-                            .font(.subheadline.weight(.semibold)).foregroundStyle(
-                              event.cancelled ? .red : campusBlue)
-                          }
-                          VStack(alignment: .leading, spacing: 4) {
-                            Text(
-                              examCountdown(
-                                to: event.start, now: clock.date, calendar: store.calendar)
-                            )
-                            .font(.subheadline.weight(.semibold)).foregroundStyle(
-                              event.cancelled ? .red : campusBlue)
-                            Text(
-                              displayDate(
-                                event.start, template: "EEE, dd. MMM yyyy",
-                                zone: store.calendar.timeZone)
-                            )
-                            .font(.subheadline).foregroundStyle(.secondary)
-                          }
-                        }
-                        EventRow(event: event)
-                      }
-                    }.listRowBackground(campusCanvas).listRowSeparatorTint(campusBlue.opacity(0.12))
+                      StudentExamCard(
+                        event: event, now: clock.date, calendar: store.calendar,
+                        prominent: event.id == nextID)
+                    }.buttonStyle(.plain)
                   }
+                  Text("Veröffentlichte Prüfungen der nächsten 120 Tage.")
+                    .font(.footnote).foregroundStyle(.secondary).padding(.top, 4)
+                } else if !store.busy {
+                  StudentEmptyState(
+                    title: "Noch keine Prüfungen geladen", symbol: "graduationcap",
+                    detail: "Ziehe die Ansicht nach unten zum Aktualisieren.")
                 }
-                Section {
-                  Text(
-                    "Zeitraum: heute und die nächsten 120 Tage. Weitere Prüfungen erscheinen nach Veröffentlichung."
-                  ).font(.footnote).foregroundStyle(.secondary)
-                    .listRowBackground(Color.clear).listRowSeparator(.hidden)
-                }
-              } else if !store.busy {
-                StudentEmptyState(
-                  title: "Noch keine Prüfungen geladen", symbol: "graduationcap",
-                  detail: "Ziehe die Ansicht nach unten zum Aktualisieren."
-                )
-                .listRowBackground(campusCanvas).listRowSeparatorTint(campusBlue.opacity(0.12))
-              }
-            }.listStyle(.plain).listRowSpacing(0)
-              .contentMargins(.horizontal, 8, for: .scrollContent).scrollContentBackground(.hidden)
-              .refreshable { await store.refresh() }
+              }.padding(20).frame(maxWidth: .infinity, alignment: .leading)
+            }.refreshable { await store.refresh() }
           }
-        }
-        .background(campusCanvas).navigationTitle("Prüfungen")
-        .navigationBarTitleDisplayMode(.inline)
-        .toolbarBackground(campusCanvas, for: .navigationBar, .tabBar)
-        .toolbarBackground(.visible, for: .navigationBar, .tabBar)
-        .toolbar {
-          ToolbarItem(placement: .topBarLeading) { brandSymbol }
-          ToolbarItem(placement: .principal) { groupIdentity }
-          ToolbarItem(placement: .topBarTrailing) { accountButton }
-        }
+        }.background(Color(red: 0.96, green: 0.97, blue: 0.98))
+          .navigationTitle("").navigationBarTitleDisplayMode(.inline)
+          .toolbarBackground(campusCanvas, for: .navigationBar, .tabBar)
+          .toolbarBackground(.visible, for: .navigationBar, .tabBar)
+          .toolbar {
+            ToolbarItem(placement: .topBarLeading) { brandSymbol }
+            ToolbarItem(placement: .principal) { groupIdentity }
+            ToolbarItem(placement: .topBarTrailing) { accountButton }
+          }
       }
     }
     private var notices: some View {
@@ -570,152 +470,242 @@
 
   }
 
-  private struct StudentDayGrid: View {
+  private struct ScheduleDaySummary: Identifiable {
+    let date: Date
     let events: [StudentEvent]
-    let day: Date
+    var id: Date { date }
+  }
+
+  private func eventTint(_ event: StudentEvent) -> Color {
+    let colors = [
+      campusBlue, Color(red: 0.18, green: 0.43, blue: 0.33),
+      Color(red: 0.53, green: 0.36, blue: 0.12),
+    ]
+    if event.cancelled { return Color(red: 0.7, green: 0.13, blue: 0.17) }
+    if event.kind == "exam" { return colors[2] }
+    return colors[event.name.utf8.reduce(0) { ($0 + Int($1)) % colors.count }]
+  }
+
+  private struct StudentWeekGrid: View {
+    let events: [StudentEvent]
+    let date: Date
     let calendar: Calendar
     @Binding var selectedEvent: StudentEvent?
-    let focusRequest: Int
-    var weekColumn = false
-    let refresh: () async -> Void
-    @ScaledMetric(relativeTo: .body) private var hourHeight: CGFloat = 96
-    @ScaledMetric(relativeTo: .caption) private var timeWidth: CGFloat = 52
-    @ScaledMetric(relativeTo: .body) private var laneWidth: CGFloat = 180
+    let openDay: (Date, [StudentEvent]) -> Void
+    @ScaledMetric(relativeTo: .caption) private var axisWidth: CGFloat = 36
+    @ScaledMetric(relativeTo: .subheadline) private var headerHeight: CGFloat = 52
+    @ScaledMetric(relativeTo: .footnote) private var footerHeight: CGFloat = 44
 
     var body: some View {
       TimelineView(.periodic(from: .now, by: 60)) { clock in
-        grid(now: clock.date)
-      }
-    }
-    private func grid(now: Date) -> some View {
-      let placements = schedulePlacements(events, day: day, calendar: calendar)
-      let range = scheduleTimeRange(placements, day: day, now: now, calendar: calendar)
-      let start = range.start
-      let end = range.end
-      let hours = Int(end.timeIntervalSince(start) / 3600)
-      // Keep short events tappable without changing their duration or covering the next event.
-      let shortest = placements.map { $0.end.timeIntervalSince($0.start) / 60 }.min() ?? 60
-      let scale = max(hourHeight / 60, 48 / CGFloat(shortest))
-      let height = CGFloat(end.timeIntervalSince(start) / 60) * scale
-      let lanes = placements.map(\.lanes).max() ?? 1
-      return GeometryReader { viewport in
-        let width =
-          weekColumn
-          ? viewport.size.width - 32
-          : max(viewport.size.width - 32, timeWidth + CGFloat(lanes) * min(laneWidth, 120))
-        ScrollViewReader { scroll in
-          ScrollView(weekColumn ? .vertical : [.vertical, .horizontal]) {
-            VStack(spacing: 0) {
-              ForEach(0...hours, id: \.self) { hour in
-                let tick = start.addingTimeInterval(Double(hour * 3600))
-                HStack(spacing: 8) {
-                  Text(displayDate(tick, template: "HH:mm", zone: calendar.timeZone))
-                    .font(.caption.monospacedDigit()).foregroundStyle(.secondary)
-                    .opacity(
-                      calendar.isDate(now, inSameDayAs: day)
-                        && abs(now.timeIntervalSince(tick)) < 600 ? 0 : 1
-                    )
-                    .frame(width: timeWidth - 8, alignment: .leading)
-                  Rectangle().fill(campusBlue.opacity(0.12)).frame(height: 0.5)
-                }.frame(width: width, height: 20)
-                  .frame(height: hour == hours ? 24 : 60 * scale, alignment: .top)
-                  .overlay(alignment: .topLeading) {
-                    if hour < hours {
-                      Rectangle().fill(campusBlue.opacity(0.05))
-                        .frame(width: width - timeWidth, height: 0.5)
-                        .offset(x: timeWidth, y: 30 * scale + 10)
-                    }
-                  }.id(tick).accessibilityHidden(true)
-              }
-            }.overlay(alignment: .topLeading) {
-              ZStack(alignment: .topLeading) {
-                ForEach(placements) { item in
-                  let column = (width - timeWidth) / CGFloat(item.lanes)
-                  let eventHeight = CGFloat(item.end.timeIntervalSince(item.start) / 60) * scale - 4
-                  let colors = [
-                    campusBlue, Color(red: 0.18, green: 0.43, blue: 0.33),
-                    Color(red: 0.53, green: 0.36, blue: 0.12),
-                  ]
-                  let tint =
-                    item.event.cancelled
-                    ? Color(red: 0.7, green: 0.13, blue: 0.17)
-                    : item.event.kind == "exam"
-                      ? colors[2]
-                      : colors[item.event.name.utf8.reduce(0) { ($0 + Int($1)) % colors.count }]
-                  Button {
-                    selectedEvent = item.event
-                  } label: {
-                    VStack(alignment: .leading, spacing: 6) {
-                      if eventHeight > 100 {
-                        Text(
-                          "\(displayDate(item.event.start, template: "HH:mm", zone: calendar.timeZone)) – \(displayDate(item.event.end, template: "HH:mm", zone: calendar.timeZone))"
-                        )
-                        .font(.caption.monospacedDigit())
-                      }
-                      Text((item.event.cancelled ? "Abgesagt · " : "") + item.event.name)
-                        .font(.subheadline.weight(.semibold)).strikethrough(item.event.cancelled)
-                        .lineLimit(
-                          eventHeight > 160 ? 4 : eventHeight > 125 ? 3 : eventHeight > 85 ? 2 : 1)
-                      if eventHeight > 70, let rooms = item.event.roomNames, !rooms.isEmpty {
-                        Label(rooms.joined(separator: ", "), systemImage: "door.left.hand.open")
-                          .font(.caption).lineLimit(1)
-                      }
-                      Spacer(minLength: 0)
-                    }.padding(10).frame(
-                      width: column - 6, height: eventHeight, alignment: .topLeading
-                    )
-                    .foregroundStyle(tint).background(tint.opacity(0.13))
-                    .overlay(alignment: .leading) { Rectangle().fill(tint).frame(width: 3) }
-                    .clipShape(RoundedRectangle(cornerRadius: 8))
-                  }.buttonStyle(.plain)
-                    .offset(
-                      x: timeWidth + CGFloat(item.lane) * column,
-                      y: CGFloat(item.start.timeIntervalSince(start) / 60) * scale + 10
-                    )
-                    .accessibilityLabel(
-                      "\(item.event.cancelled ? "Abgesagt. " : "")\(item.event.kind == "exam" ? "Prüfung. " : "")\(item.event.name), \(displayDate(item.event.start, template: "EEEE, HH:mm", zone: calendar.timeZone)) bis \(displayDate(item.event.end, template: "HH:mm", zone: calendar.timeZone)), \(item.event.roomNames?.joined(separator: ", ") ?? "")"
-                    )
-                    .accessibilityHint("Termindetails öffnen")
-                }
-                if placements.isEmpty {
-                  Text("Keine Veranstaltungen an diesem Tag").font(.subheadline).foregroundStyle(
-                    .secondary
+        let week = ScheduleWeek(events: events, date: date, now: clock.date, calendar: calendar)
+        GeometryReader { viewport in
+          let axis = min(axisWidth, 72)
+          let column = max(1, (viewport.size.width - 16 - axis) / 6)
+          let plotHeight = max(1, viewport.size.height - headerHeight - footerHeight - 8)
+          let scale = plotHeight / CGFloat((week.endHour - week.startHour) * 60)
+          let today = week.days.first { calendar.isDate($0, inSameDayAs: clock.date) }
+          let nowMinutes = today.map {
+            clock.date.timeIntervalSince(
+              calendar.date(
+                bySettingHour: week.startHour, minute: 0,
+                second: 0, of: $0)!) / 60
+          }
+          VStack(spacing: 0) {
+            HStack(spacing: 0) {
+              Color.clear.frame(width: axis)
+              ForEach(week.days.indices, id: \.self) { index in
+                let day = week.days[index]
+                Button {
+                  openDay(day, week.placements[index].map(\.event))
+                } label: {
+                  VStack(spacing: 4) {
+                    Text(displayDate(day, template: "EE", zone: calendar.timeZone)).font(.caption)
+                    Text(displayDate(day, template: "dd", zone: calendar.timeZone))
+                      .font(.subheadline.weight(.semibold).monospacedDigit())
+                  }.frame(width: column, height: headerHeight).foregroundStyle(campusBlue)
+                    .background(
+                      campusBlue.opacity(
+                        calendar.isDate(day, inSameDayAs: clock.date) ? 0.10 : 0.025))
+                }.buttonStyle(.plain)
+                  .accessibilityLabel(
+                    displayDate(day, template: "EEEE, dd. MMMM", zone: calendar.timeZone)
                   )
-                  .frame(width: width - timeWidth - 16, alignment: .leading)
-                  .offset(x: timeWidth + 8, y: 24)
+                  .accessibilityHint("Alle Termine dieses Tages anzeigen")
+              }
+            }.frame(height: headerHeight)
+            HStack(spacing: 0) {
+              ZStack(alignment: .topLeading) {
+                ForEach(week.startHour..<week.endHour, id: \.self) { hour in
+                  Text(String(format: "%02d:00", hour)).font(.caption.monospacedDigit())
+                    .foregroundStyle(.secondary).lineLimit(1)
+                    .opacity(
+                      nowMinutes.map { abs($0 - Double((hour - week.startHour) * 60)) < 15 } == true
+                        ? 0 : 1
+                    )
+                    .offset(y: CGFloat((hour - week.startHour) * 60) * scale)
                 }
-                if calendar.isDate(now, inSameDayAs: day), now >= start, now < end {
+              }.frame(width: axis, height: plotHeight, alignment: .topLeading).accessibilityHidden(
+                true)
+              ForEach(week.days.indices, id: \.self) { index in
+                dayColumn(
+                  week: week, index: index, width: column, height: plotHeight,
+                  scale: scale, now: clock.date)
+              }
+            }.frame(height: plotHeight)
+              .overlay(alignment: .topLeading) {
+                if let minutes = nowMinutes {
                   HStack(spacing: 0) {
-                    Text(displayDate(now, template: "HH:mm", zone: calendar.timeZone))
+                    Text(displayDate(clock.date, template: "HH:mm", zone: calendar.timeZone))
                       .font(.caption.weight(.semibold).monospacedDigit())
                       .foregroundStyle(Color(red: 0.7, green: 0.13, blue: 0.17))
-                      .frame(width: timeWidth, alignment: .leading).background(campusCanvas)
+                      .frame(width: axis, alignment: .leading).background(campusCanvas)
                     Rectangle().fill(.red).frame(height: 1)
-                  }.frame(width: width, height: 20)
-                    .offset(y: CGFloat(now.timeIntervalSince(start) / 60) * scale)
+                  }.frame(height: 20).offset(y: CGFloat(minutes) * scale - 10)
                     .allowsHitTesting(false)
                     .accessibilityLabel(
-                      "Aktuelle Uhrzeit \(displayDate(now, template: "HH:mm", zone: calendar.timeZone))"
+                      "Aktuelle Uhrzeit \(displayDate(clock.date, template: "HH:mm", zone: calendar.timeZone))"
                     )
                 }
-              }.frame(width: width, height: height + 24, alignment: .topLeading)
-            }.padding(.horizontal, 16).padding(.top, 8)
-          }.refreshable { await refresh() }
-            .task(id: calendar.startOfDay(for: day)) {
-              guard !weekColumn else { return }
-              await Task.yield()
-              guard !Task.isCancelled else { return }
-              let focus =
-                calendar.isDate(now, inSameDayAs: day)
-                ? now : placements.first?.start ?? start
-              scroll.scrollTo(calendar.dateInterval(of: .hour, for: focus)!.start, anchor: .center)
+              }
+            Menu {
+              ForEach(week.days.indices, id: \.self) { index in
+                Button(
+                  displayDate(week.days[index], template: "EEEE, dd. MMM", zone: calendar.timeZone)
+                ) {
+                  openDay(week.days[index], week.placements[index].map(\.event))
+                }
+              }
+            } label: {
+              Label("Termine & Details", systemImage: "list.bullet").font(.footnote.weight(.medium))
+                .frame(maxWidth: .infinity, minHeight: footerHeight)
             }
-            .onChange(of: focusRequest) { _, _ in
-              guard !weekColumn else { return }
-              scroll.scrollTo(calendar.dateInterval(of: .hour, for: now)!.start, anchor: .center)
-            }
+          }.padding(.horizontal, 8).padding(.bottom, 8)
         }
       }
+    }
+    private func dayColumn(
+      week: ScheduleWeek, index: Int, width: CGFloat,
+      height: CGFloat, scale: CGFloat, now: Date
+    ) -> some View {
+      let day = week.days[index]
+      let start = calendar.date(bySettingHour: week.startHour, minute: 0, second: 0, of: day)!
+      let rows = week.placements[index]
+      return ZStack(alignment: .topLeading) {
+        Rectangle().fill(campusBlue.opacity(calendar.isDate(day, inSameDayAs: now) ? 0.025 : 0))
+        ForEach(week.startHour..<week.endHour, id: \.self) { hour in
+          Rectangle().fill(campusBlue.opacity(0.10)).frame(width: width, height: 0.5)
+            .offset(y: CGFloat((hour - week.startHour) * 60) * scale)
+        }
+        ForEach(rows) { item in
+          let lane = width / CGFloat(item.lanes)
+          let blockHeight = CGFloat(item.end.timeIntervalSince(item.start) / 60) * scale
+          let tint = eventTint(item.event)
+          VStack(spacing: 4) {
+            if blockHeight >= 20 {
+              Text(scheduleShortTitle(item.event.name)).font(.subheadline.weight(.semibold))
+                .strikethrough(item.event.cancelled).lineLimit(1)
+              if blockHeight >= 48, let room = item.event.roomNames?.first {
+                Text(room.replacingOccurrences(of: " ", with: "")).font(.caption).lineLimit(1)
+              }
+              if item.event.cancelled && blockHeight >= 70 { Image(systemName: "xmark.circle") }
+            }
+          }.padding(.horizontal, 2).frame(width: max(1, lane - 2), height: max(1, blockHeight - 2))
+            .foregroundStyle(tint).background(tint.opacity(0.14))
+            .overlay(alignment: .leading) { Rectangle().fill(tint).frame(width: 2) }
+            .clipShape(RoundedRectangle(cornerRadius: 4))
+            .offset(
+              x: CGFloat(item.lane) * lane + 1,
+              y: CGFloat(item.start.timeIntervalSince(start) / 60) * scale + 1)
+        }
+      }.frame(width: width, height: height).clipped()
+        .overlay(alignment: .trailing) {
+          Rectangle().fill(campusBlue.opacity(0.10)).frame(width: 0.5)
+        }
+        .contentShape(Rectangle())
+        .onTapGesture(count: 1, coordinateSpace: .local) { point in
+          let time = start.addingTimeInterval(Double(point.y / scale) * 60)
+          if let event = scheduleHit(
+            rows, time: time, laneFraction: Double(point.x / width),
+            tolerance: Double(22 / scale) * 60)
+          {
+            selectedEvent = event
+          } else {
+            openDay(day, rows.map(\.event))
+          }
+        }
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(
+          "\(displayDate(day, template: "EEEE, dd. MMMM", zone: calendar.timeZone)), \(rows.count) Termine"
+        )
+        .accessibilityAddTraits(.isButton)
+        .accessibilityAction { openDay(day, rows.map(\.event)) }
+    }
+  }
+
+  private struct StudentExamCard: View {
+    let event: StudentEvent
+    let now: Date
+    let calendar: Calendar
+    let prominent: Bool
+    @ScaledMetric(relativeTo: .body) private var badgeWidth: CGFloat = 52
+    @ScaledMetric(relativeTo: .body) private var badgeHeight: CGFloat = 64
+    var body: some View {
+      let ink =
+        prominent
+        ? Color.white : event.cancelled ? Color(red: 0.7, green: 0.13, blue: 0.17) : campusInk
+      let accent = event.cancelled ? Color(red: 0.7, green: 0.13, blue: 0.17) : campusBlue
+      return VStack(alignment: .leading, spacing: 16) {
+        HStack {
+          Text(prominent ? "Nächste Prüfung" : "Prüfungstermin")
+            .font(.caption.weight(.semibold)).foregroundStyle(
+              prominent ? .white.opacity(0.85) : accent)
+          Spacer()
+          Text(
+            event.cancelled
+              ? "Abgesagt"
+              : event.end < now
+                ? "Beendet"
+                : examCountdown(to: event.start, now: now, calendar: calendar)
+          )
+          .font(.subheadline.weight(.semibold)).foregroundStyle(prominent ? .white : accent)
+        }
+        HStack(alignment: .top, spacing: 14) {
+          VStack(spacing: 4) {
+            Text(displayDate(event.start, template: "dd", zone: calendar.timeZone))
+              .font(.title2.weight(.semibold).monospacedDigit())
+            Text(displayDate(event.start, template: "MMM", zone: calendar.timeZone).uppercased())
+              .font(.caption.weight(.semibold))
+          }.frame(width: badgeWidth, height: badgeHeight).foregroundStyle(
+            prominent ? .white : accent
+          )
+          .background(
+            prominent ? Color.white.opacity(0.13) : accent.opacity(0.07),
+            in: RoundedRectangle(cornerRadius: 10))
+          VStack(alignment: .leading, spacing: 8) {
+            Text(event.name).font(prominent ? .title3.weight(.semibold) : .body.weight(.semibold))
+              .strikethrough(event.cancelled).fixedSize(horizontal: false, vertical: true)
+            Text(displayDate(event.start, template: "EEEE, yyyy", zone: calendar.timeZone))
+              .font(.subheadline).foregroundStyle(prominent ? Color.white.opacity(0.85) : campusInk.opacity(0.75))
+          }.frame(maxWidth: .infinity, alignment: .leading)
+        }
+        VStack(alignment: .leading, spacing: 8) {
+          Label(
+            "\(displayDate(event.start, template: "HH:mm", zone: calendar.timeZone)) – \(displayDate(event.end, template: "HH:mm", zone: calendar.timeZone))",
+            systemImage: "clock")
+          if let rooms = event.roomNames, !rooms.isEmpty {
+            Label(rooms.joined(separator: ", "), systemImage: "door.left.hand.open")
+          }
+        }.font(.subheadline).foregroundStyle(ink.opacity(0.85))
+      }.padding(18).frame(maxWidth: .infinity, alignment: .leading)
+        .foregroundStyle(ink).background(
+          prominent ? campusBlue : .white,
+          in: RoundedRectangle(cornerRadius: 14)
+        )
+        .overlay(
+          RoundedRectangle(cornerRadius: 14).stroke(prominent ? .clear : accent.opacity(0.12))
+        )
+        .accessibilityElement(children: .combine)
     }
   }
 
