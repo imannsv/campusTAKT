@@ -33,6 +33,17 @@ final class StudentCoreTests: XCTestCase {
     XCTAssertEqual(calendar.component(.weekday, from: interval.start), 2)
     XCTAssertEqual(interval.duration, 7 * 86400 + 3600)
   }
+  func testNoticeDeliveryIgnoresInitialFeedAndRepeatedRefreshes() {
+    let first = StudentNotice(id: 1, title: "Alt", body: "Vorhanden", created: Date(timeIntervalSince1970: 10))
+    let second = StudentNotice(id: 2, title: "Neu", body: "Ausfall", created: Date(timeIntervalSince1970: 20))
+    let third = StudentNotice(id: 3, title: "Neu", body: "Hinweis", created: second.created)
+    XCTAssertTrue(newStudentNotices([first], knownIDs: nil).isEmpty)
+    XCTAssertEqual(newStudentNotices([third, second, first], knownIDs: [1]).map(\.id), [2, 3])
+    XCTAssertTrue(newStudentNotices([third, second, first], knownIDs: [1, 2, 3]).isEmpty)
+    XCTAssertEqual(newStudentNotices([second], knownIDs: []).map(\.id), [2])
+    XCTAssertTrue(newStudentNotices([], knownIDs: [1]).isEmpty)
+  }
+
   func testClientAgainstDisposableBackend() async throws {
     guard let path = ProcessInfo.processInfo.environment["STUDENT_APP_FIXTURE"] else {
       throw XCTSkip("Set STUDENT_APP_FIXTURE to credentials from the disposable browser fixture.")

@@ -17,8 +17,10 @@
     @Published var error: String?
     @Published var selectedDate = Date()
     var calendar: Calendar { institutionCalendar(credential?.login.timezone ?? "Europe/Berlin") }
+    let permissions: StudentPermissions
 
-    init() {
+    init(permissions: StudentPermissions) {
+      self.permissions = permissions
       do {
         if let saved = try DeviceKeychain.read() {
           _ = try serverURL(saved.server.absoluteString)
@@ -45,6 +47,7 @@
           try? await api.logout(token: reply.token)
           throw error
         }
+        permissions.clearNotifications()
         feed = nil
         upcomingRows = []
         selectedDate = Date()
@@ -74,9 +77,11 @@
         feed = result
         upcomingRows = upcoming.rows
         error = nil
+        await permissions.receive(result.notices, credential: saved)
       } catch StudentError.expired {
         guard credential?.login.token == saved.login.token else { return }
         try? DeviceKeychain.clear()
+        permissions.clearNotifications()
         credential = nil
         feed = nil
         upcomingRows = []
@@ -91,6 +96,7 @@
         self.error = error.localizedDescription
         return
       }
+      permissions.clearNotifications()
       credential = nil
       feed = nil
       upcomingRows = []
@@ -103,7 +109,8 @@
   }
 
   struct ContentView: View {
-    @StateObject private var store = StudentStore()
+    @StateObject private var store: StudentStore
+    @StateObject private var permissions: StudentPermissions
     @Environment(\.scenePhase) private var scenePhase
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var tab = 0
@@ -112,6 +119,12 @@
     @State private var selectedEvent: StudentEvent?
     @State private var daySummary: ScheduleDaySummary?
     @State private var calendarOpen = false
+
+    init() {
+      let permissions = StudentPermissions()
+      _permissions = StateObject(wrappedValue: permissions)
+      _store = StateObject(wrappedValue: StudentStore(permissions: permissions))
+    }
 
     var body: some View {
       Group {
@@ -141,6 +154,15 @@
       .environment(\.locale, Locale(identifier: "de_DE"))
       .environment(\.calendar, store.calendar)
       .environment(\.timeZone, store.calendar.timeZone)
+      .task { await permissions.prepare() }
+      .sheet(isPresented: $permissions.setupOpen) { permissionSetup }
+      .onChange(of: permissions.openInbox) { _, open in
+        if open {
+          tab = 3
+          noticeSearch = ""
+          permissions.openInbox = false
+        }
+      }
       .sheet(item: $selectedEvent) { event in
         NavigationStack {
           EventDetails(event: event)
@@ -208,7 +230,14 @@
           Task { await store.refresh() }
         }
       }
-      .onChange(of: scenePhase) { _, next in if next == .active { Task { await store.refresh() } } }
+      .onChange(of: scenePhase) { _, next in
+        if next == .active {
+          Task {
+            await permissions.refreshStatus()
+            await store.refresh()
+          }
+        }
+      }
     }
     @ViewBuilder private var status: some View {
       if let error = store.error {
@@ -536,6 +565,56 @@
           .contentShape(Rectangle())
       }.buttonStyle(.plain)
     }
+    private var permissionSetup: some View {
+      NavigationStack {
+        Form {
+          Section {
+            HStack(spacing: 12) {
+              brandSymbol
+              Text("CampusZeit einrichten").font(.title3.weight(.semibold)).foregroundStyle(
+                campusInk)
+            }
+            Text(
+              "Du entscheidest, welche Freigaben du erteilst. Die Anmeldung mit Zugangsdaten funktioniert auch ohne Kamera."
+            )
+            .font(.subheadline).foregroundStyle(.secondary)
+          }
+          Section {
+            Label("Kamera", systemImage: "qrcode.viewfinder").font(.headline)
+            Text("Zum Scannen des QR-Codes deiner Verwaltung.").font(.subheadline)
+            Label("Lokales Netzwerk", systemImage: "wifi").font(.headline)
+            Text(
+              "Für einen CampusZeit-Server im selben WLAN fragt iOS beim Verbindungsaufbau nach der Netzwerkfreigabe."
+            )
+            .font(.subheadline)
+            Label("Benachrichtigungen", systemImage: "bell").font(.headline)
+            Text(
+              "Für neue Mitteilungen, sobald CampusZeit sie abruft. Push bei geschlossener App ist noch nicht verfügbar."
+            )
+            .font(.subheadline)
+          }
+          Section {
+            if let error = permissions.error {
+              Text(error).foregroundStyle(.red).font(.subheadline)
+            }
+            Button {
+              Task { await permissions.request() }
+            } label: {
+              HStack {
+                Text("Freigaben einrichten").fontWeight(.semibold)
+                if permissions.requesting {
+                  Spacer()
+                  ProgressView()
+                }
+              }.frame(minHeight: 44)
+            }.disabled(permissions.requesting)
+            Button("Später einrichten") { permissions.finishSetup() }
+              .frame(minHeight: 44).disabled(permissions.requesting)
+          }
+        }.scrollContentBackground(.hidden).background(campusCanvas)
+          .navigationTitle("Ersteinrichtung").navigationBarTitleDisplayMode(.inline)
+      }.interactiveDismissDisabled().tint(campusBlue)
+    }
     private var profile: some View {
       NavigationStack {
         VStack(spacing: 0) {
@@ -565,6 +644,24 @@
               Button("Jetzt aktualisieren", systemImage: "arrow.clockwise") {
                 Task { await store.refresh() }
               }.disabled(store.busy)
+            }
+            Section("App-Freigaben") {
+              LabeledContent(
+                "Kamera", value: permissions.cameraGranted ? "Freigegeben" : "Nicht freigegeben")
+              LabeledContent(
+                "Benachrichtigungen",
+                value: permissions.notificationsGranted ? "Freigegeben" : "Nicht freigegeben")
+              Button("Freigaben einrichten") { permissions.setupOpen = true }
+              Link(
+                "iPhone-Einstellungen öffnen",
+                destination: URL(string: UIApplication.openSettingsURLString)!)
+              if let error = permissions.error {
+                Text(error).font(.subheadline).foregroundStyle(.red)
+              }
+              Text(
+                "Neue Mitteilungen werden beim Öffnen und Aktualisieren abgerufen. Push bei geschlossener App ist noch nicht verfügbar."
+              )
+              .font(.footnote).foregroundStyle(.secondary)
             }
             Section("Über CampusZeit") {
               Text("Stundenplan, Prüfungen und Mitteilungen deiner Verwaltung.")
