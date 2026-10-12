@@ -21,6 +21,7 @@
 
     init(permissions: StudentPermissions) {
       self.permissions = permissions
+      defer { if credential == nil { permissions.clearNotifications() } }
       do {
         if let saved = try DeviceKeychain.read() {
           _ = try serverURL(saved.server.absoluteString)

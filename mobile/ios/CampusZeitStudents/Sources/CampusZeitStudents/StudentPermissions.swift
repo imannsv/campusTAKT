@@ -1,5 +1,6 @@
 #if canImport(UIKit)
   import AVFoundation
+  import CryptoKit
   import SwiftUI
   import UserNotifications
   import StudentCore
@@ -62,9 +63,9 @@
     }
 
     func receive(_ notices: [StudentNotice], credential: DeviceCredential) async {
-      let scope =
-        credential.server.absoluteString + "|" + credential.login.scopeKind + "|"
-        + credential.login.scope
+      let sessionKey = SHA256.hash(data: Data(credential.login.token.utf8))
+        .map { String(format: "%02x", $0) }.joined()
+      let scope = credential.server.absoluteString + "|" + sessionKey
       currentScope = scope
       let key = "campuszeit.notices.seen." + scope
       let saved = UserDefaults.standard.array(forKey: key) as? [Int]
