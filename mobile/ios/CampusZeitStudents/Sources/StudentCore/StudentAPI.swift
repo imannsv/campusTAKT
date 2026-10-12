@@ -169,7 +169,13 @@ public struct StudentAPI: Sendable {
     config.httpCookieStorage = nil
     let session = URLSession(configuration: config, delegate: RedirectGuard(), delegateQueue: nil)
     defer { session.finishTasksAndInvalidate() }
-    let (data, response) = try await session.data(for: request)
+    let data: Data
+    let response: URLResponse
+    do {
+      (data, response) = try await session.data(for: request)
+    } catch let error as URLError where error.code == .cancelled {
+      throw CancellationError()
+    }
     guard let response = response as? HTTPURLResponse else {
       throw StudentError.service("Keine Antwort vom Server.")
     }

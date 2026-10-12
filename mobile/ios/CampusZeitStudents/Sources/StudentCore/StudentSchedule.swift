@@ -59,3 +59,22 @@ public func examCountdown(to date: Date, now: Date, calendar: Calendar) -> Strin
   default: return "Vor \(-days) Tagen"
   }
 }
+
+public func scheduleTimeRange(
+  _ placements: [ScheduledEvent], day: Date, now: Date, calendar: Calendar
+) -> DateInterval {
+  let defaultStart = calendar.date(bySettingHour: 8, minute: 0, second: 0, of: day)!
+  let defaultEnd = calendar.date(bySettingHour: 18, minute: 0, second: 0, of: day)!
+  var first = min(defaultStart, placements.map(\.start).min() ?? defaultStart)
+  var last = max(defaultEnd, placements.map(\.end).max() ?? defaultEnd)
+  if calendar.isDate(day, inSameDayAs: now) {
+    let currentHour = calendar.dateInterval(of: .hour, for: now)!
+    first = min(first, currentHour.start)
+    last = max(last, currentHour.end)
+  }
+  let start = calendar.dateInterval(of: .hour, for: first)!.start
+  let end =
+    last == calendar.dateInterval(of: .hour, for: last)!.start
+    ? last : calendar.dateInterval(of: .hour, for: last)!.end
+  return DateInterval(start: start, end: end)
+}

@@ -96,4 +96,37 @@ final class StudentCoreTests: XCTestCase {
     XCTAssertEqual(examCountdown(to: following, now: now, calendar: calendar), "In 2 Tagen")
     XCTAssertEqual(examCountdown(to: now, now: following, calendar: calendar), "Vor 2 Tagen")
   }
+
+  func testCurrentTimeIsInsideTodaysGridBeforeAndAfterTeachingHours() {
+    let calendar = institutionCalendar("Europe/Berlin")
+    for (hour, minute) in [(6, 30), (19, 18), (23, 59)] {
+      let now = calendar.date(from: DateComponents(year: 2026, month: 10, day: 12,
+        hour: hour, minute: minute))!
+      let range = scheduleTimeRange([], day: now, now: now, calendar: calendar)
+      XCTAssertLessThanOrEqual(range.start, now)
+      XCTAssertGreaterThan(range.end, now)
+    }
+    let now = calendar.date(from: DateComponents(year: 2026, month: 10, day: 12, hour: 19, minute: 18))!
+    let tomorrow = calendar.date(byAdding: .day, value: 1, to: now)!
+    let otherDay = scheduleTimeRange([], day: tomorrow, now: now, calendar: calendar)
+    XCTAssertEqual(calendar.component(.hour, from: otherDay.start), 8)
+    XCTAssertEqual(calendar.component(.hour, from: otherDay.end), 18)
+  }
+
+  func testCancelledFeedThrowsCancellationError() async throws {
+    let api = StudentAPI(server: try serverURL("http://127.0.0.1:9"))
+    let start = Date()
+    let task = Task {
+      try await api.feed(token: "test-only", start: start,
+        end: start.addingTimeInterval(86400), zone: "Europe/Berlin")
+    }
+    task.cancel()
+    do {
+      _ = try await task.value
+      XCTFail("Cancelled requests must not produce a feed")
+    } catch is CancellationError {
+    } catch {
+      XCTFail("Expected silent task cancellation, got \(error)")
+    }
+  }
 }

@@ -69,6 +69,8 @@ Die anschließend gewählte ruhigere Gestaltung mit Tagesüberschriften und fein
 
 Die Tagesraster-Version wurde am 12.10.2026 nativ gebaut, signiert, als Update installiert und um einen getesteten Überlappungs- und Countdown-Helfer ergänzt. Vier Swift-Coretests prüfen zusätzlich aufeinanderfolgende Termine, parallele Termincluster, Tagesgrenzen und Countdown-Werte über die Zeitumstellung. Die visuelle Abnahme des Rasters, der Wochentagsauswahl und der neuen Prüfungsdarstellung am iPhone steht noch aus.
 
+Am 12.10.2026 zeigten Gerätefotos zeitweise Leerraum über dem Raster und die Meldung „Abgebrochen“. Scrollanker liegen jetzt in echten Stundenzeilen statt in verschobenen Überlagerungen. Der heutige Zeitbereich schließt die aktuelle Stunde auch vor 08:00 und nach 18:00 ein; die rote Linie trägt eine Uhrzeitbeschriftung. Beim Öffnen des Tages und über „Diese Woche“ wird die aktuelle Stunde angesteuert. URLSession-Abbrüche werden als normale Task-Abbrüche behandelt, ohne eine Fehlermeldung in Anmeldung oder Stundenplan zu erzeugen; andere Netzwerkfehler bleiben sichtbar. Regressionstests reproduzierten zunächst beide Fehler (Netzwerkabbruch und fehlende Uhrzeit außerhalb 08–18 Uhr). Alle sechs ausgewählten Swift-Coretests bestehen, einschließlich der zuvor fehlgeschlagenen Regressionen. Der native Release-Build, Signierung, Paketprüfung und Update-Installation bestanden. Die visuelle Bestätigung der Scrollkorrektur am iPhone steht noch aus.
+
 ## Lokaler Gerätetest
 
 - Server und iPhone ins gleiche Netzwerk bringen. `127.0.0.1` im QR-Code zeigt auf das iPhone, nicht auf diesen PC.

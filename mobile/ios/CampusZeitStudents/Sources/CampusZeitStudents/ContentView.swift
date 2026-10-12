@@ -47,7 +47,7 @@
         examRows = []
         selectedDate = Date()
         credential = saved
-      } catch { self.error = error.localizedDescription }
+      } catch is CancellationError {} catch { self.error = error.localizedDescription }
     }
     func refresh() async {
       guard let saved = credential, !busy else { return }
@@ -107,6 +107,7 @@
     @State private var account = false
     @State private var appeared = false
     @State private var selectedEvent: StudentEvent?
+    @State private var focusNow = 0
     @ScaledMetric(relativeTo: .subheadline) private var dayWidth: CGFloat = 44
 
     var body: some View {
@@ -236,8 +237,11 @@
       }.buttonStyle(.borderless)
     }
     private var currentWeekButton: some View {
-      Button("Diese Woche") { store.selectedDate = Date() }
-        .font(.subheadline.weight(.medium)).frame(minHeight: 44)
+      Button("Diese Woche") {
+        store.selectedDate = Date()
+        focusNow += 1
+      }
+      .font(.subheadline.weight(.medium)).frame(minHeight: 44)
     }
     private var weekControls: some View {
       ViewThatFits(in: .horizontal) {
@@ -292,7 +296,8 @@
           if let feed = store.feed {
             StudentDayGrid(
               events: feed.rows, day: store.selectedDate, calendar: store.calendar,
-              selectedEvent: $selectedEvent, refresh: { await store.refresh() })
+              selectedEvent: $selectedEvent, focusRequest: focusNow,
+              refresh: { await store.refresh() })
           } else if store.busy {
             ProgressView().frame(maxWidth: .infinity, maxHeight: .infinity)
           } else {
@@ -463,115 +468,133 @@
     let day: Date
     let calendar: Calendar
     @Binding var selectedEvent: StudentEvent?
+    let focusRequest: Int
     let refresh: () async -> Void
     @ScaledMetric(relativeTo: .body) private var hourHeight: CGFloat = 96
     @ScaledMetric(relativeTo: .caption) private var timeWidth: CGFloat = 52
     @ScaledMetric(relativeTo: .body) private var laneWidth: CGFloat = 180
 
     var body: some View {
+      TimelineView(.periodic(from: .now, by: 60)) { clock in
+        grid(now: clock.date)
+      }
+    }
+    private func grid(now: Date) -> some View {
       let placements = schedulePlacements(events, day: day, calendar: calendar)
-      let defaultStart = calendar.date(bySettingHour: 8, minute: 0, second: 0, of: day)!
-      let defaultEnd = calendar.date(bySettingHour: 18, minute: 0, second: 0, of: day)!
-      let first = min(defaultStart, placements.map(\.start).min() ?? defaultStart)
-      let last = max(defaultEnd, placements.map(\.end).max() ?? defaultEnd)
-      let start = calendar.dateInterval(of: .hour, for: first)!.start
-      let end =
-        last == calendar.dateInterval(of: .hour, for: last)!.start
-        ? last : calendar.dateInterval(of: .hour, for: last)!.end
+      let range = scheduleTimeRange(placements, day: day, now: now, calendar: calendar)
+      let start = range.start
+      let end = range.end
       let hours = Int(end.timeIntervalSince(start) / 3600)
       // Keep short events tappable without changing their duration or covering the next event.
       let shortest = placements.map { $0.end.timeIntervalSince($0.start) / 60 }.min() ?? 60
       let scale = max(hourHeight / 60, 48 / CGFloat(shortest))
       let height = CGFloat(end.timeIntervalSince(start) / 60) * scale
       let lanes = placements.map(\.lanes).max() ?? 1
-      GeometryReader { viewport in
+      return GeometryReader { viewport in
         let width = max(viewport.size.width - 32, timeWidth + CGFloat(lanes) * laneWidth)
         ScrollViewReader { scroll in
           ScrollView([.vertical, .horizontal]) {
-            ZStack(alignment: .topLeading) {
+            VStack(spacing: 0) {
               ForEach(0...hours, id: \.self) { hour in
                 let tick = start.addingTimeInterval(Double(hour * 3600))
                 HStack(spacing: 8) {
                   Text(displayDate(tick, template: "HH:mm", zone: calendar.timeZone))
                     .font(.caption.monospacedDigit()).foregroundStyle(.secondary)
+                    .opacity(
+                      calendar.isDate(now, inSameDayAs: day)
+                        && abs(now.timeIntervalSince(tick)) < 600 ? 0 : 1
+                    )
                     .frame(width: timeWidth - 8, alignment: .leading)
                   Rectangle().fill(campusBlue.opacity(0.12)).frame(height: 0.5)
-                }.frame(width: width, height: 20).offset(y: CGFloat(hour) * 60 * scale)
-                  .id(tick).accessibilityHidden(true)
-                if hour < hours {
-                  Rectangle().fill(campusBlue.opacity(0.05)).frame(
-                    width: width - timeWidth, height: 0.5
-                  )
-                  .offset(x: timeWidth, y: (CGFloat(hour) * 60 + 30) * scale + 10)
-                }
-              }
-              ForEach(placements) { item in
-                let column = (width - timeWidth) / CGFloat(item.lanes)
-                let eventHeight = CGFloat(item.end.timeIntervalSince(item.start) / 60) * scale - 4
-                let tint =
-                  item.event.cancelled
-                  ? Color(red: 0.7, green: 0.13, blue: 0.17)
-                  : item.event.kind == "exam"
-                    ? Color(red: 0.18, green: 0.43, blue: 0.33) : campusBlue
-                Button {
-                  selectedEvent = item.event
-                } label: {
-                  VStack(alignment: .leading, spacing: 6) {
-                    if eventHeight > 100 {
-                      Text(
-                        "\(displayDate(item.event.start, template: "HH:mm", zone: calendar.timeZone)) – \(displayDate(item.event.end, template: "HH:mm", zone: calendar.timeZone))"
-                      )
-                      .font(.caption.monospacedDigit())
+                }.frame(width: width, height: 20)
+                  .frame(height: hour == hours ? 24 : 60 * scale, alignment: .top)
+                  .overlay(alignment: .topLeading) {
+                    if hour < hours {
+                      Rectangle().fill(campusBlue.opacity(0.05))
+                        .frame(width: width - timeWidth, height: 0.5)
+                        .offset(x: timeWidth, y: 30 * scale + 10)
                     }
-                    Text((item.event.cancelled ? "Abgesagt · " : "") + item.event.name)
-                      .font(.subheadline.weight(.semibold)).strikethrough(item.event.cancelled)
-                      .lineLimit(eventHeight > 160 ? 4 : eventHeight > 125 ? 3 : eventHeight > 85 ? 2 : 1)
-                    if eventHeight > 70, let rooms = item.event.roomNames, !rooms.isEmpty {
-                      Label(rooms.joined(separator: ", "), systemImage: "door.left.hand.open")
-                        .font(.caption).lineLimit(1)
-                    }
-                    Spacer(minLength: 0)
-                  }.padding(10).frame(
-                    width: column - 6, height: eventHeight, alignment: .topLeading
-                  )
-                  .foregroundStyle(tint).background(tint.opacity(0.08))
-                  .overlay(alignment: .leading) { Rectangle().fill(tint).frame(width: 3) }
-                  .clipShape(RoundedRectangle(cornerRadius: 8))
-                }.buttonStyle(.plain)
-                  .offset(
-                    x: timeWidth + CGFloat(item.lane) * column,
-                    y: CGFloat(item.start.timeIntervalSince(start) / 60) * scale + 10
-                  )
-                  .accessibilityLabel(
-                    "\(item.event.cancelled ? "Abgesagt. " : "")\(item.event.kind == "exam" ? "Prüfung. " : "")\(item.event.name), \(displayDate(item.event.start, template: "EEEE, HH:mm", zone: calendar.timeZone)) bis \(displayDate(item.event.end, template: "HH:mm", zone: calendar.timeZone)), \(item.event.roomNames?.joined(separator: ", ") ?? "")"
-                  )
-                  .accessibilityHint("Termindetails öffnen")
+                  }.id(tick).accessibilityHidden(true)
               }
-              if placements.isEmpty {
-                Text("Keine Veranstaltungen an diesem Tag").font(.subheadline).foregroundStyle(
-                  .secondary
-                )
-                .frame(width: width - timeWidth - 16, alignment: .leading)
-                .offset(x: timeWidth + 8, y: 24)
-              }
-              TimelineView(.periodic(from: .now, by: 60)) { clock in
-                if calendar.isDate(clock.date, inSameDayAs: day), clock.date >= start,
-                  clock.date < end
-                {
-                  Rectangle().fill(.red).frame(width: width - timeWidth, height: 1)
+            }.overlay(alignment: .topLeading) {
+              ZStack(alignment: .topLeading) {
+                ForEach(placements) { item in
+                  let column = (width - timeWidth) / CGFloat(item.lanes)
+                  let eventHeight = CGFloat(item.end.timeIntervalSince(item.start) / 60) * scale - 4
+                  let tint =
+                    item.event.cancelled
+                    ? Color(red: 0.7, green: 0.13, blue: 0.17)
+                    : item.event.kind == "exam"
+                      ? Color(red: 0.18, green: 0.43, blue: 0.33) : campusBlue
+                  Button {
+                    selectedEvent = item.event
+                  } label: {
+                    VStack(alignment: .leading, spacing: 6) {
+                      if eventHeight > 100 {
+                        Text(
+                          "\(displayDate(item.event.start, template: "HH:mm", zone: calendar.timeZone)) – \(displayDate(item.event.end, template: "HH:mm", zone: calendar.timeZone))"
+                        )
+                        .font(.caption.monospacedDigit())
+                      }
+                      Text((item.event.cancelled ? "Abgesagt · " : "") + item.event.name)
+                        .font(.subheadline.weight(.semibold)).strikethrough(item.event.cancelled)
+                        .lineLimit(
+                          eventHeight > 160 ? 4 : eventHeight > 125 ? 3 : eventHeight > 85 ? 2 : 1)
+                      if eventHeight > 70, let rooms = item.event.roomNames, !rooms.isEmpty {
+                        Label(rooms.joined(separator: ", "), systemImage: "door.left.hand.open")
+                          .font(.caption).lineLimit(1)
+                      }
+                      Spacer(minLength: 0)
+                    }.padding(10).frame(
+                      width: column - 6, height: eventHeight, alignment: .topLeading
+                    )
+                    .foregroundStyle(tint).background(tint.opacity(0.08))
+                    .overlay(alignment: .leading) { Rectangle().fill(tint).frame(width: 3) }
+                    .clipShape(RoundedRectangle(cornerRadius: 8))
+                  }.buttonStyle(.plain)
                     .offset(
-                      x: timeWidth,
-                      y: CGFloat(clock.date.timeIntervalSince(start) / 60) * scale + 10)
+                      x: timeWidth + CGFloat(item.lane) * column,
+                      y: CGFloat(item.start.timeIntervalSince(start) / 60) * scale + 10
+                    )
+                    .accessibilityLabel(
+                      "\(item.event.cancelled ? "Abgesagt. " : "")\(item.event.kind == "exam" ? "Prüfung. " : "")\(item.event.name), \(displayDate(item.event.start, template: "EEEE, HH:mm", zone: calendar.timeZone)) bis \(displayDate(item.event.end, template: "HH:mm", zone: calendar.timeZone)), \(item.event.roomNames?.joined(separator: ", ") ?? "")"
+                    )
+                    .accessibilityHint("Termindetails öffnen")
                 }
-              }.allowsHitTesting(false).accessibilityHidden(true)
-            }.frame(width: width, height: height + 24).padding(.horizontal, 16).padding(.top, 8)
+                if placements.isEmpty {
+                  Text("Keine Veranstaltungen an diesem Tag").font(.subheadline).foregroundStyle(
+                    .secondary
+                  )
+                  .frame(width: width - timeWidth - 16, alignment: .leading)
+                  .offset(x: timeWidth + 8, y: 24)
+                }
+                if calendar.isDate(now, inSameDayAs: day), now >= start, now < end {
+                  HStack(spacing: 0) {
+                    Text(displayDate(now, template: "HH:mm", zone: calendar.timeZone))
+                      .font(.caption.weight(.semibold).monospacedDigit())
+                      .foregroundStyle(Color(red: 0.7, green: 0.13, blue: 0.17))
+                      .frame(width: timeWidth, alignment: .leading).background(campusCanvas)
+                    Rectangle().fill(.red).frame(height: 1)
+                  }.frame(width: width, height: 20)
+                    .offset(y: CGFloat(now.timeIntervalSince(start) / 60) * scale)
+                    .allowsHitTesting(false)
+                    .accessibilityLabel(
+                      "Aktuelle Uhrzeit \(displayDate(now, template: "HH:mm", zone: calendar.timeZone))"
+                    )
+                }
+              }.frame(width: width, height: height + 24, alignment: .topLeading)
+            }.padding(.horizontal, 16).padding(.top, 8)
           }.refreshable { await refresh() }
             .task(id: calendar.startOfDay(for: day)) {
-              let now = Date()
+              await Task.yield()
+              guard !Task.isCancelled else { return }
               let focus =
-                calendar.isDate(now, inSameDayAs: day) && now >= start && now < end
+                calendar.isDate(now, inSameDayAs: day)
                 ? now : placements.first?.start ?? start
-              scroll.scrollTo(calendar.dateInterval(of: .hour, for: focus)!.start, anchor: .top)
+              scroll.scrollTo(calendar.dateInterval(of: .hour, for: focus)!.start, anchor: .center)
+            }
+            .onChange(of: focusRequest) { _, _ in
+              scroll.scrollTo(calendar.dateInterval(of: .hour, for: now)!.start, anchor: .center)
             }
         }
       }
