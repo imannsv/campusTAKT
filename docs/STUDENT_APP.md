@@ -2,7 +2,7 @@
 
 Native iPhone-App unter `mobile/ios/CampusZeitStudents`, angelegt mit Xtool 1.21.0. Mindestversion iOS 17. Die App ist ausschließlich lesend; Stundenplan, Prüfungstermine und Mitteilungen kommen aus der eigenen CampusZeit-Instanz. Android folgt nach dem iPhone-Gerätetest und kann dieselbe API verwenden.
 
-Stand 12.10.2026: Der native Release-Build mit dem iPhoneOS-27.1-SDK aus `Xcode_27.1_Release_Candidate.xip` besteht ohne Compilerwarnungen. Xtool erzeugt die unsignierte IPA unter `mobile/ios/CampusZeitStudents/xtool/CampusZeitStudents.ipa`. Paketintegrität, arm64-Executable, Mindestversion iOS 17, Kamera-Hinweis und unverändertes Logo wurden geprüft. Die IPA benötigt vor der Installation noch die Apple-Signierung; ein Gerätetest steht aus.
+Stand 12.10.2026: Der native Release-Build mit dem iPhoneOS-27.1-SDK aus `Xcode_27.1_Release_Candidate.xip` besteht ohne Compilerwarnungen. Xtool erzeugt die IPA unter `mobile/ios/CampusZeitStudents/xtool/CampusZeitStudents.ipa`. Paketintegrität, arm64-Executable, Mindestversion iOS 17, Kamera-Hinweis und unverändertes Logo wurden geprüft. Die lokale Testfassung ist inzwischen signiert; Signaturdateien, passendes eingebettetes Profil und dessen Gültigkeit wurden geprüft. Das Testprofil gilt bis 19.10.2026. Installation und Gerätetest stehen noch aus: Die direkte USB-Weiterleitung unter WSL scheitert am unten beschriebenen Paketgrößenfehler.
 
 ## Verwaltung und Backend
 
@@ -44,7 +44,18 @@ xtool devices --usb --no-wait
 xtool dev run
 ```
 
-Die Apple-Anmeldung erfolgt interaktiv im Terminal. Kein Apple-Passwort in den Chat eingeben. Stand dieser Prüfung ist Xtool abgemeldet und erkennt kein angeschlossenes USB-iPhone. Die bestehende unsignierte IPA allein kann deshalb noch nicht installiert werden.
+Die Apple-Anmeldung erfolgt interaktiv im Terminal. Kein Apple-Passwort in den Chat eingeben. Xtool ist auf diesem Entwicklungsrechner angemeldet, und das Test-iPhone ist bei Apple registriert. Die erste Profilerstellung meldete noch keine passenden Geräte; nach Übernahme der Registrierung bestand derselbe Ablauf. Falls Xtool den Widerruf eines bestehenden Entwicklerzertifikats verlangt, ist dafür eine gesonderte Zustimmung erforderlich: Andere damit signierte Test-Apps können betroffen sein.
+
+### Windows-Geräteverbindung
+
+Unter Windows benötigt Xtool eine Verbindung zwischen WSL und dem iPhone. `usbipd-win` plus Linux-`usbmuxd` kann das Gerät erkennen, aber bei bestimmten Kombinationen scheitert die Übertragung mit `asyncReadComplete, message was too large (65536 bytes, max = 65535)`. Dieser Fehler wurde auf dem Entwicklungsrechner reproduziert. Der [im Xtool-Projekt dokumentierte Ersatzweg](https://github.com/xtool-org/xtool/issues/19#issuecomment-2898986718) verwendet Apples Windows-Geräteverbindung.
+
+1. [Apple Devices aus dem Microsoft Store](https://apps.microsoft.com/detail/9NP83LWLPZ9K) installieren und öffnen. Den Begrüßungsdialog abschließen; das iPhone muss in der App erkannt werden.
+2. Das iPhone von direkter WSL-USB-Weiterleitung trennen, sodass Windows es wieder verwaltet.
+3. Apples lokalen Geräteanschluss auf Port 27015 ausschließlich für die WSL-Adresse weiterleiten. Dafür sind Windows-Administratorrechte nötig. Keine allgemeine Firewallfreigabe für alle Netzwerke einrichten.
+4. In WSL `USBMUXD_SOCKET_ADDRESS` auf die Windows-Hostadresse mit Port 27015 setzen und zunächst `ideviceinfo -k DeviceName` prüfen. Erst nach erfolgreicher Geräteabfrage Xtool installieren lassen.
+
+Die Weiterleitung wurde vorbereitet, aber noch nicht aktiviert: Apples Windows-Geräteanschluss muss zuerst verfügbar sein. Zertifikate, private Schlüssel, Geräteseriennummern und signierte Pakete bleiben außerhalb des Git-Repositories.
 
 ## Lokaler Gerätetest
 
