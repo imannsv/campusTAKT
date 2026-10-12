@@ -59,6 +59,8 @@ Unter Windows benötigt Xtool eine Verbindung zwischen WSL und dem iPhone. `usbi
 
 Die auf die lokale Ubuntu-Adresse begrenzte Weiterleitung ist eingerichtet und wurde durch Geräteabfrage und erfolgreiche Installation geprüft. Das automatische Starten über Xtool meldet noch einen Debugserver-Fehler; die App lässt sich auf dem iPhone manuell öffnen. Zertifikate, private Schlüssel, Geräteseriennummern und signierte Pakete bleiben außerhalb des Git-Repositories.
 
+Die überarbeitete Anmeldung mit Startanimation wurde am 12.10.2026 ebenfalls installiert und von iOS verifiziert. Für eine bereits signierte IPA `ideviceinstaller install xtool/CampusZeitStudents.ipa` verwenden, mit derselben `USBMUXD_SOCKET_ADDRESS` wie oben. `xtool install` signiert erneut und hat bei der ersten signierten IPA die Bundle-ID nochmals präfixiert. Die dadurch entstandene ältere Testfassung wurde nach erfolgreicher Installation der neuen Fassung entfernt; auf dem iPhone bleibt eine CampusZeit-App. Die zwischenzeitlichen Schreibfehler im Übertragungsbereich traten beim späteren Versuch nicht mehr auf. Die neue Darstellung, QR-Anmeldung und Keychain-Sitzung sind noch auf dem Gerät zu prüfen.
+
 ## Lokaler Gerätetest
 
 - Server und iPhone ins gleiche Netzwerk bringen. `127.0.0.1` im QR-Code zeigt auf das iPhone, nicht auf diesen PC.
