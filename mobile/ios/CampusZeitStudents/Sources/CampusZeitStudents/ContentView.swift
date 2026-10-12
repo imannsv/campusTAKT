@@ -242,11 +242,14 @@
     }
     private var dateCaption: String {
       let calendar = store.calendar
-      let monday = calendar.dateInterval(of: .weekOfYear, for: store.selectedDate)!.start
-      let saturday = calendar.date(byAdding: .day, value: 5, to: monday)!
-      let sameMonth = calendar.isDate(monday, equalTo: saturday, toGranularity: .month)
+      let week = ScheduleWeek(
+        events: store.feed?.rows ?? [], date: store.selectedDate,
+        now: Date(), calendar: calendar)
+      let monday = week.days.first!
+      let lastDay = week.days.last!
+      let sameMonth = calendar.isDate(monday, equalTo: lastDay, toGranularity: .month)
       return displayDate(monday, template: sameMonth ? "dd." : "dd. MMM", zone: calendar.timeZone)
-        + "–" + displayDate(saturday, template: "dd. MMM", zone: calendar.timeZone)
+        + "–" + displayDate(lastDay, template: "dd. MMM", zone: calendar.timeZone)
     }
     private func moveWeek(_ step: Int) {
       store.selectedDate = store.calendar.date(
@@ -629,7 +632,7 @@
         let week = ScheduleWeek(events: events, date: date, now: clock.date, calendar: calendar)
         GeometryReader { viewport in
           let axis = min(axisWidth, 72)
-          let column = max(1, (viewport.size.width - 16 - axis) / 6)
+          let column = max(1, (viewport.size.width - 16 - axis) / CGFloat(week.days.count))
           let plotHeight = max(1, viewport.size.height - headerHeight - footerHeight - 8)
           let scale = plotHeight / CGFloat((week.endHour - week.startHour) * 60)
           let today = week.days.first { calendar.isDate($0, inSameDayAs: clock.date) }

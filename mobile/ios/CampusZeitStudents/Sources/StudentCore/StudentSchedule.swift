@@ -20,8 +20,12 @@ public struct ScheduleWeek {
 
   public init(events: [StudentEvent], date: Date, now: Date, calendar: Calendar) {
     let monday = calendar.dateInterval(of: .weekOfYear, for: date)!.start
-    let weekDays = (0..<6).map { calendar.date(byAdding: .day, value: $0, to: monday)! }
-    let weekPlacements = weekDays.map { schedulePlacements(events, day: $0, calendar: calendar) }
+    var weekDays = (0..<6).map { calendar.date(byAdding: .day, value: $0, to: monday)! }
+    var weekPlacements = weekDays.map { schedulePlacements(events, day: $0, calendar: calendar) }
+    if weekPlacements[5].isEmpty {
+      weekDays.removeLast()
+      weekPlacements.removeLast()
+    }
     let ranges = weekDays.indices.map {
       scheduleTimeRange(weekPlacements[$0], day: weekDays[$0], now: now, calendar: calendar)
     }

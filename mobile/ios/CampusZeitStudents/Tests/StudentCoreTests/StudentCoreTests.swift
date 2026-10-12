@@ -145,7 +145,7 @@ final class StudentCoreTests: XCTestCase {
     XCTAssertNotEqual(calendar.dateInterval(of: .weekOfYear, for: sunday)?.start,
       calendar.dateInterval(of: .weekOfYear, for: next)?.start)
   }
-  func testWholeWeekHasSixDaysAndCommonTimeBounds() {
+  func testWholeWeekUsesWeekdaysAndCommonTimeBounds() {
     let calendar = institutionCalendar("Europe/Berlin")
     let monday = calendar.date(from: DateComponents(year: 2026, month: 10, day: 12))!
     let sunday = calendar.date(byAdding: .day, value: 6, to: monday)!
@@ -154,14 +154,38 @@ final class StudentCoreTests: XCTestCase {
       roomNames: [], groupNames: [], teacherNames: [])
     let week = ScheduleWeek(events: [hidden], date: sunday,
       now: monday.addingTimeInterval(19 * 3600 + 18 * 60), calendar: calendar)
-    XCTAssertEqual(week.days.count, 6)
+    XCTAssertEqual(week.days.count, 5)
     XCTAssertEqual(calendar.component(.weekday, from: week.days.first!), 2)
-    XCTAssertEqual(calendar.component(.weekday, from: week.days.last!), 7)
+    XCTAssertEqual(calendar.component(.weekday, from: week.days.last!), 6)
     XCTAssertTrue(week.placements.allSatisfy { $0.isEmpty })
     XCTAssertEqual(week.startHour, 8)
     XCTAssertEqual(week.endHour, 20)
     XCTAssertEqual(scheduleShortTitle("Management von Projekten"), "MVP")
     XCTAssertEqual(scheduleShortTitle("C++"), "C++")
+  }
+
+  func testSaturdayAppearsOnlyForEventsInTheDisplayedWeek() {
+    let calendar = institutionCalendar("Europe/Berlin")
+    let monday = calendar.date(from: DateComponents(year: 2026, month: 10, day: 12))!
+    let saturday = calendar.date(byAdding: .day, value: 5, to: monday)!
+    func event(_ start: Date, _ end: Date, cancelled: Bool = false) -> StudentEvent {
+      StudentEvent(id: "test", name: "Samstag", start: start, end: end, kind: "teaching",
+        cancelled: cancelled, roomNames: [], groupNames: [], teacherNames: [])
+    }
+    func week(_ rows: [StudentEvent], date: Date? = nil) -> ScheduleWeek {
+      ScheduleWeek(events: rows, date: date ?? monday, now: monday, calendar: calendar)
+    }
+    XCTAssertEqual(week([]).days.count, 5)
+    let lecture = event(saturday.addingTimeInterval(8 * 3600), saturday.addingTimeInterval(11 * 3600))
+    let withSaturday = week([lecture])
+    XCTAssertEqual(withSaturday.days.count, 6)
+    XCTAssertEqual(withSaturday.days.last, saturday)
+    XCTAssertEqual(withSaturday.placements.last?.map(\.id), [lecture.id])
+    XCTAssertEqual(week([event(lecture.start, lecture.end, cancelled: true)]).days.count, 6)
+    XCTAssertEqual(week([lecture], date: calendar.date(byAdding: .day, value: 7, to: monday)!).days.count, 5)
+    XCTAssertEqual(week([event(saturday.addingTimeInterval(-3600), saturday)]).days.count, 5)
+    XCTAssertEqual(week([event(saturday.addingTimeInterval(-3600), saturday.addingTimeInterval(3600))]).days.count, 6)
+    XCTAssertEqual(week([event(lecture.end, lecture.start)]).days.count, 5)
   }
 
   func testCompactWeekHitTestingSelectsAdjacentAndParallelEvents() {
