@@ -2,6 +2,9 @@
   import SwiftUI
   import StudentCore
 
+  private let campusBlue = Color(red: 33 / 255, green: 75 / 255, blue: 118 / 255)
+  private let campusCanvas = Color(red: 234 / 255, green: 241 / 255, blue: 247 / 255)
+
   @MainActor
   final class StudentStore: ObservableObject {
     @Published var credential: DeviceCredential?
@@ -102,7 +105,6 @@
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var account = false
     @State private var appeared = false
-    private let blue = Color(red: 33 / 255, green: 75 / 255, blue: 118 / 255)
 
     var body: some View {
       Group {
@@ -125,7 +127,8 @@
           withAnimation(.easeOut(duration: 0.35)) { appeared = true }
         }
       }
-      .tint(blue)
+      .tint(campusBlue)
+      .preferredColorScheme(.light)
       .environment(\.locale, Locale(identifier: "de_DE"))
       .environment(\.calendar, store.calendar)
       .environment(\.timeZone, store.calendar.timeZone)
@@ -164,141 +167,218 @@
       .onChange(of: scenePhase) { _, next in if next == .active { Task { await store.refresh() } } }
     }
     @ViewBuilder private var status: some View {
-      if let error = store.error { Text(error).foregroundStyle(.red).font(.callout) }
-      if let feed = store.feed {
-        Text(
-          "Stand: \(displayDate(feed.updated, template: "dd.MM., HH:mm", zone: store.calendar.timeZone))"
-        ).font(
-          .caption
-        ).foregroundStyle(.secondary)
+      if let error = store.error {
+        Label(error, systemImage: "exclamationmark.circle").foregroundStyle(.red).font(.callout)
       }
-      if store.busy { ProgressView("Wird aktualisiert …") }
     }
     private var header: some View {
-      VStack(alignment: .leading, spacing: 6) {
-        Text(store.credential?.login.scope ?? "").font(.headline)
-        Text(store.credential?.login.institution ?? "").font(.subheadline).foregroundStyle(
-          .secondary)
+      VStack(alignment: .leading, spacing: 8) {
+        HStack(spacing: 12) {
+          VStack(alignment: .leading, spacing: 4) {
+            Text(store.credential?.login.scope ?? "").font(.headline).foregroundStyle(campusBlue)
+            Text(store.credential?.login.institution ?? "").font(.caption).foregroundStyle(
+              .secondary)
+          }.layoutPriority(1)
+          Spacer(minLength: 4)
+          if store.busy { ProgressView().controlSize(.small) }
+          if let feed = store.feed {
+            Text(
+              "Stand \(displayDate(feed.updated, template: "dd.MM., HH:mm", zone: store.calendar.timeZone))"
+            )
+            .font(.caption).foregroundStyle(.secondary).multilineTextAlignment(.trailing)
+          }
+        }
         status
-      }.padding(.vertical, 4)
+      }.padding(.horizontal, 20).padding(.vertical, 12)
+    }
+    private var cardBackground: some View {
+      RoundedRectangle(cornerRadius: 12).fill(.white)
+        .overlay(RoundedRectangle(cornerRadius: 12).stroke(campusBlue.opacity(0.08)))
+    }
+    private var dateNavigation: some View {
+      HStack(spacing: 4) {
+        Button {
+          moveWeek(-1)
+        } label: {
+          Image(systemName: "chevron.left").frame(minWidth: 44, minHeight: 44)
+        }.accessibilityLabel("Vorherige Woche")
+        DatePicker("Datum auswählen", selection: $store.selectedDate, displayedComponents: .date)
+          .labelsHidden().datePickerStyle(.compact)
+          .onChange(of: store.selectedDate) { _, _ in Task { await store.refresh() } }
+        Button {
+          moveWeek(1)
+        } label: {
+          Image(systemName: "chevron.right").frame(minWidth: 44, minHeight: 44)
+        }.accessibilityLabel("Nächste Woche")
+      }.buttonStyle(.borderless)
+    }
+    private var currentWeekButton: some View {
+      Button("Diese Woche") { store.selectedDate = Date() }
+        .font(.subheadline.weight(.medium)).frame(minHeight: 44)
+    }
+    private var weekControls: some View {
+      ViewThatFits(in: .horizontal) {
+        HStack(spacing: 8) {
+          dateNavigation
+          Spacer(minLength: 0)
+          currentWeekButton
+        }
+        VStack(alignment: .leading, spacing: 4) {
+          dateNavigation
+          currentWeekButton
+        }
+      }.padding(.horizontal, 16).padding(.bottom, 8)
     }
     private var schedule: some View {
       NavigationStack {
-        List {
-          Section { header }
-          Section {
-            HStack {
-              Button {
-                moveWeek(-1)
-              } label: {
-                Image(systemName: "chevron.left").frame(minWidth: 44, minHeight: 44)
-              }.accessibilityLabel("Vorherige Woche")
-              DatePicker("Datum", selection: $store.selectedDate, displayedComponents: .date)
-                .onChange(of: store.selectedDate) { _, _ in Task { await store.refresh() } }
-              Button {
-                moveWeek(1)
-              } label: {
-                Image(systemName: "chevron.right").frame(minWidth: 44, minHeight: 44)
-              }.accessibilityLabel("Nächste Woche")
-            }.buttonStyle(.borderless)
-            Button("Diese Woche") { store.selectedDate = Date() }
-          }
-          if let feed = store.feed {
-            let monday = store.calendar.dateInterval(of: .weekOfYear, for: store.selectedDate)!
-              .start
-            ForEach(0..<7, id: \.self) { offset in
-              let day = store.calendar.date(byAdding: .day, value: offset, to: monday)!
-              let next = store.calendar.date(byAdding: .day, value: 1, to: day)!
-              let events = feed.rows.filter { $0.start < next && $0.end > day }
-              Section(displayDate(day, template: "EEEE, dd. MMM", zone: store.calendar.timeZone)) {
-                if events.isEmpty { Text("Keine Veranstaltungen").foregroundStyle(.secondary) }
-                ForEach(events) { event in
-                  NavigationLink {
-                    EventDetails(event: event)
-                  } label: {
-                    EventRow(event: event)
+        VStack(spacing: 0) {
+          header
+          weekControls
+          List {
+            if let feed = store.feed {
+              let monday = store.calendar.dateInterval(of: .weekOfYear, for: store.selectedDate)!
+                .start
+              ForEach(0..<7, id: \.self) { offset in
+                let day = store.calendar.date(byAdding: .day, value: offset, to: monday)!
+                let next = store.calendar.date(byAdding: .day, value: 1, to: day)!
+                let events = feed.rows.filter { $0.start < next && $0.end > day }
+                Section {
+                  if events.isEmpty {
+                    Text("Keine Veranstaltungen").font(.subheadline).foregroundStyle(.secondary)
+                      .listRowBackground(Color.clear).listRowSeparator(.hidden)
                   }
+                  ForEach(events) { event in
+                    NavigationLink {
+                      EventDetails(event: event)
+                    } label: {
+                      EventRow(event: event)
+                    }.listRowBackground(cardBackground).listRowSeparator(.hidden)
+                  }
+                } header: {
+                  HStack {
+                    Text(displayDate(day, template: "EEEE, dd. MMM", zone: store.calendar.timeZone))
+                      .font(.subheadline.weight(.semibold)).foregroundStyle(campusBlue)
+                    if store.calendar.isDateInToday(day) {
+                      Text("Heute").font(.caption.weight(.semibold)).foregroundStyle(campusBlue)
+                        .padding(.horizontal, 8).padding(.vertical, 4)
+                        .background(campusBlue.opacity(0.08), in: Capsule())
+                    }
+                  }.textCase(nil)
                 }
               }
+            } else if !store.busy {
+              StudentEmptyState(
+                title: "Noch kein Stundenplan geladen", symbol: "calendar",
+                detail: "Ziehe die Ansicht nach unten zum Aktualisieren."
+              )
+              .listRowBackground(cardBackground).listRowSeparator(.hidden)
             }
-          } else if !store.busy {
-            ContentUnavailableView(
-              "Noch kein Stundenplan geladen", systemImage: "calendar",
-              description: Text("Ziehe die Ansicht nach unten zum Aktualisieren."))
-          }
+          }.listStyle(.plain).listRowSpacing(8)
+            .contentMargins(.horizontal, 20, for: .scrollContent).scrollContentBackground(.hidden)
+            .refreshable { await store.refresh() }
         }
-        .navigationTitle("Stundenplan")
+        .background(campusCanvas).navigationTitle("Stundenplan")
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbarBackground(campusCanvas, for: .navigationBar, .tabBar)
+        .toolbarBackground(.visible, for: .navigationBar, .tabBar)
         .toolbar { ToolbarItem(placement: .topBarTrailing) { accountButton } }
-        .refreshable { await store.refresh() }
       }
     }
     private var exams: some View {
       NavigationStack {
-        List {
-          Section { header }
-          if store.feed != nil {
-            let today = store.calendar.startOfDay(for: Date())
-            let events = store.examRows.filter { $0.end >= today }
-            Section("Freigegebene Prüfungstermine") {
-              if events.isEmpty {
-                Text("Im geladenen Zeitraum sind keine Prüfungen veröffentlicht.").foregroundStyle(
-                  .secondary)
-              }
-              ForEach(events) { event in
-                NavigationLink {
-                  EventDetails(event: event)
-                } label: {
-                  VStack(alignment: .leading, spacing: 6) {
-                    Text(
-                      displayDate(
-                        event.start, template: "EEE, dd. MMM yyyy", zone: store.calendar.timeZone)
-                    ).font(
-                      .subheadline
-                    ).foregroundStyle(.secondary)
-                    EventRow(event: event)
-                  }
+        VStack(spacing: 0) {
+          header
+          List {
+            if store.feed != nil {
+              let today = store.calendar.startOfDay(for: Date())
+              let events = store.examRows.filter { $0.end >= today }
+              Section {
+                if events.isEmpty {
+                  StudentEmptyState(
+                    title: "Keine Prüfungstermine", symbol: "graduationcap",
+                    detail: "Im geladenen Zeitraum sind keine Prüfungen veröffentlicht."
+                  )
+                  .listRowBackground(cardBackground).listRowSeparator(.hidden)
+                }
+                ForEach(events) { event in
+                  NavigationLink {
+                    EventDetails(event: event)
+                  } label: {
+                    VStack(alignment: .leading, spacing: 6) {
+                      Text(
+                        displayDate(
+                          event.start, template: "EEE, dd. MMM yyyy", zone: store.calendar.timeZone)
+                      ).font(.subheadline.weight(.semibold)).foregroundStyle(campusBlue)
+                      EventRow(event: event)
+                    }
+                  }.listRowBackground(cardBackground).listRowSeparator(.hidden)
                 }
               }
+              Section {
+                Text(
+                  "Zeitraum: heute und die nächsten 120 Tage. Weitere Prüfungen erscheinen nach Veröffentlichung."
+                ).font(.footnote).foregroundStyle(.secondary)
+                  .listRowBackground(Color.clear).listRowSeparator(.hidden)
+              }
+            } else if !store.busy {
+              StudentEmptyState(
+                title: "Noch keine Prüfungen geladen", symbol: "graduationcap",
+                detail: "Ziehe die Ansicht nach unten zum Aktualisieren."
+              )
+              .listRowBackground(cardBackground).listRowSeparator(.hidden)
             }
-            Section {
-              Text(
-                "Zeitraum: heute und die nächsten 120 Tage. Weitere Prüfungen erscheinen nach Veröffentlichung."
-              ).font(.footnote).foregroundStyle(.secondary)
-            }
-          }
+          }.listStyle(.plain).listRowSpacing(12)
+            .contentMargins(.horizontal, 20, for: .scrollContent).scrollContentBackground(.hidden)
+            .refreshable { await store.refresh() }
         }
-        .navigationTitle("Prüfungen")
+        .background(campusCanvas).navigationTitle("Prüfungen")
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbarBackground(campusCanvas, for: .navigationBar, .tabBar)
+        .toolbarBackground(.visible, for: .navigationBar, .tabBar)
         .toolbar { ToolbarItem(placement: .topBarTrailing) { accountButton } }
-        .refreshable { await store.refresh() }
       }
     }
     private var notices: some View {
       NavigationStack {
-        List {
-          Section { header }
-          if let feed = store.feed {
-            if feed.notices.isEmpty {
-              ContentUnavailableView(
-                "Keine Mitteilungen", systemImage: "bell",
-                description: Text("Neue Hinweise deiner Verwaltung erscheinen hier."))
-            }
-            ForEach(feed.notices) { notice in
-              Section {
-                Text(notice.title).font(.headline)
-                Text(notice.body).textSelection(.enabled)
-                Text(
-                  displayDate(
-                    notice.created, template: "dd.MM.yyyy, HH:mm", zone: store.calendar.timeZone)
-                ).font(
-                  .caption
-                ).foregroundStyle(.secondary)
+        VStack(spacing: 0) {
+          header
+          List {
+            if let feed = store.feed {
+              if feed.notices.isEmpty {
+                StudentEmptyState(
+                  title: "Keine Mitteilungen", symbol: "bell",
+                  detail: "Neue Hinweise deiner Verwaltung erscheinen hier."
+                )
+                .listRowBackground(cardBackground).listRowSeparator(.hidden)
               }
+              ForEach(feed.notices) { notice in
+                VStack(alignment: .leading, spacing: 10) {
+                  Text(notice.title).font(.headline).foregroundStyle(campusBlue)
+                  Text(notice.body).textSelection(.enabled)
+                  Text(
+                    displayDate(
+                      notice.created, template: "dd.MM.yyyy, HH:mm", zone: store.calendar.timeZone)
+                  ).font(
+                    .caption
+                  ).foregroundStyle(.secondary)
+                }.padding(.vertical, 8).listRowBackground(cardBackground).listRowSeparator(.hidden)
+              }
+            } else if !store.busy {
+              StudentEmptyState(
+                title: "Noch keine Mitteilungen geladen", symbol: "bell",
+                detail: "Ziehe die Ansicht nach unten zum Aktualisieren."
+              )
+              .listRowBackground(cardBackground).listRowSeparator(.hidden)
             }
-          }
+          }.listStyle(.plain).listRowSpacing(12)
+            .contentMargins(.horizontal, 20, for: .scrollContent).scrollContentBackground(.hidden)
+            .refreshable { await store.refresh() }
         }
-        .navigationTitle("Mitteilungen")
+        .background(campusCanvas).navigationTitle("Mitteilungen")
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbarBackground(campusCanvas, for: .navigationBar, .tabBar)
+        .toolbarBackground(.visible, for: .navigationBar, .tabBar)
         .toolbar { ToolbarItem(placement: .topBarTrailing) { accountButton } }
-        .refreshable { await store.refresh() }
       }
     }
     private var accountButton: some View {
@@ -317,23 +397,45 @@
   struct EventRow: View {
     let event: StudentEvent
     @Environment(\.timeZone) private var zone
+    @ScaledMetric(relativeTo: .subheadline) private var timeWidth: CGFloat = 56
     var body: some View {
-      VStack(alignment: .leading, spacing: 6) {
-        HStack {
-          Text(
-            "\(displayDate(event.start, template: "HH:mm", zone: zone))–\(displayDate(event.end, template: "HH:mm", zone: zone))"
-          ).font(.subheadline.monospacedDigit())
+      HStack(alignment: .top, spacing: 12) {
+        VStack(alignment: .leading, spacing: 4) {
+          Text(displayDate(event.start, template: "HH:mm", zone: zone))
+            .font(.subheadline.weight(.semibold).monospacedDigit())
+          Text(displayDate(event.end, template: "HH:mm", zone: zone))
+            .font(.caption.monospacedDigit()).foregroundStyle(.secondary)
+        }.frame(width: timeWidth, alignment: .leading)
+        VStack(alignment: .leading, spacing: 8) {
+          Text(event.name).font(.headline).strikethrough(event.cancelled)
+            .fixedSize(horizontal: false, vertical: true)
           if event.cancelled {
-            Text("Abgesagt").font(.caption.bold())
+            Label("Abgesagt", systemImage: "xmark.circle").font(.subheadline.weight(.medium))
           } else if event.kind == "exam" {
-            Text("Prüfung").font(.caption.bold())
+            Text("Prüfung").font(.caption.weight(.medium)).foregroundStyle(.secondary)
+          }
+          if let rooms = event.roomNames, !rooms.isEmpty {
+            Label(rooms.joined(separator: ", "), systemImage: "door.left.hand.open")
+              .font(.subheadline).foregroundStyle(.secondary)
           }
         }
-        Text(event.name).font(.headline).strikethrough(event.cancelled)
-        if let rooms = event.roomNames, !rooms.isEmpty {
-          Label(rooms.joined(separator: ", "), systemImage: "mappin.and.ellipse").font(.subheadline)
+      }.foregroundStyle(event.cancelled ? Color(red: 0.7, green: 0.13, blue: 0.17) : campusBlue)
+        .padding(.vertical, 10)
+    }
+  }
+  private struct StudentEmptyState: View {
+    let title: String
+    let symbol: String
+    let detail: String
+    var body: some View {
+      HStack(alignment: .top, spacing: 12) {
+        Image(systemName: symbol).font(.title3).foregroundStyle(campusBlue)
+          .accessibilityHidden(true)
+        VStack(alignment: .leading, spacing: 6) {
+          Text(title).font(.headline).foregroundStyle(campusBlue)
+          Text(detail).font(.subheadline).foregroundStyle(.secondary)
         }
-      }.foregroundStyle(event.cancelled ? Color.red : Color.primary).padding(.vertical, 4)
+      }.padding(.vertical, 12)
     }
   }
   struct EventDetails: View {
@@ -357,7 +459,8 @@
             ForEach(groups, id: \.self) { Text($0) }
           }
         }
-      }.navigationTitle("Termindetails").navigationBarTitleDisplayMode(.inline)
+      }.scrollContentBackground(.hidden).background(campusCanvas)
+        .navigationTitle("Termindetails").navigationBarTitleDisplayMode(.inline)
     }
   }
 #endif
