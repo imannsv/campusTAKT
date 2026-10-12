@@ -1,13 +1,183 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
-  <rect width="1200" height="630" fill="#f4f8fa"/>
-  <g transform="translate(72 57) scale(2)"><g transform="rotate(-5 14 14)"><rect x="2.5" y="2.5" width="10" height="10" rx="2" fill="#214b76"/><rect x="15.5" y="2.5" width="10" height="10" rx="2" fill="#80a9c5"/><rect x="2.5" y="15.5" width="10" height="10" rx="2" fill="#81b5a2"/><rect x="15.5" y="15.5" width="10" height="10" rx="2" fill="#c7d9e6"/></g></g>
-  <text x="144" y="98" fill="#214b76" font-family="DM Sans" font-size="38" font-weight="800" letter-spacing="-1.74">campuszeit</text><text x="346" y="98" fill="#91acc4" font-family="DM Sans" font-size="38" font-weight="800">.</text>
-  <g fill="#20364a" font-family="Manrope" font-size="60" font-weight="700"><text x="72" y="220">Ein Stundenplan,</text><text x="72" y="294">der alles</text><text x="72" y="368">zusammenbringt.</text></g>
-  <text x="72" y="440" fill="#52677b" font-family="DM Sans" font-size="25">Räume, Lehrpläne und Prüfungen</text><text x="72" y="478" fill="#52677b" font-family="DM Sans" font-size="25">gemeinsam planen.</text>
-  <rect x="727" y="175" width="402" height="300" rx="12" fill="white" stroke="#dce6ed"/>
-  <path d="M739 175h378a12 12 0 0 1 12 12v42H727v-42a12 12 0 0 1 12-12Z" fill="#214b76"/>
-  <text x="748" y="210" fill="white" font-family="DM Sans" font-size="19">Wochenplanung</text>
-  <g stroke="#e6edf1"><path d="M748 279h360M748 342h360M748 405h360M820 247v200M892 247v200M964 247v200M1036 247v200"/></g>
-  <rect x="752" y="284" width="63" height="53" rx="4" fill="#c9e8dd"/><rect x="825" y="348" width="62" height="52" rx="4" fill="#d8e5f5"/><rect x="897" y="284" width="62" height="53" rx="4" fill="#e6e0f3"/><rect x="970" y="411" width="61" height="37" rx="4" fill="#f6e9c8"/><rect x="1042" y="284" width="61" height="53" rx="4" fill="#c9e8dd"/>
-  <text x="72" y="576" fill="#214b76" font-family="DM Sans" font-size="20">Für Hochschulen und Schulen</text>
+<svg
+  xmlns="http://www.w3.org/2000/svg"
+  width="1200"
+  height="630"
+  viewBox="0 0 1200 630"
+>
+  <rect width="1200" height="630" fill="#f4f7fa" />
+  <g transform="translate(64 48) scale(1.7)">
+    <g transform="rotate(-5 14 14)">
+      <rect x="2.5" y="2.5" width="10" height="10" rx="2" fill="#214b76" />
+      <rect x="15.5" y="2.5" width="10" height="10" rx="2" fill="#80a9c5" />
+      <rect x="2.5" y="15.5" width="10" height="10" rx="2" fill="#81b5a2" />
+      <rect x="15.5" y="15.5" width="10" height="10" rx="2" fill="#c7d9e6" />
+    </g>
+  </g>
+  <text
+    x="126"
+    y="83"
+    fill="#214b76"
+    font-family="DM Sans"
+    font-size="32"
+    font-weight="800"
+    letter-spacing="-1.46"
+  >
+    campuszeit
+  </text>
+  <text
+    x="296"
+    y="83"
+    fill="#91acc4"
+    font-family="DM Sans"
+    font-size="32"
+    font-weight="800"
+  >
+    .
+  </text>
+  <text
+    x="64"
+    y="186"
+    fill="#24374c"
+    font-family="DM Sans"
+    font-size="48"
+    font-weight="600"
+  >
+    Die Planungszentrale
+  </text>
+  <text
+    x="64"
+    y="246"
+    fill="#24374c"
+    font-family="DM Sans"
+    font-size="48"
+    font-weight="600"
+  >
+    für Hochschulen.
+  </text>
+  <text x="64" y="301" fill="#52677b" font-family="DM Sans" font-size="23">
+    Lehre, Räume und Prüfungen gemeinsam planen.
+  </text>
+  <rect
+    x="64"
+    y="345"
+    width="1072"
+    height="244"
+    rx="10"
+    fill="white"
+    stroke="#d8e2ec"
+  />
+  <path
+    d="M74 345h1052a10 10 0 0 1 10 10v32H64v-32a10 10 0 0 1 10-10Z"
+    fill="#fff"
+  />
+  <path d="M64 387h1072" stroke="#e5ebf1" />
+  <text
+    x="84"
+    y="374"
+    fill="#214b76"
+    font-family="DM Sans"
+    font-size="16"
+    font-weight="600"
+  >
+    Campus Nord
+  </text>
+  <text x="956" y="374" fill="#52677b" font-family="DM Sans" font-size="13">
+    Beispielansicht
+  </text>
+  <path d="M236 387v202" stroke="#e5ebf1" />
+  <rect x="80" y="407" width="140" height="32" rx="5" fill="#214b76" />
+  <text x="92" y="429" fill="white" font-family="DM Sans" font-size="14">
+    Stundenplan
+  </text>
+  <text x="92" y="470" fill="#52677b" font-family="DM Sans" font-size="14">
+    Räume
+  </text>
+  <text x="92" y="510" fill="#52677b" font-family="DM Sans" font-size="14">
+    Prüfungen
+  </text>
+  <rect
+    x="252"
+    y="404"
+    width="652"
+    height="168"
+    rx="5"
+    fill="#fff"
+    stroke="#e5ebf1"
+  />
+  <text
+    x="268"
+    y="431"
+    fill="#24374c"
+    font-family="DM Sans"
+    font-size="16"
+    font-weight="600"
+  >
+    Wochenplanung
+  </text>
+  <text x="754" y="431" fill="#315e4e" font-family="DM Sans" font-size="13">
+    Freigegeben
+  </text>
+  <g stroke="#e5ebf1">
+    <path
+      d="M252 447h652M252 509h652M380 447v125M508 447v125M636 447v125M764 447v125"
+    />
+  </g>
+  <rect x="266" y="460" width="102" height="42" rx="4" fill="#e4f2ed" />
+  <rect
+    x="394"
+    y="521"
+    width="102"
+    height="38"
+    rx="4"
+    fill="#e7effa"
+    stroke="#214b76"
+    stroke-width="2"
+  />
+  <rect x="522" y="460" width="102" height="42" rx="4" fill="#efebf9" />
+  <rect x="650" y="521" width="102" height="38" rx="4" fill="#fbf1dc" />
+  <rect x="778" y="460" width="112" height="42" rx="4" fill="#e7effa" />
+  <text x="275" y="485" fill="#24374c" font-family="DM Sans" font-size="11">
+    Projektmanagement
+  </text>
+  <text x="404" y="545" fill="#24374c" font-family="DM Sans" font-size="12">
+    Mathematik
+  </text>
+  <text x="532" y="485" fill="#24374c" font-family="DM Sans" font-size="12">
+    Datenbanken
+  </text>
+  <text x="660" y="545" fill="#24374c" font-family="DM Sans" font-size="12">
+    Wirtschaftsrecht
+  </text>
+  <text x="788" y="485" fill="#24374c" font-family="DM Sans" font-size="12">
+    Statistik
+  </text>
+  <rect
+    x="920"
+    y="404"
+    width="200"
+    height="168"
+    rx="5"
+    fill="#fff"
+    stroke="#e5ebf1"
+  />
+  <text x="936" y="429" fill="#52677b" font-family="DM Sans" font-size="12">
+    Termindetails
+  </text>
+  <text
+    x="936"
+    y="460"
+    fill="#24374c"
+    font-family="DM Sans"
+    font-size="18"
+    font-weight="600"
+  >
+    Mathematik
+  </text>
+  <text x="936" y="490" fill="#52677b" font-family="DM Sans" font-size="13">
+    10:15–11:45
+  </text>
+  <text x="936" y="518" fill="#52677b" font-family="DM Sans" font-size="13">
+    B.101 · WI26
+  </text>
+  <rect x="936" y="536" width="168" height="22" rx="3" fill="#e4f2ed" />
 </svg>

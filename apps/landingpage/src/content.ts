@@ -7,12 +7,12 @@ export const features: { title: string; text: string; icon: IconName }[] = [
     icon: "room",
   },
   {
-    title: "Lehrpläne mit klarer Struktur",
+    title: "Studienstruktur als Planungsgrundlage",
     text: "Module, Teilmodule und Semester in versionierten Lehrplänen. Credit Points und Unterrichtsumfang werden getrennt erfasst.",
     icon: "book",
   },
   {
-    title: "Jahrgänge und Gruppen zusammenführen",
+    title: "Gemeinsame Lehre koordinieren",
     text: "Mehrere Gruppen pro Jahrgang, gemeinsame Veranstaltungen, konkrete Wahlpflichtteilnehmer und mehrere Lehrende.",
     icon: "people",
   },
@@ -36,7 +36,7 @@ export const features: { title: string; text: string; icon: IconName }[] = [
 export const steps = [
   {
     title: "Grundlagen einrichten",
-    text: "Räume, Lehrende und Verfügbarkeiten erfassen. Studien- oder Bildungsgänge, Lehrpläne und Jahrgänge zuordnen.",
+    text: "Räume, Lehrende und Verfügbarkeiten erfassen. Studiengänge, Lehrplanversionen und Jahrgänge zuordnen.",
   },
   {
     title: "Veranstaltungen vorbereiten",

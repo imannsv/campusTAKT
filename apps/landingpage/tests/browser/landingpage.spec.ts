@@ -4,9 +4,9 @@ import AxeBuilder from "@axe-core/playwright";
 test("product benefits and honest demo link are present", async ({ page }) => {
   await page.goto("/");
   await expect(page.getByRole("heading", { level: 1 })).toHaveText(
-    "Ein Stundenplan, der alles zusammenbringt.",
+    "Die Planungszentrale für Ihren Hochschulalltag.",
   );
-  const demo = page.getByRole("link", { name: "Browser-Demo öffnen" }).first();
+  const demo = page.getByRole("link", { name: "Demo ausprobieren" }).first();
   await expect(demo).toHaveAttribute(
     "href",
     "https://campustime-flame.vercel.app",
@@ -37,6 +37,69 @@ test("product view selector exposes meaningful room and exam examples", async ({
     .getByRole("button", { name: "Stundenplan", exact: true })
     .click();
   await expect(preview.getByText("Wochenplanung")).toBeVisible();
+});
+
+test("planning preview allows keyboard selection and shows the matching saved example", async ({
+  page,
+}) => {
+  await page.goto("/#produkt");
+  const preview = page.getByRole("region", { name: "Produktvorschau" });
+  const event = preview.getByRole("button", {
+    name: "Montag: Projektmanagement, 08:30–10:00",
+  });
+  await event.focus();
+  await page.keyboard.press("Enter");
+  await expect(event).toHaveAttribute("aria-pressed", "true");
+  const detail = preview.getByRole("region", { name: "Termindetails" });
+  await expect(
+    detail.getByRole("heading", { name: "Projektmanagement", exact: true }),
+  ).toBeVisible();
+  await expect(detail.getByText("A.204", { exact: true })).toBeVisible();
+  await expect(
+    detail.getByText("WI26 · Gruppe A", { exact: true }),
+  ).toBeVisible();
+  await preview
+    .getByRole("button", { name: "Dienstag: Mathematik, 10:15–11:45" })
+    .click();
+  await expect(
+    detail.getByRole("heading", { name: "Mathematik", exact: true }),
+  ).toBeVisible();
+  await expect(event).toHaveAttribute("aria-pressed", "false");
+  await expect(detail.getByText("B.101", { exact: true })).toBeVisible();
+});
+
+test("mobile exam badges and tablet event text stay inside their panels", async ({
+  page,
+}) => {
+  for (const width of [320, 390, 600]) {
+    await page.setViewportSize({ width, height: 844 });
+    await page.goto("/#produkt");
+    const preview = page.getByRole("region", { name: "Produktvorschau" });
+    await preview
+      .getByRole("button", { name: "Prüfungen", exact: true })
+      .click();
+    expect(
+      await preview.locator(".exam-tag").evaluateAll((tags) =>
+        tags.every((tag) => {
+          const parent = tag.closest(".exam-demo")!.getBoundingClientRect();
+          const rect = tag.getBoundingClientRect();
+          return rect.left >= parent.left && rect.right <= parent.right;
+        }),
+      ),
+    ).toBe(true);
+  }
+  await page.setViewportSize({ width: 768, height: 1000 });
+  await page.goto("/");
+  expect(
+    await page.locator(".week-calendar .schedule-event").evaluateAll((events) =>
+      events.every((event) => {
+        const bounds = event.getBoundingClientRect();
+        return Array.from(event.children).every(
+          (child) => child.getBoundingClientRect().bottom <= bounds.bottom,
+        );
+      }),
+    ),
+  ).toBe(true);
 });
 
 test("mobile navigation supports Escape, focus return and closes after navigation", async ({
@@ -126,8 +189,20 @@ test("complete content and FAQ remain usable without JavaScript", async ({
   });
   const page = await context.newPage();
   await page.goto("http://127.0.0.1:4180/");
+  await expect(
+    page
+      .getByRole("region", { name: "Produktvorschau" })
+      .getByRole("button", { name: "Dienstag: Mathematik, 10:15–11:45" }),
+  ).toBeDisabled();
+  await expect(
+    page
+      .getByText(
+        "Statische Vorschau. In der Browser-Demo können Sie die Oberfläche ausprobieren.",
+      )
+      .first(),
+  ).toBeVisible();
   await expect(page.getByRole("heading", { level: 1 })).toContainText(
-    "Ein Stundenplan",
+    "Die Planungszentrale",
   );
   await page
     .getByText("Was kann ich in der Browser-Demo ausprobieren?", {
@@ -158,6 +233,7 @@ test("mobile, tablet and desktop fit the viewport and meet accessibility checks"
   for (const width of [320, 390, 768, 1440]) {
     await page.setViewportSize({ width, height: 1000 });
     await page.goto("/");
+    await expect(page.locator(".product-window .brand")).toBeVisible();
     await expect
       .poll(() =>
         page.evaluate(() => document.documentElement.scrollWidth <= innerWidth),

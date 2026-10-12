@@ -22,7 +22,7 @@ const escapeHtml = (value) =>
     .replaceAll("<", "&lt;")
     .replaceAll(">", "&gt;");
 const description =
-  "Räume, Lehrpläne, Jahrgänge, Unterricht und Prüfungen gemeinsam planen. Entdecken Sie CampusZeit für Hochschulen und Schulen in der Browser-Demo.";
+  "Die Planungszentrale für Hochschulen: Lehrveranstaltungen, Räume und Prüfungen gemeinsam planen, Konflikte prüfen und freigegebene Stundenpläne teilen.";
 const routes = [
   ["/", "index.html"],
   ["/impressum/", "impressum/index.html"],
@@ -106,7 +106,7 @@ const fonts = {
   ),
   heading: createFont(
     await readFile(
-      "node_modules/@fontsource/manrope/files/manrope-latin-700-normal.woff2",
+      "node_modules/@fontsource/dm-sans/files/dm-sans-latin-600-normal.woff2",
     ),
   ),
   body: createFont(
@@ -126,7 +126,9 @@ const svg = svgSource.replace(
       attr("font-family") === "DM Sans"
         ? attr("font-weight") === "800"
           ? fonts.brand
-          : fonts.body
+          : attr("font-weight") === "600"
+            ? fonts.heading
+            : fonts.body
         : fonts.heading;
     const scale = Number(attr("font-size", "60")) / font.unitsPerEm;
     const tracking = Number(attr("letter-spacing", "0")) / scale;

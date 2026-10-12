@@ -8,7 +8,7 @@ import legal from "../content/legal.json";
 function DemoLink({
   config,
   className = "button primary",
-  children = "Browser-Demo öffnen",
+  children = "Demo ausprobieren",
 }: {
   config: SiteConfig;
   className?: string;
@@ -72,7 +72,7 @@ function Header({ config, home }: { config: SiteConfig; home: boolean }) {
             Ablauf
           </a>
           <a href={`${prefix}#zielgruppen`} onClick={() => setOpen(false)}>
-            Für wen
+            Für Hochschulen
           </a>
           <a href={`${prefix}#fragen`} onClick={() => setOpen(false)}>
             Fragen
@@ -96,9 +96,9 @@ function Footer({ config }: { config: SiteConfig }) {
           <Logo />
         </a>
         <p>
-          Unterricht, Studium und Prüfungen.
+          Ein gemeinsamer Arbeitsbereich für Ihre Hochschule.
           <br />
-          Mit einem Plan für das Ganze.
+          Studienstruktur, Stundenpläne und Prüfungen.
         </p>
         <a href="/#kontakt" className="footer-contact">
           Kontakt
@@ -146,15 +146,17 @@ function Home({ config }: { config: SiteConfig }) {
     <>
       <section className="hero container" aria-labelledby="hero-title">
         <div className="hero-copy">
-          <h1 id="hero-title">Ein Stundenplan, der alles zusammenbringt.</h1>
+          <h1 id="hero-title">
+            Die Planungszentrale für Ihren Hochschulalltag.
+          </h1>
           <p className="hero-description">
-            Räume, Lehrpläne, Menschen und Prüfungen gemeinsam planen. Damit aus
-            vielen Vorgaben ein übersichtlicher, geprüfter Plan wird.
+            Lehrveranstaltungen, Räume und Prüfungen gemeinsam planen. Konflikte
+            prüfen und freigegebene Stundenpläne mit Studierenden teilen.
           </p>
           <div className="hero-actions">
             <DemoLink config={config} />
             <a className="text-link" href="#kontakt">
-              Ins Gespräch kommen
+              Pilotbetrieb besprechen
               <Icon name="chevron" />
             </a>
           </div>
@@ -164,26 +166,56 @@ function Home({ config }: { config: SiteConfig }) {
             Änderungen bleiben in Ihrem Browser.
           </p>
         </div>
+        <div className="hero-context">
+          <p>Ein Semester hat viele Abhängigkeiten.</p>
+          <p>
+            Bringen Sie Studienstruktur, Lehrende und Räume in einen gemeinsamen
+            Arbeitsbereich. Ihre Verwaltung entscheidet, welcher Plan
+            freigegeben wird.
+          </p>
+        </div>
         <div className="hero-product">
           <div className="hero-window">
             <div className="mini-window-bar">
-              <span className="mini-mark">
-                <Icon name="calendar" />
-                Stundenplanung
+              <Logo />
+              <span className="mini-code">
+                Campus Nord · Hochschule & Akademie
               </span>
-              <span className="mini-code">WI26</span>
             </div>
-            <Schedule compact />
+            <div className="hero-workspace">
+              <aside className="hero-sidebar" aria-label="Beispielnavigation">
+                <span>Planung</span>
+                <strong>
+                  <Icon name="calendar" /> Stundenplan
+                </strong>
+                <span>
+                  <Icon name="room" /> Räume
+                </span>
+                <span>
+                  <Icon name="exam" /> Prüfungen
+                </span>
+                <div>
+                  <Icon name="book" /> Studienstruktur
+                </div>
+                <p>
+                  Wintersemester
+                  <br />
+                  2026/27
+                </p>
+              </aside>
+              <Schedule compact />
+            </div>
           </div>
           <div className="hero-caption">
             <span className="caption-line" />
-            Ein Plan. Alle Zusammenhänge im Blick.<span>Fiktives Beispiel</span>
+            Ihre Planung. Alle Zusammenhänge im Blick.
+            <span>Produktvorschau mit fiktiven Daten</span>
           </div>
         </div>
       </section>
       <div className="scope-strip">
         <div className="container">
-          <span>Von der ersten Einrichtung bis zum freigegebenen Plan</span>
+          <span>Ein Arbeitsbereich für das ganze Semester</span>
           <div>
             <span>
               <Icon name="room" />
@@ -191,7 +223,7 @@ function Home({ config }: { config: SiteConfig }) {
             </span>
             <span>
               <Icon name="book" />
-              Lehrpläne
+              Studienstruktur
             </span>
             <span>
               <Icon name="calendar" />
@@ -212,16 +244,17 @@ function Home({ config }: { config: SiteConfig }) {
       >
         <div className="section-intro">
           <div>
-            <p className="section-label">Das Produkt</p>
+            <p className="section-label">Die Planungszentrale</p>
             <h2 id="product-title">
-              Viele Aufgaben.
+              Das Semester planen.
               <br />
-              Ein gemeinsamer Überblick.
+              Zusammenhänge erkennen.
             </h2>
           </div>
           <p>
-            Wer einen Stundenplan erstellt, plant mehr als Uhrzeiten. CampusZeit
-            verbindet die Informationen, die Ihre Verwaltung dafür braucht.
+            Wochenplan, Räume und Prüfungen in einem Arbeitsbereich: CampusZeit
+            verbindet die Aufgaben Ihrer Studienverwaltung in einer klaren
+            Oberfläche. Die Vorschau zeigt ein fiktives Hochschulsemester.
           </p>
         </div>
         <ProductPreview />
@@ -249,9 +282,9 @@ function Home({ config }: { config: SiteConfig }) {
           <div className="workflow-intro">
             <p className="section-label">Der Ablauf</p>
             <h2 id="workflow-title">
-              Von guten Grundlagen
+              Ein klarer Weg
               <br />
-              zu einem guten Plan.
+              zum freigegebenen Plan.
             </h2>
             <p>
               Die Verwaltung behält die Entscheidung. CampusZeit unterstützt
@@ -286,23 +319,24 @@ function Home({ config }: { config: SiteConfig }) {
       >
         <div className="section-intro">
           <div>
-            <p className="section-label">Für Ihre Einrichtung</p>
+            <p className="section-label">Für Hochschulen</p>
             <h2 id="audience-title">
-              Andere Anforderungen.
+              Ihre Studienstruktur.
               <br />
-              Dieselbe Sorgfalt.
+              Ihr Planungsalltag.
             </h2>
           </div>
           <p>
-            Hochschulen planen in Modulen und Semestern. Schulen organisieren
-            Klassen und Unterricht. CampusZeit bietet Grundlagen für beide
-            Abläufe.
+            Ob Studienverwaltung, Raumkoordination oder Prüfungsorganisation:
+            CampusZeit führt die benötigten Grundlagen zusammen. Ein
+            Pilotbetrieb zeigt, wie Ihre konkreten Abläufe darin abgebildet
+            werden können.
           </p>
         </div>
         <div className="audience-grid">
           <article>
             <Icon name="book" />
-            <h3>Für Hochschulen</h3>
+            <h3>Studiengänge strukturiert organisieren</h3>
             <p>
               Studienstrukturen nachvollziehbar aufbauen und Jahrgänge durch
               ihre Semester begleiten.
@@ -316,16 +350,17 @@ function Home({ config }: { config: SiteConfig }) {
           </article>
           <article>
             <Icon name="people" />
-            <h3>Für Schulen</h3>
+            <h3>Planung verlässlich abstimmen</h3>
             <p>
-              Klassen, Lehrende und Räume zusammenbringen und Unterricht für den
-              gewählten Zeitraum planen.
+              Verfügbarkeiten berücksichtigen, Konflikte prüfen und Änderungen
+              zuerst im Entwurf bearbeiten. Die Freigabe bleibt bei Ihrer
+              Verwaltung.
             </p>
             <ul>
-              <li>Bildungsgänge, Jahrgänge und Klassen</li>
-              <li>Unterrichtsumfang und Lehrendenteams</li>
-              <li>Verfügbarkeiten, freie Tage und Raumbelegung</li>
-              <li>Freigegebene Pläne für Gruppen und Anzeigen</li>
+              <li>Lehrende mit ihren Verfügbarkeiten</li>
+              <li>Raumkapazitäten, Ausstattung und Sperrzeiten</li>
+              <li>Geprüfte Entwürfe und separate Veröffentlichung</li>
+              <li>Studierendenübersicht und öffentliche Anzeigen</li>
             </ul>
           </article>
         </div>
@@ -338,14 +373,14 @@ function Home({ config }: { config: SiteConfig }) {
         <div className="assistant-copy">
           <p className="section-label">Freddy / CampusAI</p>
           <h2 id="assistant-title">
-            Eine Hilfe, die weiß,
+            Unterstützung dort,
             <br />
-            wo Sie gerade sind.
+            wo Sie gerade planen.
           </h2>
           <p>
             Freddy erklärt Funktionen, zeigt Hinweise zur aktuellen Planung und
-            führt Sie zur passenden Ansicht. Auf Wunsch öffnet er ein
-            vorbereitetes Formular. Sie prüfen und speichern selbst.
+            führt Sie zur passenden Ansicht. So finden Sie sich auch bei
+            selteneren Aufgaben zurecht. Sie prüfen und speichern selbst.
           </p>
           <p className="assistant-limits">
             In der Browser-Demo gibt es Schnellhilfe. Im Backend kann optional
@@ -392,21 +427,21 @@ function Home({ config }: { config: SiteConfig }) {
       >
         <div className="container contact-grid">
           <div>
-            <p className="section-label">Individuelles Angebot</p>
+            <p className="section-label">Ihr nächster Schritt</p>
             <h2 id="contact-title">
-              Passt CampusZeit
+              Beginnen wir mit
               <br />
-              zu Ihrer Einrichtung?
+              Ihrem nächsten Semester.
             </h2>
             <p>
-              Probieren Sie die Oberfläche aus. Für einen Pilotbetrieb werden
-              Ihre Abläufe, Daten und die Betriebsumgebung gemeinsam geprüft.
-              Ein Angebot richtet sich nach Ihrer Einrichtung; feste Preise sind
-              noch nicht veröffentlicht.
+              Testen Sie die Oberfläche und prüfen Sie CampusZeit anschließend
+              mit den Abläufen Ihrer Hochschule. Für einen Pilotbetrieb stimmen
+              wir Daten, Planungsbedarf und Betriebsumgebung gemeinsam ab. Das
+              Angebot richtet sich nach Ihrer Einrichtung.
             </p>
           </div>
           <div className="contact-panel">
-            <h3>Der erste Schritt: kennenlernen.</h3>
+            <h3>Die Planungszentrale kennenlernen</h3>
             <p>
               Die Demo zeigt Ihnen, wie sich die Arbeit mit CampusZeit anfühlt.
             </p>
@@ -414,14 +449,14 @@ function Home({ config }: { config: SiteConfig }) {
             <div className="contact-divider" />
             {config.contactEmail ? (
               <>
-                <h3>Demo anfragen</h3>
+                <h3>Pilotbetrieb besprechen</h3>
                 <p>
-                  Beschreiben Sie kurz Ihre Einrichtung und Ihren
+                  Erzählen Sie uns von Ihren Studiengängen und Ihrem
                   Planungsbedarf.
                 </p>
                 <a
                   className="text-link"
-                  href={`mailto:${config.contactEmail}?subject=${encodeURIComponent("CampusZeit – Demo und individuelles Angebot")}`}
+                  href={`mailto:${config.contactEmail}?subject=${encodeURIComponent("CampusZeit – Pilotbetrieb für unsere Hochschule")}`}
                 >
                   <Icon name="mail" />
                   {config.contactEmail}
@@ -433,7 +468,7 @@ function Home({ config }: { config: SiteConfig }) {
               </>
             ) : (
               <>
-                <h3>Persönlich sprechen</h3>
+                <h3>Pilotbetrieb besprechen</h3>
                 <p className="pending-contact">
                   Der persönliche Kontaktweg wird gerade eingerichtet.
                 </p>

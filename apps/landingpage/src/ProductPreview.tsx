@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useId, useState } from "react";
 import { Icon, Logo } from "./Icon";
 
 const days = ["Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag"];
@@ -59,87 +59,183 @@ const events = [
   },
 ];
 
-function Event({ event }: { event: (typeof events)[number] }) {
+function Event({
+  event,
+  selected,
+  onSelect,
+  detailsId,
+  enhanced,
+}: {
+  event: (typeof events)[number];
+  selected: boolean;
+  onSelect: () => void;
+  detailsId: string;
+  enhanced: boolean;
+}) {
   return (
-    <div className={`schedule-event ${event.tone}`}>
+    <button
+      type="button"
+      disabled={!enhanced}
+      className={`schedule-event ${event.tone}`}
+      aria-label={`${days[event.day]}: ${event.title}, ${event.time}`}
+      aria-pressed={selected}
+      aria-controls={detailsId}
+      onClick={onSelect}
+    >
       <span className="event-time">{event.time}</span>
       <strong>{event.title}</strong>
       <span>
         {event.room} · {event.group}
       </span>
-    </div>
+    </button>
   );
 }
 
 export function Schedule({ compact = false }: { compact?: boolean }) {
+  const [selected, setSelected] = useState(1);
+  const [enhanced, setEnhanced] = useState(false);
+  useEffect(() => setEnhanced(true), []);
+  const detailsId = useId();
+  const current = events[selected];
+  const renderEvent = (event: (typeof events)[number], index: number) => (
+    <Event
+      event={event}
+      selected={selected === index}
+      onSelect={() => setSelected(index)}
+      detailsId={detailsId}
+      enhanced={enhanced}
+    />
+  );
   return (
     <div className={compact ? "schedule compact" : "schedule"}>
-      <div className="schedule-toolbar">
+      <div className="planning-preview-heading">
         <div>
-          <strong>
-            {compact ? "Das Semester im Überblick" : "Wochenplanung"}
-          </strong>
-          <span>Wirtschaftsinformatik · WI26</span>
+          <strong>Stundenplanung</strong>
+          <span>Wirtschaftsinformatik · Wintersemester 2026/27</span>
         </div>
-        <span className="status-label">
-          <Icon name="check" />
-          Freigegeben
-        </span>
+        <span className="planning-count">6 Termine diese Woche</span>
       </div>
-      <div className="week-bar">
-        <span>5.–9. Oktober 2026</span>
-        <span className="week-selection">Woche 41</span>
-      </div>
-      <div className="week-calendar">
-        <div className="calendar-corner" />
-        {days.map((day, index) => (
-          <div
-            className="day-label"
-            key={day}
-            style={{ gridColumn: index + 2 }}
-          >
-            <span>{compact ? day.slice(0, 2) : day}</span>
-            <strong>{index + 5}</strong>
-          </div>
-        ))}
-        {["08:30", "10:15", "12:15", "14:00"].map((hour, index) => (
-          <span
-            className="hour-label"
-            key={hour}
-            style={{ gridRow: index + 2 }}
-          >
-            {hour}
-          </span>
-        ))}
-        {days.flatMap((day, column) =>
-          [1, 2, 3, 4].map((row) => (
-            <div
-              className="calendar-cell"
-              key={`${day}-${row}`}
-              style={{ gridColumn: column + 2, gridRow: row + 1 }}
-            />
-          )),
-        )}
-        {events.map((event, index) => (
-          <div
-            className="event-position"
-            key={index}
-            style={{ gridColumn: event.day + 2, gridRow: event.row + 1 }}
-          >
-            <Event event={event} />
-          </div>
-        ))}
-      </div>
-      <div className="mobile-calendar">
-        {events.slice(0, 4).map((event, index) => (
-          <div className="mobile-day" key={index}>
-            <span>
-              {days[event.day]}
-              <strong>{event.day + 5}. Oktober</strong>
+      <div className="planning-preview-grid">
+        <div className="planning-preview-calendar">
+          <div className="schedule-toolbar">
+            <div>
+              <strong>Wochenplanung</strong>
+              <span>Wirtschaftsinformatik · WI26</span>
+            </div>
+            <span className="status-label">
+              <Icon name="check" />
+              Freigegeben
             </span>
-            <Event event={event} />
           </div>
-        ))}
+          <div className="week-bar">
+            <span>5.–9. Oktober 2026</span>
+            <span className="week-selection">Woche 41</span>
+          </div>
+          <div className="week-calendar">
+            <div className="calendar-corner" />
+            {days.map((day, index) => (
+              <div
+                className="day-label"
+                key={day}
+                style={{ gridColumn: index + 2 }}
+              >
+                <span>{compact ? day.slice(0, 2) : day}</span>
+                <strong>{index + 5}</strong>
+              </div>
+            ))}
+            {["08:30", "10:15", "12:15", "14:00"].map((hour, index) => (
+              <span
+                className="hour-label"
+                key={hour}
+                style={{ gridRow: index + 2 }}
+              >
+                {hour}
+              </span>
+            ))}
+            {days.flatMap((day, column) =>
+              [1, 2, 3, 4].map((row) => (
+                <div
+                  className="calendar-cell"
+                  key={`${day}-${row}`}
+                  style={{ gridColumn: column + 2, gridRow: row + 1 }}
+                />
+              )),
+            )}
+            {events.map((event, index) => (
+              <div
+                className="event-position"
+                key={index}
+                style={{ gridColumn: event.day + 2, gridRow: event.row + 1 }}
+              >
+                {renderEvent(event, index)}
+              </div>
+            ))}
+          </div>
+          <div className="mobile-calendar">
+            {events.map((event, index) => (
+              <div className="mobile-day" key={index}>
+                <span>
+                  {days[event.day]}
+                  <strong>{event.day + 5}. Oktober</strong>
+                </span>
+                {renderEvent(event, index)}
+              </div>
+            ))}
+          </div>
+          <div className="calendar-preview-footer">
+            <span>
+              <Icon name="check" /> Freigegebener Beispielplan
+            </span>
+            <span>
+              {enhanced
+                ? "Termine auswählen und Details ansehen"
+                : "Statische Vorschau. In der Browser-Demo können Sie die Oberfläche ausprobieren."}
+            </span>
+          </div>
+        </div>
+        <section
+          id={detailsId}
+          className="term-details"
+          aria-label="Termindetails"
+        >
+          <div className="term-details-heading">
+            <span>Ausgewählter Termin</span>
+            <Icon name="calendar" />
+          </div>
+          <div
+            className="term-details-body"
+            aria-live="polite"
+            aria-atomic="true"
+          >
+            <span className={`term-color ${current.tone}`} />
+            <h3>{current.title}</h3>
+            <p>
+              {days[current.day]}, {current.day + 5}. Oktober
+            </p>
+            <dl>
+              <div>
+                <dt>Zeit</dt>
+                <dd>{current.time}</dd>
+              </div>
+              <div>
+                <dt>Raum</dt>
+                <dd>{current.room}</dd>
+              </div>
+              <div>
+                <dt>Jahrgang / Gruppe</dt>
+                <dd>{current.group}</dd>
+              </div>
+            </dl>
+            <div className="term-details-state">
+              <Icon name="check" />
+              <span>Im Beispielplan freigegeben</span>
+            </div>
+            <p className="term-details-note">
+              Raum, Zeit und Gruppe zusammen im Blick. Bearbeiten können Sie
+              Termine in der vollständigen Anwendung.
+            </p>
+          </div>
+        </section>
       </div>
     </div>
   );
@@ -257,45 +353,56 @@ export function ProductPreview() {
       role="region"
       aria-label="Produktvorschau"
     >
-      <div
-        className="preview-switcher enhanced-only"
-        role="group"
-        aria-label="Produktansicht auswählen"
-      >
-        {(
-          [
-            ["schedule", "Stundenplan", "calendar"],
-            ["rooms", "Räume", "room"],
-            ["exams", "Prüfungen", "exam"],
-          ] as const
-        ).map(([id, label, icon]) => (
-          <button
-            key={id}
-            type="button"
-            aria-pressed={view === id}
-            onClick={() => setView(id)}
-          >
-            <Icon name={icon} />
-            {label}
-          </button>
-        ))}
-      </div>
       <div className="product-window">
         <div className="window-top">
           <Logo />
-          <span>Fiktive Produktansicht</span>
+          <span>Campus Nord · Fiktive Produktansicht</span>
           <span className="window-avatar" aria-hidden="true">
             V
           </span>
         </div>
-        <div className="product-content">
-          {view === "schedule" ? (
-            <Schedule />
-          ) : view === "rooms" ? (
-            <Rooms />
-          ) : (
-            <Exams />
-          )}
+        <div className="workspace-preview">
+          <div className="preview-sidebar">
+            <span className="sidebar-institution">
+              Campus Nord<span>Hochschule & Akademie</span>
+            </span>
+            <div
+              className="preview-switcher enhanced-only"
+              role="group"
+              aria-label="Produktansicht auswählen"
+            >
+              {(
+                [
+                  ["schedule", "Stundenplan", "calendar"],
+                  ["rooms", "Räume", "room"],
+                  ["exams", "Prüfungen", "exam"],
+                ] as const
+              ).map(([id, label, icon]) => (
+                <button
+                  key={id}
+                  type="button"
+                  aria-pressed={view === id}
+                  onClick={() => setView(id)}
+                >
+                  <Icon name={icon} />
+                  {label}
+                </button>
+              ))}
+            </div>
+            <p className="sidebar-note">
+              <Icon name="book" /> Studienstruktur als Grundlage für die
+              Planung.
+            </p>
+          </div>
+          <div className="product-content">
+            {view === "schedule" ? (
+              <Schedule />
+            ) : view === "rooms" ? (
+              <Rooms />
+            ) : (
+              <Exams />
+            )}
+          </div>
         </div>
       </div>
       <figcaption>

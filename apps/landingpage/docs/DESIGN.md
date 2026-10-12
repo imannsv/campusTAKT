@@ -2,21 +2,22 @@
 
 ## Auftrag und Grenzen
 
-Die Arbeitsanweisung unter `outputs/jakob-landingpage/Arbeitsanweisung-Jakob.md` ist das Briefing. Die Seite erklärt Hochschul- und Schulverwaltungen das aktuelle Produkt und führt zur Browser-Demo oder einer Kontaktanfrage. Umsetzung direkt auf dem vorgegebenen Branch `landingpage`, ausschließlich unter `apps/landingpage`. Produktdateien und bestehendes Vercel-Projekt bleiben unverändert.
+Die Seite erklärt Hochschulverwaltungen das aktuelle Produkt und führt zur Browser-Demo oder zum Gespräch über einen Pilotbetrieb. Der am 09.10.2026 bestätigte Entwurf überträgt die Planungszentrale der Anwendung auf die Landingpage. Umsetzung auf dem vorgegebenen Branch `landingpage`, ausschließlich unter `apps/landingpage`.
 
 ## Gestaltung
 
-Farben: Campusblau `#214b76`, Text `#20364a`, Mint `#6ed8bf`, heller Hintergrund `#f4f8fa`, Weiß `#ffffff`, Nebeninformation `#52677b`. Manrope für Überschriften, DM Sans für Fließtext, lokal ausgelieferte Latin-Schriftdateien. Links ausgerichtete Texte, großzügige Abstände und ein ruhiger Wechsel zwischen hellen Flächen und einem dunkelblauen Ablaufbereich.
+Farben: Campusblau `#214b76`, Text `#24374c`, Mintflächen `#e4f2ed`, heller Hintergrund `#f4f7fa`, Weiß `#ffffff`, Nebeninformation `#52677b`. DM Sans für Überschriften, Fließtext und die unveränderte Wortmarke, lokal ausgelieferte Schriftdateien. Links ausgerichtete Texte, klare Linien und großzügige Abstände. Heller Ablaufbereich; blaues Kontaktfeld und dunkler Footer mit weißer Fläche für das Original-Logo.
 
-Die Wochenplanung ist das zentrale visuelle Motiv. Eine ausdrücklich fiktive Produktvorschau zeigt Termin, Raum und Gruppe; ergänzende Ansichten erklären Räume und Prüfungen. Keine erfundenen Kennzahlen oder Referenzen, keine dekorativen Stockbilder. Funktionalität ist wichtiger als Animation. Navigation, Vorschau-Auswahl und FAQ funktionieren mit Tastatur; Inhalte und FAQ sind auch ohne JavaScript lesbar.
+Die Wochenplanung ist das zentrale visuelle Motiv. Eine große, ausdrücklich fiktive Produktvorschau zeigt die Navigation links, den Wochenplan mittig und die ausgewählten Termindetails rechts. Beispieltermine sind mit Maus und Tastatur auswählbar; Raum- und Prüfungsansichten ergänzen die Vorschau. Auf Mobilgeräten erscheinen Termine als Liste und Details darunter. Ohne JavaScript bleiben Inhalt und FAQ lesbar; Terminwahl ist deaktiviert und als statische Vorschau erklärt. Keine erfundenen Kundenreferenzen, Erfolgskennzahlen oder dekorativen Stockbilder.
 
 ```text
-Logo                  Produkt | Ablauf | Zielgruppen | Fragen      Demo
-Konkreter Nutzen                    Fiktive Wochenplanung
-Demo / Kontakt                      Termin mit Raum und Gruppe
+Logo                  Produkt | Ablauf | Für Hochschulen | Fragen      Demo
+Die Planungszentrale für Ihren Hochschulalltag
+Demo ausprobieren / Pilotbetrieb besprechen
+Große Produktansicht: Navigation | Wochenplanung | Termindetails
 Produktansichten: Stundenplan / Räume / Prüfungen
 Vier tatsächliche Schritte von Einrichtung bis Veröffentlichung
-Hochschulen                         Schulen
+Studienstruktur                     Planung abstimmen
 Freddy und seine nachvollziehbaren Grenzen
 Individuelles Angebot / Kontakt
 FAQ                                 Footer / Rechtliche Seiten

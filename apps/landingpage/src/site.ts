@@ -14,7 +14,7 @@ export function pageForPath(path: string): PageKind {
   return "notfound";
 }
 export const pageTitles: Record<PageKind, string> = {
-  home: "CampusZeit – Stundenpläne, Räume und Prüfungen zusammen planen",
+  home: "CampusZeit – Die Planungszentrale für Hochschulen",
   imprint: "Impressum – CampusZeit",
   privacy: "Datenschutz – CampusZeit",
   notfound: "Seite nicht gefunden – CampusZeit",

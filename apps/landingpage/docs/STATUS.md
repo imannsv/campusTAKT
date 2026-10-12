@@ -1,5 +1,17 @@
 # Prüf- und Übergabestand
 
+## Überarbeitung für Hochschulen · 09.10.2026
+
+- Gestaltung an die Planungszentrale angepasst: bestehende Produktfarben, DM Sans, helle Arbeitsflächen, klare Navigation und unverändertes Logo.
+- Große Wochenplanvorschau mit auswählbaren Beispielterminen und passenden Termindetails; weitere Ansichten für Räume und Prüfungen.
+- Hochschultexte mit Schwerpunkt Studienstruktur, Raumkoordination, Prüfungsorganisation und kontrollierte Freigabe. Kontakt für Pilotbetrieb nur über eine bestätigte Adresse; bestehender Hinweis bleibt ohne Adresse erhalten.
+- Gemeinsame Gestaltung für Ablauf, Hochschulnutzen, Freddy, Kontakt, FAQ, Footer, Rechtsseiten und Open-Graph-Grafik.
+- Rechtsinhalte und öffentliche Freigabesicherung bleiben im bisherigen Entwurfsstand. Keine neuen Tracker oder externen Einbettungen.
+- Build, 6 Node-Tests und 9 Browsertests einschließlich Terminwahl, Tastatur, JavaScript-freier Ansicht, Logo bei allen Breiten und nicht abgeschnittener Prüfungszeilen/Termintexte geprüft. Desktop, Mobil, Räume, Prüfungen, Rechtsseiten und Vorschaugrafik zusätzlich visuell geprüft.
+- Unabhängige Codeprüfung: keine kritischen Probleme; mobile Prüfungszeilen, Tablet-Termintexte und statische Vorschau ohne JavaScript nach Hinweisen korrigiert und durch Regressionstests abgesichert.
+
+Der folgende Stand dokumentiert die ursprüngliche Einrichtung und Bereitstellung.
+
 Stand: 07.10.2026. Eigenständige Umsetzung unter `apps/landingpage`, Branch `landingpage`.
 
 ## Umgesetzt
@@ -18,21 +30,21 @@ Stand: 07.10.2026. Eigenständige Umsetzung unter `apps/landingpage`, Branch `la
 
 ## Verifiziert
 
-| Prüfung | Ergebnis |
-| --- | --- |
-| TypeScript und Client-/Serverbuild | Bestanden |
-| Statische Erzeugung von 4 Seiten | Bestanden |
-| 6 Node-Tests | Bestanden |
-| 7 Playwright-Prüfungen | Bestanden |
-| axe: Startseite bei 320, 390, 768 und 1440 Pixeln | Keine Verstöße in geprüften WCAG-A-/AA-Regeln |
-| Ohne JavaScript: Inhalte, FAQ und mobile Ankernavigation | Bestanden |
-| Produktansichten, Menü/Escape/Fokus, Rechtsseiten und 404-Inhalt | Bestanden |
-| Desktop- und Mobil-Screenshots | Visuell geprüft |
-| Generierte Open-Graph-Grafik | Visuell geprüft, Schriftzeichen als eingebettete Konturen |
-| Browserkonsole | Keine Fehler im geprüften Browser |
-| Öffentliche Freigabe ohne Betreiberangaben | Erwartungsgemäß abgewiesen |
-| Demo-Link | HTTP 200 am 06.10.2026 |
-| npm-Abhängigkeiten | Audit meldet keine bekannten Schwachstellen bei Installation |
+| Prüfung                                                          | Ergebnis                                                     |
+| ---------------------------------------------------------------- | ------------------------------------------------------------ |
+| TypeScript und Client-/Serverbuild                               | Bestanden                                                    |
+| Statische Erzeugung von 4 Seiten                                 | Bestanden                                                    |
+| 6 Node-Tests                                                     | Bestanden                                                    |
+| 7 Playwright-Prüfungen                                           | Bestanden                                                    |
+| axe: Startseite bei 320, 390, 768 und 1440 Pixeln                | Keine Verstöße in geprüften WCAG-A-/AA-Regeln                |
+| Ohne JavaScript: Inhalte, FAQ und mobile Ankernavigation         | Bestanden                                                    |
+| Produktansichten, Menü/Escape/Fokus, Rechtsseiten und 404-Inhalt | Bestanden                                                    |
+| Desktop- und Mobil-Screenshots                                   | Visuell geprüft                                              |
+| Generierte Open-Graph-Grafik                                     | Visuell geprüft, Schriftzeichen als eingebettete Konturen    |
+| Browserkonsole                                                   | Keine Fehler im geprüften Browser                            |
+| Öffentliche Freigabe ohne Betreiberangaben                       | Erwartungsgemäß abgewiesen                                   |
+| Demo-Link                                                        | HTTP 200 am 06.10.2026                                       |
+| npm-Abhängigkeiten                                               | Audit meldet keine bekannten Schwachstellen bei Installation |
 
 Eine unabhängige Codeprüfung fand keine kritischen oder wesentlichen Probleme. Der Hinweis auf verdeckte Ankerüberschriften ohne JavaScript wurde mit einem zuerst fehlschlagenden Browsertest reproduziert und behoben. Alle sieben Browserprüfungen bestanden danach erneut. Das ist keine vollständige manuelle WCAG-Zertifizierung.
 
