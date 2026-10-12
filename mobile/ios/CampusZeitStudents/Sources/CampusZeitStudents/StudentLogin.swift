@@ -17,8 +17,8 @@
         ScrollView {
           VStack(spacing: 32) {
             // The original logo asset includes a wide empty margin on the right.
-            Image("Logo", bundle: .module).resizable().scaledToFit().frame(width: 720)
-              .frame(width: 230, alignment: .leading).clipped()
+            Image("Logo", bundle: .module).resizable().scaledToFit().frame(width: 720, height: 46)
+              .frame(width: 230, height: 46, alignment: .leading).clipped()
               .accessibilityLabel("CampusZeit").padding(.top, 32)
             VStack(spacing: 20) {
               Image(systemName: "qrcode.viewfinder")
