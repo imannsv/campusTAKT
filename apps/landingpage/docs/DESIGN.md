@@ -25,6 +25,14 @@ FAQ                                 Footer / Rechtliche Seiten
 
 ## Technik und Inhalte
 
+### Vermarktung für Hochschulen · 12.10.2026
+
+Das Praxisbeispiel zeigt einen Raumwechsel im Zusammenhang mit Planprüfung und erneuter Freigabe. Es ist ausdrücklich fiktiv und beschreibt keine automatische Ersatzraumsuche. Eine Vergleichstabelle stellt typische Aufgaben in getrennten Listen dem gemeinsamen Arbeitsbereich gegenüber; auf Mobilgeräten bleiben die Tabellenüberschriften für Hilfstechnologien erhalten.
+
+Der Pilot wird als individuell zu vereinbarender Einstieg beschrieben: abgegrenzter Planbereich, Datenbedarf, repräsentative Aufgaben und mögliche Abnahmekriterien. Umfang, Laufzeit, Kosten, Betrieb, Einführung und Support sind vor Start festzulegen. Es werden keine Preisbeträge, Reaktionszeiten, Anbieter-/Teamnamen, Referenzkunden oder Hostingstandorte erfunden. Die Kauf- und IT-Fragen ergänzen die fachlichen FAQ. Der Benutzer hat diese Ausrichtung mit „Individuell“ bestätigt.
+
+Anbieteridentität, Kontakt und freigegebene Rechtsangaben müssen weiterhin tatsächlich bereitgestellt werden; die vorhandene Entwurfs- und Freigabesicherung gilt unverändert.
+
 Eigenständiges React-/TypeScript-/Vite-Projekt mit eigenem Lockfile. React-Rendering beim Build erzeugt vollständige HTML-Dateien für `/`, `/impressum/`, `/datenschutz/` und `/404.html`; der Client hydriert nur für Interaktionen. Keine Produkt-API, Tracker, Fremdeinbettungen oder Formulardienste. Schriften, Logo, Favicon und Vorschaugrafik gehören zum eigenen Projekt.
 
 Demo-Link: `https://campustime-flame.vercel.app`, am 06.10.2026 per HTTP geprüft. Der Text nennt Testdaten, Browser-Speicherung und fehlende automatische Backendplanung. Freddy wird als Hilfe und Navigation beschrieben; das lokale Sprachmodell ist optional.

@@ -1,5 +1,15 @@
 # Prüf- und Übergabestand
 
+## Vermarktungsinhalte · 12.10.2026
+
+- Fiktives Praxisbeispiel: Raumblockierung, Änderung im Entwurf, Planprüfung und erneute Freigabe.
+- Vergleich typischer Planungsaufgaben in getrennten Listen mit Campuszeit; responsiv und mit erhaltener Tabellenstruktur für Hilfstechnologien.
+- Individuell zu vereinbarender Pilotablauf mit Umfang, Datenbedarf, repräsentativen Aufgaben und möglichen Abnahmekriterien.
+- Angebotsorientierung über Nutzungsumfang, Einrichtung, Datenübernahme, Betrieb und Begleitung; keine erfundenen Preise oder Servicezusagen.
+- Zusätzliche FAQ für Verwaltung und IT zu Pilotstart, Betriebsumgebung, Datenübernahme, Zugängen, Einführung, Support und Kosten.
+- Build, 6 Node-Tests und 9 bestehende Browsertests bestanden. Neue statische Inhalte bei 320, 390, 768 und 1440 Pixeln sowie ohne JavaScript geprüft. Unabhängige Prüfung ohne wesentliche Befunde.
+- Kontakt- und Rechtsplatzhalter sowie Zugriffsschutz bleiben im bisherigen Entwurfsstand. Namen von Anbietern, Teammitgliedern oder Referenzkunden benötigen weiterhin bestätigte Angaben.
+
 ## Überarbeitung für Hochschulen · 09.10.2026
 
 - Gestaltung an die Planungszentrale angepasst: bestehende Produktfarben, DM Sans, helle Arbeitsflächen, klare Navigation und unverändertes Logo.

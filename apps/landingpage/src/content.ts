@@ -54,6 +54,31 @@ export const steps = [
 
 export const faq = [
   {
+    question: "Wie beginnt ein Pilotbetrieb an unserer Hochschule?",
+    answer:
+      "Sie wählen einen abgegrenzten Planbereich und legen die zu prüfenden Abläufe sowie Abnahmekriterien fest. Laufzeit, Einrichtung, Datenübernahme, Kosten und Begleitung werden individuell vereinbart. Ein größeres Einsatzgebiet wird erst nach Bewertung der Pilot-Ergebnisse abgestimmt.",
+  },
+  {
+    question: "Wo läuft CampusZeit und wer betreibt es?",
+    answer:
+      "Die Betriebsumgebung und die zuständigen Ansprechpartner werden vor einem Pilotbetrieb gemeinsam mit Ihrer IT festgelegt. Dabei sind Hosting, Datenstandort, Backups, Updates und Zugriffe zu klären. Die Browser-Demo ist eine getrennte Umgebung mit fiktiven Daten und ersetzt keine eingerichtete Kundenumgebung.",
+  },
+  {
+    question: "Können wir vorhandene Daten übernehmen?",
+    answer:
+      "Im vollständigen System können Stammdaten per CSV oder XLSX geprüft und anschließend übernommen werden. Welche Daten Sie bereits haben, welche Zuordnungen benötigt werden und welche Aufbereitung anfällt, wird vor dem Pilotstart abgestimmt. Eine direkte Anbindung an Ihr Campusmanagement-System ist damit nicht zugesagt.",
+  },
+  {
+    question: "Wer erhält Zugriff auf unsere Planung?",
+    answer:
+      "Verwaltungs- und Planungskonten werden einer Einrichtung zugeordnet. Öffentliche Ansichten zeigen freigegebene Planversionen und liefern keine einzelnen Lernendennamen oder Teilnehmerlisten aus. Benötigte Konten, Zuständigkeiten und die Konfiguration veröffentlichter Ansichten werden vor dem Einsatz gemeinsam festgelegt.",
+  },
+  {
+    question: "Wie sind Einführung, Support und Kosten geregelt?",
+    answer:
+      "Einführung, zuständige Ansprechpartner, Supportumfang und Kosten sind Bestandteil des individuellen Angebots. Reaktionszeiten oder bestimmte Servicezeiten sind erst verbindlich, wenn sie vereinbart wurden. Feste Standardpreise sind derzeit nicht veröffentlicht.",
+  },
+  {
     question: "Wie richte ich meine Einrichtung ein?",
     answer:
       "Die geführte Einrichtung beginnt mit Räumen und Lehrenden. Danach folgen Studien- oder Bildungsgänge, Lehrplanversionen, Jahrgänge und Semesterpläne. Stammdaten können im Backend auch nach vorheriger Prüfung per CSV oder XLSX importiert werden.",

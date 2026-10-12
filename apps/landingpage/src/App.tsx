@@ -1,6 +1,11 @@
 import { useEffect, useRef, useState } from "react";
 import { Icon, Logo } from "./Icon";
 import { ProductPreview, Schedule } from "./ProductPreview";
+import {
+  PracticeCase,
+  PlanningComparison,
+  PilotInfo,
+} from "./MarketingSections";
 import { faq, features, steps } from "./content";
 import { pageForPath, type SiteConfig } from "./site";
 import legal from "../content/legal.json";
@@ -71,8 +76,8 @@ function Header({ config, home }: { config: SiteConfig; home: boolean }) {
           <a href={`${prefix}#ablauf`} onClick={() => setOpen(false)}>
             Ablauf
           </a>
-          <a href={`${prefix}#zielgruppen`} onClick={() => setOpen(false)}>
-            Für Hochschulen
+          <a href={`${prefix}#pilot`} onClick={() => setOpen(false)}>
+            Pilotbetrieb
           </a>
           <a href={`${prefix}#fragen`} onClick={() => setOpen(false)}>
             Fragen
@@ -237,6 +242,8 @@ function Home({ config }: { config: SiteConfig }) {
         </div>
       </div>
 
+      <PracticeCase />
+
       <section
         id="produkt"
         className="section container"
@@ -312,59 +319,8 @@ function Home({ config }: { config: SiteConfig }) {
         </div>
       </section>
 
-      <section
-        id="zielgruppen"
-        className="section container"
-        aria-labelledby="audience-title"
-      >
-        <div className="section-intro">
-          <div>
-            <p className="section-label">Für Hochschulen</p>
-            <h2 id="audience-title">
-              Ihre Studienstruktur.
-              <br />
-              Ihr Planungsalltag.
-            </h2>
-          </div>
-          <p>
-            Ob Studienverwaltung, Raumkoordination oder Prüfungsorganisation:
-            CampusZeit führt die benötigten Grundlagen zusammen. Ein
-            Pilotbetrieb zeigt, wie Ihre konkreten Abläufe darin abgebildet
-            werden können.
-          </p>
-        </div>
-        <div className="audience-grid">
-          <article>
-            <Icon name="book" />
-            <h3>Studiengänge strukturiert organisieren</h3>
-            <p>
-              Studienstrukturen nachvollziehbar aufbauen und Jahrgänge durch
-              ihre Semester begleiten.
-            </p>
-            <ul>
-              <li>Lehrplanversionen, Module und Credit Points</li>
-              <li>Wahlpflichtkurse und gemeinsame Veranstaltungen</li>
-              <li>Semesterbelastung und Modulvoraussetzungen</li>
-              <li>Prüfungsanforderungen, Klausuren und Abgaben</li>
-            </ul>
-          </article>
-          <article>
-            <Icon name="people" />
-            <h3>Planung verlässlich abstimmen</h3>
-            <p>
-              Verfügbarkeiten berücksichtigen, Konflikte prüfen und Änderungen
-              zuerst im Entwurf bearbeiten. Die Freigabe bleibt bei Ihrer
-              Verwaltung.
-            </p>
-            <ul>
-              <li>Lehrende mit ihren Verfügbarkeiten</li>
-              <li>Raumkapazitäten, Ausstattung und Sperrzeiten</li>
-              <li>Geprüfte Entwürfe und separate Veröffentlichung</li>
-              <li>Studierendenübersicht und öffentliche Anzeigen</li>
-            </ul>
-          </article>
-        </div>
-      </section>
+      <PlanningComparison />
+      <PilotInfo />
 
       <section
         className="assistant-section container"
@@ -498,7 +454,10 @@ function Home({ config }: { config: SiteConfig }) {
             <br />
             bevor Sie planen.
           </h2>
-          <p>Was heute funktioniert und wo die Grenzen liegen.</p>
+          <p>
+            Antworten für Studienverwaltung und IT sowie zum Einstieg in den
+            Pilotbetrieb.
+          </p>
         </div>
         <div className="faq-list">
           {faq.map((item) => (

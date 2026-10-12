@@ -2,6 +2,7 @@ import { createRoot, hydrateRoot } from "react-dom/client";
 import App from "./App";
 import { pageForPath, type SiteConfig } from "./site";
 import "./styles.css";
+import "./marketing.css";
 import "@fontsource/dm-sans/latin-400.css";
 import "@fontsource/dm-sans/latin-500.css";
 import "@fontsource/dm-sans/latin-600.css";
