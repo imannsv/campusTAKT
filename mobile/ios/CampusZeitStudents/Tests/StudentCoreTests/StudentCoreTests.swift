@@ -97,20 +97,45 @@ final class StudentCoreTests: XCTestCase {
     XCTAssertEqual(examCountdown(to: now, now: following, calendar: calendar), "Vor 2 Tagen")
   }
 
-  func testCurrentTimeIsInsideTodaysGridBeforeAndAfterTeachingHours() {
+  func testWeekStartsAtFirstEventInsteadOfCurrentTime() {
     let calendar = institutionCalendar("Europe/Berlin")
-    for (hour, minute) in [(6, 30), (19, 18), (23, 59)] {
-      let now = calendar.date(from: DateComponents(year: 2026, month: 10, day: 12,
-        hour: hour, minute: minute))!
-      let range = scheduleTimeRange([], day: now, now: now, calendar: calendar)
-      XCTAssertLessThanOrEqual(range.start, now)
-      XCTAssertGreaterThan(range.end, now)
+    let monday = calendar.date(from: DateComponents(year: 2026, month: 10, day: 12))!
+    let event = StudentEvent(id: "morning", name: "Vorlesung",
+      start: monday.addingTimeInterval(10 * 3600 + 30 * 60),
+      end: monday.addingTimeInterval(12 * 3600), kind: "teaching", cancelled: false,
+      roomNames: [], groupNames: [], teacherNames: [])
+    let week = ScheduleWeek(events: [event], date: monday, calendar: calendar)
+    XCTAssertEqual(week.startMinute, 630)
+    XCTAssertEqual(week.endMinute, 720)
+    XCTAssertEqual(week.timeTicks, [630, 660])
+  }
+
+  func testWeekBoundsUseAllVisibleDaysAndPreserveMidnightEvents() {
+    let calendar = institutionCalendar("Europe/Berlin")
+    let monday = calendar.date(from: DateComponents(year: 2026, month: 10, day: 12))!
+    func event(_ id: String, day: Int, start: Int, end: Int) -> StudentEvent {
+      let date = calendar.date(byAdding: .day, value: day, to: monday)!
+      return StudentEvent(id: id, name: id, start: date.addingTimeInterval(Double(start * 60)),
+        end: date.addingTimeInterval(Double(end * 60)), kind: "teaching", cancelled: false,
+        roomNames: [], groupNames: [], teacherNames: [])
     }
-    let now = calendar.date(from: DateComponents(year: 2026, month: 10, day: 12, hour: 19, minute: 18))!
-    let tomorrow = calendar.date(byAdding: .day, value: 1, to: now)!
-    let otherDay = scheduleTimeRange([], day: tomorrow, now: now, calendar: calendar)
-    XCTAssertEqual(calendar.component(.hour, from: otherDay.start), 8)
-    XCTAssertEqual(calendar.component(.hour, from: otherDay.end), 18)
+    let rows = [event("late", day: 0, start: 600, end: 810),
+      event("early", day: 2, start: 465, end: 645),
+      event("outside-week", day: 7, start: 0, end: 60)]
+    let week = ScheduleWeek(events: rows, date: monday, calendar: calendar)
+    XCTAssertEqual(week.startMinute, 465)
+    XCTAssertEqual(week.endMinute, 810)
+    XCTAssertEqual(week.timeTicks.first, 465)
+    XCTAssertEqual(week.timeTicks.last, 780)
+    let overnight = ScheduleWeek(events: [event("night", day: 4, start: 1380, end: 1500)],
+      date: monday, calendar: calendar)
+    XCTAssertEqual(overnight.days.count, 6)
+    XCTAssertEqual(overnight.startMinute, 0)
+    XCTAssertEqual(overnight.endMinute, 1440)
+    let tiny = ScheduleWeek(events: [event("short", day: 0, start: 630, end: 631)],
+      date: monday, calendar: calendar)
+    XCTAssertGreaterThan(tiny.endMinute, tiny.startMinute)
+    XCTAssertEqual(tiny.timeTicks, [630])
   }
 
   func testCancelledFeedThrowsCancellationError() async throws {
@@ -152,14 +177,13 @@ final class StudentCoreTests: XCTestCase {
     let hidden = StudentEvent(id: "sun", name: "Sonntag", start: sunday.addingTimeInterval(36000),
       end: sunday.addingTimeInterval(39600), kind: "teaching", cancelled: false,
       roomNames: [], groupNames: [], teacherNames: [])
-    let week = ScheduleWeek(events: [hidden], date: sunday,
-      now: monday.addingTimeInterval(19 * 3600 + 18 * 60), calendar: calendar)
+    let week = ScheduleWeek(events: [hidden], date: sunday, calendar: calendar)
     XCTAssertEqual(week.days.count, 5)
     XCTAssertEqual(calendar.component(.weekday, from: week.days.first!), 2)
     XCTAssertEqual(calendar.component(.weekday, from: week.days.last!), 6)
     XCTAssertTrue(week.placements.allSatisfy { $0.isEmpty })
-    XCTAssertEqual(week.startHour, 8)
-    XCTAssertEqual(week.endHour, 20)
+    XCTAssertEqual(week.startMinute, 480)
+    XCTAssertEqual(week.endMinute, 1080)
     XCTAssertEqual(scheduleShortTitle("Management von Projekten"), "MVP")
     XCTAssertEqual(scheduleShortTitle("C++"), "C++")
   }
@@ -173,7 +197,7 @@ final class StudentCoreTests: XCTestCase {
         cancelled: cancelled, roomNames: [], groupNames: [], teacherNames: [])
     }
     func week(_ rows: [StudentEvent], date: Date? = nil) -> ScheduleWeek {
-      ScheduleWeek(events: rows, date: date ?? monday, now: monday, calendar: calendar)
+      ScheduleWeek(events: rows, date: date ?? monday, calendar: calendar)
     }
     XCTAssertEqual(week([]).days.count, 5)
     let lecture = event(saturday.addingTimeInterval(8 * 3600), saturday.addingTimeInterval(11 * 3600))
@@ -224,7 +248,7 @@ final class StudentCoreTests: XCTestCase {
         end: nextWeek.addingTimeInterval(11 * 3600), kind: "teaching", cancelled: false,
         roomNames: [], groupNames: [], teacherNames: []),
     ]
-    let browsed = ScheduleWeek(events: upcoming, date: nextWeek, now: today, calendar: calendar)
+    let browsed = ScheduleWeek(events: upcoming, date: nextWeek, calendar: calendar)
     XCTAssertEqual(browsed.placements.flatMap { $0 }.map(\.id), ["next-week"])
     let summary = schedulePlacements(upcoming, day: today, calendar: calendar).map(\.event)
     XCTAssertEqual(summary.map(\.id), ["today", "cancelled"])

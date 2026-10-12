@@ -244,7 +244,7 @@
       let calendar = store.calendar
       let week = ScheduleWeek(
         events: store.feed?.rows ?? [], date: store.selectedDate,
-        now: Date(), calendar: calendar)
+        calendar: calendar)
       let monday = week.days.first!
       let lastDay = week.days.last!
       let sameMonth = calendar.isDate(monday, equalTo: lastDay, toGranularity: .month)
@@ -629,17 +629,18 @@
 
     var body: some View {
       TimelineView(.periodic(from: .now, by: 60)) { clock in
-        let week = ScheduleWeek(events: events, date: date, now: clock.date, calendar: calendar)
+        let week = ScheduleWeek(events: events, date: date, calendar: calendar)
         GeometryReader { viewport in
           let axis = min(axisWidth, 72)
           let column = max(1, (viewport.size.width - 16 - axis) / CGFloat(week.days.count))
           let plotHeight = max(1, viewport.size.height - headerHeight - footerHeight - 8)
-          let scale = plotHeight / CGFloat((week.endHour - week.startHour) * 60)
+          let duration = week.endMinute - week.startMinute
+          let scale = plotHeight / CGFloat(duration)
           let today = week.days.first { calendar.isDate($0, inSameDayAs: clock.date) }
           let nowMinutes = today.map {
             clock.date.timeIntervalSince(
               calendar.date(
-                bySettingHour: week.startHour, minute: 0,
+                bySettingHour: week.startMinute / 60, minute: week.startMinute % 60,
                 second: 0, of: $0)!) / 60
           }
           VStack(spacing: 0) {
@@ -680,14 +681,19 @@
             }.frame(height: headerHeight).background(.white)
             HStack(spacing: 0) {
               ZStack(alignment: .topLeading) {
-                ForEach(week.startHour..<week.endHour, id: \.self) { hour in
-                  Text(String(format: "%02d:00", hour)).font(.caption.monospacedDigit())
-                    .foregroundStyle(.secondary).lineLimit(1)
-                    .opacity(
-                      nowMinutes.map { abs($0 - Double((hour - week.startHour) * 60)) < 15 } == true
-                        ? 0 : 1
-                    )
-                    .offset(y: CGFloat((hour - week.startHour) * 60) * scale)
+                ForEach(week.timeTicks, id: \.self) { minute in
+                  Text(String(format: "%02d:%02d", minute / 60, minute % 60)).font(
+                    .caption.monospacedDigit()
+                  )
+                  .foregroundStyle(.secondary).lineLimit(1)
+                  .opacity(
+                    (minute != week.startMinute && CGFloat(minute - week.startMinute) * scale < 20)
+                      || nowMinutes.map {
+                        $0 >= 0 && $0 < Double(duration)
+                          && abs($0 - Double(minute - week.startMinute)) < 15
+                      } == true ? 0 : 1
+                  )
+                  .offset(y: CGFloat(minute - week.startMinute) * scale)
                 }
               }.frame(width: axis, height: plotHeight, alignment: .topLeading).accessibilityHidden(
                 true)
@@ -698,7 +704,7 @@
               }
             }.frame(height: plotHeight)
               .overlay(alignment: .topLeading) {
-                if let minutes = nowMinutes {
+                if let minutes = nowMinutes, minutes >= 0, minutes < Double(duration) {
                   HStack(spacing: 0) {
                     Text(displayDate(clock.date, template: "HH:mm", zone: calendar.timeZone))
                       .font(.caption.weight(.semibold).monospacedDigit())
@@ -721,8 +727,16 @@
                 }
               }
             } label: {
-              Label("Termine & Details", systemImage: "list.bullet").font(.footnote.weight(.medium))
-                .frame(maxWidth: .infinity, minHeight: footerHeight)
+              VStack(spacing: 4) {
+                if let minutes = nowMinutes, minutes < 0 || minutes >= Double(duration) {
+                  Text(
+                    "Jetzt \(displayDate(clock.date, template: "HH:mm", zone: calendar.timeZone)) · \(minutes < 0 ? "vor Beginn" : "nach Ende")"
+                  )
+                  .font(.caption).foregroundStyle(Color(red: 0.7, green: 0.13, blue: 0.17))
+                }
+                Label("Termine & Details", systemImage: "list.bullet").font(
+                  .footnote.weight(.medium))
+              }.frame(maxWidth: .infinity, minHeight: footerHeight)
             }
           }.padding(.horizontal, 8).padding(.bottom, 8).background(campusCanvas)
         }
@@ -733,13 +747,14 @@
       height: CGFloat, scale: CGFloat, now: Date
     ) -> some View {
       let day = week.days[index]
-      let start = calendar.date(bySettingHour: week.startHour, minute: 0, second: 0, of: day)!
+      let start = calendar.date(
+        bySettingHour: week.startMinute / 60, minute: week.startMinute % 60, second: 0, of: day)!
       let rows = week.placements[index]
       return ZStack(alignment: .topLeading) {
         Rectangle().fill(campusBlue.opacity(calendar.isDate(day, inSameDayAs: now) ? 0.025 : 0))
-        ForEach(week.startHour..<week.endHour, id: \.self) { hour in
+        ForEach(week.timeTicks, id: \.self) { minute in
           Rectangle().fill(campusBlue.opacity(0.10)).frame(width: width, height: 0.5)
-            .offset(y: CGFloat((hour - week.startHour) * 60) * scale)
+            .offset(y: CGFloat(minute - week.startMinute) * scale)
         }
         ForEach(rows) { item in
           let lane = width / CGFloat(item.lanes)

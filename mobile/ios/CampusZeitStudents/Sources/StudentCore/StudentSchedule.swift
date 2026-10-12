@@ -15,10 +15,13 @@ public func scheduleSwipeStep(horizontal: Double, vertical: Double) -> Int {
 public struct ScheduleWeek {
   public let days: [Date]
   public let placements: [[ScheduledEvent]]
-  public let startHour: Int
-  public let endHour: Int
+  public let startMinute: Int
+  public let endMinute: Int
+  public var timeTicks: [Int] {
+    [startMinute] + Array(stride(from: (startMinute / 60 + 1) * 60, to: endMinute, by: 60))
+  }
 
-  public init(events: [StudentEvent], date: Date, now: Date, calendar: Calendar) {
+  public init(events: [StudentEvent], date: Date, calendar: Calendar) {
     let monday = calendar.dateInterval(of: .weekOfYear, for: date)!.start
     var weekDays = (0..<6).map { calendar.date(byAdding: .day, value: $0, to: monday)! }
     var weekPlacements = weekDays.map { schedulePlacements(events, day: $0, calendar: calendar) }
@@ -26,17 +29,21 @@ public struct ScheduleWeek {
       weekDays.removeLast()
       weekPlacements.removeLast()
     }
-    let ranges = weekDays.indices.map {
-      scheduleTimeRange(weekPlacements[$0], day: weekDays[$0], now: now, calendar: calendar)
-    }
     days = weekDays
     placements = weekPlacements
-    startHour = ranges.map { calendar.component(.hour, from: $0.start) }.min() ?? 8
-    endHour =
-      weekDays.indices.map {
-        calendar.isDate(ranges[$0].end, inSameDayAs: weekDays[$0])
-          ? calendar.component(.hour, from: ranges[$0].end) : 24
-      }.max() ?? 18
+    let rows = weekPlacements.flatMap { $0 }
+    startMinute =
+      rows.map {
+        calendar.component(.hour, from: $0.start) * 60 + calendar.component(.minute, from: $0.start)
+      }.min() ?? 480
+    endMinute = max(
+      startMinute + 1,
+      rows.map {
+        calendar.isDate($0.end, inSameDayAs: $0.start)
+          ? calendar.component(.hour, from: $0.end) * 60 + calendar.component(.minute, from: $0.end)
+            + (calendar.component(.second, from: $0.end) > 0 ? 1 : 0)
+          : 1440
+      }.max() ?? 1080)
   }
 }
 public func scheduleShortTitle(_ title: String) -> String {
@@ -108,22 +115,4 @@ public func examCountdown(to date: Date, now: Date, calendar: Calendar) -> Strin
   case -1: return "Gestern"
   default: return "Vor \(-days) Tagen"
   }
-}
-public func scheduleTimeRange(
-  _ placements: [ScheduledEvent], day: Date, now: Date, calendar: Calendar
-) -> DateInterval {
-  let defaultStart = calendar.date(bySettingHour: 8, minute: 0, second: 0, of: day)!
-  let defaultEnd = calendar.date(bySettingHour: 18, minute: 0, second: 0, of: day)!
-  var first = min(defaultStart, placements.map(\.start).min() ?? defaultStart)
-  var last = max(defaultEnd, placements.map(\.end).max() ?? defaultEnd)
-  if calendar.isDate(day, inSameDayAs: now) {
-    let currentHour = calendar.dateInterval(of: .hour, for: now)!
-    first = min(first, currentHour.start)
-    last = max(last, currentHour.end)
-  }
-  let start = calendar.dateInterval(of: .hour, for: first)!.start
-  let end =
-    last == calendar.dateInterval(of: .hour, for: last)!.start
-    ? last : calendar.dateInterval(of: .hour, for: last)!.end
-  return DateInterval(start: start, end: end)
 }
