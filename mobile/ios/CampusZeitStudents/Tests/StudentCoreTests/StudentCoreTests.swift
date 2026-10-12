@@ -185,4 +185,26 @@ final class StudentCoreTests: XCTestCase {
     XCTAssertNil(hit(12, 0.5))
   }
 
+  func testTodaySummaryKeepsCurrentEventsWhenBrowsingAnotherWeek() {
+    let calendar = institutionCalendar("Europe/Berlin")
+    let today = calendar.date(from: DateComponents(year: 2026, month: 10, day: 12))!
+    let nextWeek = calendar.date(byAdding: .day, value: 7, to: today)!
+    let upcoming = [
+      StudentEvent(id: "today", name: "Heute", start: today.addingTimeInterval(8 * 3600),
+        end: today.addingTimeInterval(11 * 3600), kind: "teaching", cancelled: false,
+        roomNames: ["R 1.1"], groupNames: [], teacherNames: []),
+      StudentEvent(id: "cancelled", name: "Abgesagt", start: today.addingTimeInterval(11 * 3600),
+        end: today.addingTimeInterval(14 * 3600), kind: "teaching", cancelled: true,
+        roomNames: [], groupNames: [], teacherNames: []),
+      StudentEvent(id: "next-week", name: "Andere Woche", start: nextWeek.addingTimeInterval(8 * 3600),
+        end: nextWeek.addingTimeInterval(11 * 3600), kind: "teaching", cancelled: false,
+        roomNames: [], groupNames: [], teacherNames: []),
+    ]
+    let browsed = ScheduleWeek(events: upcoming, date: nextWeek, now: today, calendar: calendar)
+    XCTAssertEqual(browsed.placements.flatMap { $0 }.map(\.id), ["next-week"])
+    let summary = schedulePlacements(upcoming, day: today, calendar: calendar).map(\.event)
+    XCTAssertEqual(summary.map(\.id), ["today", "cancelled"])
+    XCTAssertTrue(summary.last!.cancelled)
+  }
+
 }
