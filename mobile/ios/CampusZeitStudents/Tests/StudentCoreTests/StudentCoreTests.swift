@@ -54,4 +54,46 @@ final class StudentCoreTests: XCTestCase {
       XCTFail("Logged-out device must lose access")
     } catch StudentError.expired {}
   }
+
+  func testScheduleSequentialParallelAndMidnightEvents() throws {
+    let calendar = institutionCalendar("Europe/Berlin")
+    let day = calendar.date(from: DateComponents(year: 2026, month: 10, day: 12))!
+    func event(_ id: String, _ start: Int, _ end: Int) -> StudentEvent {
+      StudentEvent(
+        id: id, name: id, start: day.addingTimeInterval(Double(start * 3600)),
+        end: day.addingTimeInterval(Double(end * 3600)), kind: "teaching", cancelled: false,
+        roomNames: [], groupNames: [], teacherNames: [])
+    }
+    let sequential = schedulePlacements(
+      [event("c", 14, 17), event("a", 8, 11), event("b", 11, 14)], day: day, calendar: calendar)
+    XCTAssertEqual(sequential.map(\.id), ["a", "b", "c"])
+    XCTAssertTrue(sequential.allSatisfy { $0.lane == 0 && $0.lanes == 1 })
+    let parallel = schedulePlacements(
+      [event("solo", 8, 9), event("a", 10, 12), event("b", 11, 13), event("c", 12, 14)],
+      day: day, calendar: calendar)
+    XCTAssertEqual(parallel.map(\.lanes), [1, 2, 2, 2])
+    XCTAssertEqual(parallel.map(\.lane), [0, 0, 1, 0])
+    let midnight = schedulePlacements(
+      [
+        event("before", -2, 1), event("after", 23, 26), event("invalid", 10, 9),
+        event("next", 24, 25),
+      ],
+      day: day, calendar: calendar)
+    XCTAssertEqual(midnight.map(\.id), ["before", "after"])
+    XCTAssertEqual(midnight.first?.start, day)
+    XCTAssertEqual(midnight.last?.end, calendar.date(byAdding: .day, value: 1, to: day))
+  }
+
+  func testExamCountdownUsesLocalDaysAcrossClockChange() {
+    let calendar = institutionCalendar("Europe/Berlin")
+    let now = calendar.date(
+      from: DateComponents(year: 2026, month: 10, day: 24, hour: 23, minute: 55))!
+    let tomorrow = calendar.date(from: DateComponents(year: 2026, month: 10, day: 25, hour: 8))!
+    let following = calendar.date(from: DateComponents(year: 2026, month: 10, day: 26, hour: 8))!
+    XCTAssertEqual(
+      examCountdown(to: now.addingTimeInterval(-3600), now: now, calendar: calendar), "Heute")
+    XCTAssertEqual(examCountdown(to: tomorrow, now: now, calendar: calendar), "Morgen")
+    XCTAssertEqual(examCountdown(to: following, now: now, calendar: calendar), "In 2 Tagen")
+    XCTAssertEqual(examCountdown(to: now, now: following, calendar: calendar), "Vor 2 Tagen")
+  }
 }
