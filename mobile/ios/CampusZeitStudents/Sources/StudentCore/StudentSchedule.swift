@@ -9,6 +9,11 @@ public struct ScheduledEvent: Identifiable {
   public var lanes: Int
 }
 
+public func scheduleSwipeStep(horizontal: Double, vertical: Double) -> Int {
+  guard abs(horizontal) >= 60, abs(horizontal) > abs(vertical) * 1.5 else { return 0 }
+  return horizontal < 0 ? 1 : -1
+}
+
 public func schedulePlacements(
   _ events: [StudentEvent], day: Date, calendar: Calendar
 ) -> [ScheduledEvent] {

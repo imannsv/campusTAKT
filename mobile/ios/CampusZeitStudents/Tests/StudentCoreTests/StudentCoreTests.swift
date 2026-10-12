@@ -129,4 +129,20 @@ final class StudentCoreTests: XCTestCase {
       XCTFail("Expected silent task cancellation, got \(error)")
     }
   }
+
+  func testDaySwipeDirectionIgnoresVerticalScrollingAndSmallDrags() {
+    XCTAssertEqual(scheduleSwipeStep(horizontal: -130, vertical: 20), 1)
+    XCTAssertEqual(scheduleSwipeStep(horizontal: 130, vertical: -20), -1)
+    XCTAssertEqual(scheduleSwipeStep(horizontal: 40, vertical: 0), 0)
+    XCTAssertEqual(scheduleSwipeStep(horizontal: 80, vertical: 140), 0)
+    XCTAssertEqual(scheduleSwipeStep(horizontal: -100, vertical: 90), 0)
+    let calendar = institutionCalendar("Europe/Berlin")
+    let sunday = calendar.date(from: DateComponents(year: 2026, month: 10, day: 25, hour: 12))!
+    let next = calendar.date(byAdding: .day,
+      value: scheduleSwipeStep(horizontal: -130, vertical: 0), to: sunday)!
+    XCTAssertEqual(calendar.component(.day, from: next), 26)
+    XCTAssertEqual(calendar.component(.hour, from: next), 12)
+    XCTAssertNotEqual(calendar.dateInterval(of: .weekOfYear, for: sunday)?.start,
+      calendar.dateInterval(of: .weekOfYear, for: next)?.start)
+  }
 }

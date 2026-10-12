@@ -1,5 +1,6 @@
 #if canImport(UIKit)
   import SwiftUI
+  import UIKit
   import StudentCore
 
   private let campusBlue = Color(red: 33 / 255, green: 75 / 255, blue: 118 / 255)
@@ -108,6 +109,8 @@
     @State private var appeared = false
     @State private var selectedEvent: StudentEvent?
     @State private var focusNow = 0
+    @State private var weekView = false
+    @State private var calendarOpen = false
     @ScaledMetric(relativeTo: .subheadline) private var dayWidth: CGFloat = 44
 
     var body: some View {
@@ -180,6 +183,8 @@
       .onChange(of: store.credential?.login.token) { _, _ in
         selectedEvent = nil
         account = false
+        calendarOpen = false
+        weekView = false
       }
       .task(id: store.credential?.login.token) {
         guard store.credential != nil else { return }
@@ -187,6 +192,26 @@
         while !Task.isCancelled {
           do { try await Task.sleep(for: .seconds(60)) } catch { return }
           if scenePhase == .active { await store.refresh() }
+        }
+      }
+      .sheet(isPresented: $calendarOpen) {
+        NavigationStack {
+          DatePicker("Datum auswählen", selection: $store.selectedDate, displayedComponents: .date)
+            .datePickerStyle(.graphical).padding(16)
+            .onChange(of: store.selectedDate) { _, _ in calendarOpen = false }
+            .navigationTitle("Datum auswählen").navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+              ToolbarItem(placement: .confirmationAction) {
+                Button("Fertig") { calendarOpen = false }
+              }
+            }
+        }.presentationDetents([.medium, .large])
+      }
+      .onChange(of: store.selectedDate) { previous, next in
+        if store.calendar.dateInterval(of: .weekOfYear, for: previous)?.start
+          != store.calendar.dateInterval(of: .weekOfYear, for: next)?.start
+        {
+          Task { await store.refresh() }
         }
       }
       .onChange(of: scenePhase) { _, next in if next == .active { Task { await store.refresh() } } }
@@ -213,91 +238,173 @@
         }.lineLimit(1).frame(minHeight: 44)
       }.buttonStyle(.plain).accessibilityHint("Gruppenzugang und Aktualisierungsstand öffnen")
     }
-    private var dateNavigation: some View {
-      HStack(spacing: 4) {
-        Button {
-          moveWeek(-1)
-        } label: {
-          Image(systemName: "chevron.left").frame(minWidth: 44, minHeight: 44)
-        }.accessibilityLabel("Vorherige Woche")
-        DatePicker("Datum auswählen", selection: $store.selectedDate, displayedComponents: .date)
-          .labelsHidden().datePickerStyle(.compact)
-          .onChange(of: store.selectedDate) { previous, next in
-            if store.calendar.dateInterval(of: .weekOfYear, for: previous)?.start
-              != store.calendar.dateInterval(of: .weekOfYear, for: next)?.start
-            {
-              Task { await store.refresh() }
-            }
-          }
-        Button {
-          moveWeek(1)
-        } label: {
-          Image(systemName: "chevron.right").frame(minWidth: 44, minHeight: 44)
-        }.accessibilityLabel("Nächste Woche")
-      }.buttonStyle(.borderless)
+    @ViewBuilder private var brandSymbol: some View {
+      if let url = Bundle.module.url(forResource: "Mark", withExtension: "png"),
+        let mark = UIImage(contentsOfFile: url.path)
+      {
+        Image(uiImage: mark).resizable().scaledToFit().frame(width: 60, height: 60)
+          .frame(width: 44, height: 44).clipped().accessibilityLabel("CampusZeit")
+      }
     }
-    private var currentWeekButton: some View {
-      Button("Diese Woche") {
+    private var dateCaption: String {
+      let calendar = store.calendar
+      if !weekView {
+        return displayDate(store.selectedDate, template: "dd. MMM yyyy", zone: calendar.timeZone)
+      }
+      let monday = calendar.dateInterval(of: .weekOfYear, for: store.selectedDate)!.start
+      let sunday = calendar.date(byAdding: .day, value: 6, to: monday)!
+      let sameMonth = calendar.isDate(monday, equalTo: sunday, toGranularity: .month)
+      return displayDate(monday, template: sameMonth ? "dd." : "dd. MMM", zone: calendar.timeZone)
+        + "–" + displayDate(sunday, template: "dd. MMM", zone: calendar.timeZone)
+    }
+    private var dateButton: some View {
+      Button {
+        calendarOpen = true
+      } label: {
+        HStack(spacing: 6) {
+          Image(systemName: "calendar").foregroundStyle(campusBlue)
+          Text(dateCaption)
+            .foregroundStyle(campusInk)
+        }.font(.subheadline.weight(.medium)).frame(minHeight: 44)
+      }.buttonStyle(.plain).accessibilityLabel("Datum auswählen")
+        .accessibilityValue(
+          displayDate(store.selectedDate, template: "dd. MMMM yyyy", zone: store.calendar.timeZone))
+    }
+    private var currentDayButton: some View {
+      Button(weekView ? "Diese Woche" : "Heute") {
         store.selectedDate = Date()
         focusNow += 1
       }
-      .font(.subheadline.weight(.medium)).frame(minHeight: 44)
+      .font(.subheadline.weight(.medium)).frame(minWidth: 44, minHeight: 44)
+      .accessibilityLabel(
+        weekView ? "Aktuelle Woche anzeigen" : "Heute und aktuelle Uhrzeit anzeigen")
+    }
+    private var viewPicker: some View {
+      Picker("Stundenplanansicht", selection: $weekView) {
+        Text("Tag").tag(false)
+        Text("Woche").tag(true)
+      }.pickerStyle(.segmented).frame(width: 132, height: 44)
     }
     private var weekControls: some View {
       ViewThatFits(in: .horizontal) {
         HStack(spacing: 8) {
-          dateNavigation
+          dateButton
           Spacer(minLength: 0)
-          currentWeekButton
+          currentDayButton
+          viewPicker
         }
-        VStack(alignment: .leading, spacing: 4) {
-          dateNavigation
-          currentWeekButton
+        VStack(spacing: 4) {
+          HStack {
+            dateButton
+            Spacer()
+            currentDayButton
+          }
+          viewPicker.frame(maxWidth: .infinity, alignment: .trailing)
         }
-      }.padding(.horizontal, 16).padding(.bottom, 12)
-        .overlay(alignment: .bottom) { Divider() }
+      }.padding(.horizontal, 16).padding(.vertical, 4)
+    }
+    private func weekdayButton(_ offset: Int, monday: Date) -> some View {
+      let day = store.calendar.date(byAdding: .day, value: offset, to: monday)!
+      let selected = store.calendar.isDate(day, inSameDayAs: store.selectedDate)
+      return Button {
+        store.selectedDate = day
+      } label: {
+        VStack(spacing: 6) {
+          Text(displayDate(day, template: "EE", zone: store.calendar.timeZone)).font(.caption)
+          Text(displayDate(day, template: "dd", zone: store.calendar.timeZone))
+            .font(.subheadline.weight(.semibold).monospacedDigit())
+        }.frame(maxWidth: .infinity).frame(minWidth: dayWidth, minHeight: 52)
+          .foregroundStyle(selected ? .white : campusInk)
+          .background(selected ? campusBlue : .clear, in: RoundedRectangle(cornerRadius: 10))
+          .overlay(alignment: .bottom) {
+            if store.calendar.isDateInToday(day) && !selected {
+              Circle().fill(campusBlue).frame(width: 4, height: 4).padding(.bottom, 2)
+            }
+          }
+      }.buttonStyle(.plain)
+        .accessibilityLabel(
+          displayDate(day, template: "EEEE, dd. MMMM", zone: store.calendar.timeZone)
+        )
+        .accessibilityAddTraits(selected ? .isSelected : [])
     }
     private var weekdays: some View {
       let monday = store.calendar.dateInterval(of: .weekOfYear, for: store.selectedDate)!.start
-      return LazyVGrid(columns: [GridItem(.adaptive(minimum: dayWidth), spacing: 4)], spacing: 4) {
-        ForEach(0..<7, id: \.self) { offset in
-          let day = store.calendar.date(byAdding: .day, value: offset, to: monday)!
-          let selected = store.calendar.isDate(day, inSameDayAs: store.selectedDate)
-          Button {
-            store.selectedDate = day
-          } label: {
-            VStack(spacing: 6) {
-              Text(displayDate(day, template: "EE", zone: store.calendar.timeZone)).font(
-                .caption)
-              Text(displayDate(day, template: "dd", zone: store.calendar.timeZone))
-                .font(.subheadline.weight(.semibold).monospacedDigit())
-            }.frame(maxWidth: .infinity).frame(minHeight: 52)
-              .foregroundStyle(selected ? .white : campusInk)
-              .background(selected ? campusBlue : .clear, in: RoundedRectangle(cornerRadius: 10))
-              .overlay(alignment: .bottom) {
-                if store.calendar.isDateInToday(day) && !selected {
-                  Circle().fill(campusBlue).frame(width: 4, height: 4).padding(.bottom, 2)
-                }
-              }
-          }.buttonStyle(.plain)
-            .accessibilityLabel(
-              displayDate(day, template: "EEEE, dd. MMMM", zone: store.calendar.timeZone)
-            )
-            .accessibilityAddTraits(selected ? .isSelected : [])
+      return ViewThatFits(in: .horizontal) {
+        HStack(spacing: 4) { ForEach(0..<7, id: \.self) { weekdayButton($0, monday: monday) } }
+        LazyVGrid(columns: [GridItem(.adaptive(minimum: dayWidth), spacing: 4)], spacing: 4) {
+          ForEach(0..<7, id: \.self) { weekdayButton($0, monday: monday) }
         }
       }.padding(.horizontal, 16).padding(.vertical, 8)
+    }
+    private func weekCalendar(_ feed: StudentFeed) -> some View {
+      let monday = store.calendar.dateInterval(of: .weekOfYear, for: store.selectedDate)!.start
+      return GeometryReader { viewport in
+        ScrollViewReader { scroll in
+          ScrollView(.horizontal) {
+            HStack(spacing: 0) {
+              ForEach(0..<7, id: \.self) { offset in
+                let day = store.calendar.date(byAdding: .day, value: offset, to: monday)!
+                VStack(spacing: 0) {
+                  Text(displayDate(day, template: "EEEE, dd. MMM", zone: store.calendar.timeZone))
+                    .font(.subheadline.weight(.semibold)).foregroundStyle(campusBlue)
+                    .frame(maxWidth: .infinity, minHeight: 44)
+                    .background(
+                      campusBlue.opacity(store.calendar.isDateInToday(day) ? 0.08 : 0.025))
+                  StudentDayGrid(
+                    events: feed.rows, day: day, calendar: store.calendar,
+                    selectedEvent: $selectedEvent, focusRequest: 0, weekColumn: true,
+                    refresh: { await store.refresh() })
+                }.frame(width: max(260, viewport.size.width * 0.7), height: viewport.size.height)
+                  .overlay(alignment: .trailing) { Divider() }.id(offset)
+              }
+            }.scrollTargetLayout()
+          }.scrollTargetBehavior(.viewAligned)
+            .task(id: monday) {
+              let offset =
+                store.calendar.dateComponents(
+                  [.day], from: monday,
+                  to: store.calendar.startOfDay(for: store.selectedDate)
+                ).day ?? 0
+              scroll.scrollTo(offset, anchor: .leading)
+            }
+            .onChange(of: focusNow) { _, _ in
+              let offset =
+                store.calendar.dateComponents(
+                  [.day], from: monday,
+                  to: store.calendar.startOfDay(for: store.selectedDate)
+                ).day ?? 0
+              scroll.scrollTo(offset, anchor: .leading)
+            }
+        }
+      }
     }
     private var schedule: some View {
       NavigationStack {
         VStack(spacing: 0) {
           header
           weekControls
-          weekdays
+          if !weekView { weekdays }
           if let feed = store.feed {
-            StudentDayGrid(
-              events: feed.rows, day: store.selectedDate, calendar: store.calendar,
-              selectedEvent: $selectedEvent, focusRequest: focusNow,
-              refresh: { await store.refresh() })
+            if weekView {
+              weekCalendar(feed)
+            } else {
+              StudentDayGrid(
+                events: feed.rows, day: store.selectedDate, calendar: store.calendar,
+                selectedEvent: $selectedEvent, focusRequest: focusNow,
+                refresh: { await store.refresh() }
+              )
+              .simultaneousGesture(
+                DragGesture(minimumDistance: 40).onEnded { drag in
+                  let step = scheduleSwipeStep(
+                    horizontal: Double(drag.translation.width),
+                    vertical: Double(drag.translation.height))
+                  if step != 0 {
+                    store.selectedDate = store.calendar.date(
+                      byAdding: .day, value: step,
+                      to: store.selectedDate)!
+                  }
+                })
+            }
           } else if store.busy {
             ProgressView().frame(maxWidth: .infinity, maxHeight: .infinity)
           } else {
@@ -312,6 +419,7 @@
           .toolbarBackground(campusCanvas, for: .navigationBar, .tabBar)
           .toolbarBackground(.visible, for: .navigationBar, .tabBar)
           .toolbar {
+            ToolbarItem(placement: .topBarLeading) { brandSymbol }
             ToolbarItem(placement: .principal) { groupIdentity }
             ToolbarItem(placement: .topBarTrailing) { accountButton }
           }
@@ -398,6 +506,7 @@
         .toolbarBackground(campusCanvas, for: .navigationBar, .tabBar)
         .toolbarBackground(.visible, for: .navigationBar, .tabBar)
         .toolbar {
+          ToolbarItem(placement: .topBarLeading) { brandSymbol }
           ToolbarItem(placement: .principal) { groupIdentity }
           ToolbarItem(placement: .topBarTrailing) { accountButton }
         }
@@ -445,6 +554,7 @@
         .toolbarBackground(campusCanvas, for: .navigationBar, .tabBar)
         .toolbarBackground(.visible, for: .navigationBar, .tabBar)
         .toolbar {
+          ToolbarItem(placement: .topBarLeading) { brandSymbol }
           ToolbarItem(placement: .principal) { groupIdentity }
           ToolbarItem(placement: .topBarTrailing) { accountButton }
         }
@@ -457,10 +567,7 @@
         Image(systemName: "person.crop.circle")
       }.accessibilityLabel("Mein Zugang")
     }
-    private func moveWeek(_ offset: Int) {
-      store.selectedDate = store.calendar.date(
-        byAdding: .day, value: offset * 7, to: store.selectedDate)!
-    }
+
   }
 
   private struct StudentDayGrid: View {
@@ -469,6 +576,7 @@
     let calendar: Calendar
     @Binding var selectedEvent: StudentEvent?
     let focusRequest: Int
+    var weekColumn = false
     let refresh: () async -> Void
     @ScaledMetric(relativeTo: .body) private var hourHeight: CGFloat = 96
     @ScaledMetric(relativeTo: .caption) private var timeWidth: CGFloat = 52
@@ -491,9 +599,12 @@
       let height = CGFloat(end.timeIntervalSince(start) / 60) * scale
       let lanes = placements.map(\.lanes).max() ?? 1
       return GeometryReader { viewport in
-        let width = max(viewport.size.width - 32, timeWidth + CGFloat(lanes) * laneWidth)
+        let width =
+          weekColumn
+          ? viewport.size.width - 32
+          : max(viewport.size.width - 32, timeWidth + CGFloat(lanes) * min(laneWidth, 120))
         ScrollViewReader { scroll in
-          ScrollView([.vertical, .horizontal]) {
+          ScrollView(weekColumn ? .vertical : [.vertical, .horizontal]) {
             VStack(spacing: 0) {
               ForEach(0...hours, id: \.self) { hour in
                 let tick = start.addingTimeInterval(Double(hour * 3600))
@@ -521,11 +632,16 @@
                 ForEach(placements) { item in
                   let column = (width - timeWidth) / CGFloat(item.lanes)
                   let eventHeight = CGFloat(item.end.timeIntervalSince(item.start) / 60) * scale - 4
+                  let colors = [
+                    campusBlue, Color(red: 0.18, green: 0.43, blue: 0.33),
+                    Color(red: 0.53, green: 0.36, blue: 0.12),
+                  ]
                   let tint =
                     item.event.cancelled
                     ? Color(red: 0.7, green: 0.13, blue: 0.17)
                     : item.event.kind == "exam"
-                      ? Color(red: 0.18, green: 0.43, blue: 0.33) : campusBlue
+                      ? colors[2]
+                      : colors[item.event.name.utf8.reduce(0) { ($0 + Int($1)) % colors.count }]
                   Button {
                     selectedEvent = item.event
                   } label: {
@@ -548,7 +664,7 @@
                     }.padding(10).frame(
                       width: column - 6, height: eventHeight, alignment: .topLeading
                     )
-                    .foregroundStyle(tint).background(tint.opacity(0.08))
+                    .foregroundStyle(tint).background(tint.opacity(0.13))
                     .overlay(alignment: .leading) { Rectangle().fill(tint).frame(width: 3) }
                     .clipShape(RoundedRectangle(cornerRadius: 8))
                   }.buttonStyle(.plain)
@@ -586,6 +702,7 @@
             }.padding(.horizontal, 16).padding(.top, 8)
           }.refreshable { await refresh() }
             .task(id: calendar.startOfDay(for: day)) {
+              guard !weekColumn else { return }
               await Task.yield()
               guard !Task.isCancelled else { return }
               let focus =
@@ -594,6 +711,7 @@
               scroll.scrollTo(calendar.dateInterval(of: .hour, for: focus)!.start, anchor: .center)
             }
             .onChange(of: focusRequest) { _, _ in
+              guard !weekColumn else { return }
               scroll.scrollTo(calendar.dateInterval(of: .hour, for: now)!.start, anchor: .center)
             }
         }
