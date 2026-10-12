@@ -1,5 +1,6 @@
 #if canImport(UIKit)
   import SwiftUI
+  import UIKit
   import StudentCore
 
   struct StudentLogin: View {
@@ -13,41 +14,53 @@
     @State private var manualLogin = false
     private let blue = Color(red: 33 / 255, green: 75 / 255, blue: 118 / 255)
     var body: some View {
-      NavigationStack {
+      GeometryReader { viewport in
         ScrollView {
-          VStack(spacing: 32) {
-            // The original logo asset includes a wide empty margin on the right.
-            Image("Logo", bundle: .module).resizable().scaledToFit().frame(width: 720, height: 46)
-              .frame(width: 230, height: 46, alignment: .leading).clipped()
-              .accessibilityLabel("CampusZeit").padding(.top, 32)
-            VStack(spacing: 20) {
-              Image(systemName: "qrcode.viewfinder")
-                .font(.system(size: 64, weight: .light)).foregroundStyle(blue)
-                .frame(width: 120, height: 120)
-                .background(blue.opacity(0.08), in: RoundedRectangle(cornerRadius: 24))
-                .accessibilityHidden(true)
-              Text("Anmelden").font(.title.bold())
-              Text("Scanne den QR-Code deiner Verwaltung.")
-                .font(.body).foregroundStyle(.secondary).multilineTextAlignment(.center)
-            }.padding(.vertical, 16)
-            VStack(spacing: 12) {
-              Button {
-                scanning = true
-              } label: {
-                HStack(spacing: 12) {
-                  if store.busy { ProgressView().tint(.white) }
-                  Label(store.busy ? "Anmelden …" : "QR-Code scannen", systemImage: "qrcode")
-                }.font(.headline).frame(maxWidth: .infinity, minHeight: 52)
-                  .foregroundStyle(.white).background(blue, in: RoundedRectangle(cornerRadius: 12))
-              }.buttonStyle(.plain).disabled(store.busy)
-              Button("Mit Zugangsdaten anmelden") { manualLogin = true }
-                .font(.body.weight(.medium)).frame(maxWidth: .infinity, minHeight: 48)
-                .buttonStyle(.plain).foregroundStyle(.primary).disabled(store.busy)
-              errorMessage
+          VStack(spacing: 28) {
+            if let url = Bundle.module.url(forResource: "Logo", withExtension: "png"),
+              let logo = UIImage(contentsOfFile: url.path)
+            {
+              // Load the copied PNG directly and bound its empty right margin.
+              Image(uiImage: logo).resizable().scaledToFit().frame(width: 720, height: 46)
+                .frame(width: 230, height: 46, alignment: .leading).clipped()
+                .accessibilityLabel("CampusZeit")
+            } else {
+              Text("CampusZeit").font(.title.bold())
             }
-          }.frame(maxWidth: 420).padding(.horizontal, 24).padding(.bottom, 24)
-            .frame(maxWidth: .infinity)
-        }.background(Color(uiColor: .systemBackground))
+            VStack(alignment: .leading, spacing: 24) {
+              VStack(alignment: .leading, spacing: 12) {
+                Text("Anmelden").font(.title.weight(.semibold)).foregroundStyle(blue)
+                Text("Den QR-Code oder die Zugangsdaten erhältst du von deiner Verwaltung.")
+                  .font(.body).foregroundStyle(.secondary)
+              }
+              VStack(spacing: 12) {
+                Button {
+                  scanning = true
+                } label: {
+                  HStack(spacing: 12) {
+                    if store.busy { ProgressView().tint(.white) }
+                    Label(store.busy ? "Anmelden …" : "QR-Code scannen", systemImage: "qrcode")
+                  }.font(.headline).frame(maxWidth: .infinity, minHeight: 52)
+                    .foregroundStyle(.white).background(
+                      blue, in: RoundedRectangle(cornerRadius: 12))
+                }.buttonStyle(.plain).disabled(store.busy)
+                Button {
+                  manualLogin = true
+                } label: {
+                  Text("Mit Zugangsdaten anmelden").font(.body.weight(.medium))
+                    .frame(maxWidth: .infinity, minHeight: 52).foregroundStyle(blue)
+                    .overlay(RoundedRectangle(cornerRadius: 12).stroke(blue.opacity(0.18)))
+                    .contentShape(Rectangle())
+                }.buttonStyle(.plain).disabled(store.busy)
+              }
+              errorMessage
+            }.padding(24).background(.white, in: RoundedRectangle(cornerRadius: 20))
+              .overlay(RoundedRectangle(cornerRadius: 20).stroke(blue.opacity(0.1)))
+          }.frame(maxWidth: 420).padding(24)
+            .frame(maxWidth: .infinity, minHeight: viewport.size.height)
+        }.scrollBounceBehavior(.basedOnSize)
+          .background(Color(red: 234 / 255, green: 241 / 255, blue: 247 / 255).ignoresSafeArea())
+          .preferredColorScheme(.light)
           .sheet(isPresented: $manualLogin) {
             NavigationStack {
               Form {

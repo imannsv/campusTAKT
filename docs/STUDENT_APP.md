@@ -6,7 +6,7 @@ Stand 12.10.2026: Der native Release-Build mit dem iPhoneOS-27.1-SDK aus `Xcode_
 
 ## Verwaltung und Backend
 
-Die Anmeldung startet mit dem unveränderten Logo und „QR-Code scannen“. „Mit Zugangsdaten anmelden“ öffnet das getrennte Formular. Der Kamerabereich zeigt einen Scanrahmen und einen kurzen Hinweis; die Serverbestätigung bleibt vor der QR-Anmeldung erhalten. Beim App-Start wird der Inhalt kurz eingeblendet, ohne zusätzliche Wartezeit. Mit aktivierter iPhone-Einstellung „Bewegung reduzieren“ entfällt die Animation.
+Die Anmeldung zeigt das unveränderte Logo auf einem hellen Campus-Hintergrund und bündelt beide Aktionen in einer weißen Karte. „QR-Code scannen“ öffnet die Kamera, „Mit Zugangsdaten anmelden“ das getrennte Formular. Die helle Darstellung gilt nur für die Anmeldung. Der Kamerabereich zeigt einen Scanrahmen und einen kurzen Hinweis; die Serverbestätigung bleibt vor der QR-Anmeldung erhalten. Beim App-Start wird der Inhalt kurz eingeblendet, ohne zusätzliche Wartezeit. Mit aktivierter iPhone-Einstellung „Bewegung reduzieren“ entfällt die Animation.
 
 1. Python-Abhängigkeiten installieren: `.venv/Scripts/python.exe -m pip install -r requirements.txt`.
 2. Additive Migration anwenden: `.venv/Scripts/python.exe backend/manage.py migrate`.
@@ -60,6 +60,8 @@ Unter Windows benötigt Xtool eine Verbindung zwischen WSL und dem iPhone. `usbi
 Die auf die lokale Ubuntu-Adresse begrenzte Weiterleitung ist eingerichtet und wurde durch Geräteabfrage und erfolgreiche Installation geprüft. Das automatische Starten über Xtool meldet noch einen Debugserver-Fehler; die App lässt sich auf dem iPhone manuell öffnen. Zertifikate, private Schlüssel, Geräteseriennummern und signierte Pakete bleiben außerhalb des Git-Repositories.
 
 Die überarbeitete Anmeldung mit Startanimation wurde am 12.10.2026 ebenfalls installiert und von iOS verifiziert. Für eine bereits signierte IPA `ideviceinstaller install xtool/CampusZeitStudents.ipa` verwenden, mit derselben `USBMUXD_SOCKET_ADDRESS` wie oben. `xtool install` signiert erneut und hat bei der ersten signierten IPA die Bundle-ID nochmals präfixiert. Die dadurch entstandene ältere Testfassung wurde nach erfolgreicher Installation der neuen Fassung entfernt; auf dem iPhone bleibt eine CampusZeit-App. Die zwischenzeitlichen Schreibfehler im Übertragungsbereich traten beim späteren Versuch nicht mehr auf. Die neue Darstellung, QR-Anmeldung und Keychain-Sitzung sind noch auf dem Gerät zu prüfen.
+
+Beim ersten Gerätetest suchte `Image("Logo", bundle: .module)` einen Asset-Katalog und fand das als PNG kopierte Logo nicht. Ohne feste Höhe reservierte das fehlende Bild einen großen leeren Bereich. Die Anmeldung lädt `Logo.png` jetzt über `UIImage(contentsOfFile:)` aus dem Ressourcenbundle und begrenzt den Bildbereich auf 46 Punkte. Die Originaldatei bleibt unverändert. Der folgende Gerätescreenshot bestätigte sichtbares Logo und Anmeldeaktionen; die anschließend gewählte helle Kartenansicht wurde ebenfalls nativ gebaut, signiert und installiert.
 
 ## Lokaler Gerätetest
 
