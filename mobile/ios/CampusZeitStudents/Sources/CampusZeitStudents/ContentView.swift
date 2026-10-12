@@ -3,7 +3,8 @@
   import StudentCore
 
   private let campusBlue = Color(red: 33 / 255, green: 75 / 255, blue: 118 / 255)
-  private let campusCanvas = Color(red: 234 / 255, green: 241 / 255, blue: 247 / 255)
+  private let campusCanvas = Color.white
+  private let campusInk = Color(red: 31 / 255, green: 47 / 255, blue: 61 / 255)
 
   @MainActor
   final class StudentStore: ObservableObject {
@@ -175,7 +176,8 @@
       VStack(alignment: .leading, spacing: 8) {
         HStack(spacing: 12) {
           VStack(alignment: .leading, spacing: 4) {
-            Text(store.credential?.login.scope ?? "").font(.headline).foregroundStyle(campusBlue)
+            Text(store.credential?.login.scope ?? "").font(.subheadline.weight(.semibold))
+              .foregroundStyle(campusInk)
             Text(store.credential?.login.institution ?? "").font(.caption).foregroundStyle(
               .secondary)
           }.layoutPriority(1)
@@ -189,11 +191,7 @@
           }
         }
         status
-      }.padding(.horizontal, 20).padding(.vertical, 12)
-    }
-    private var cardBackground: some View {
-      RoundedRectangle(cornerRadius: 12).fill(.white)
-        .overlay(RoundedRectangle(cornerRadius: 12).stroke(campusBlue.opacity(0.08)))
+      }.padding(.horizontal, 24).padding(.top, 8).padding(.bottom, 16)
     }
     private var dateNavigation: some View {
       HStack(spacing: 4) {
@@ -227,7 +225,8 @@
           dateNavigation
           currentWeekButton
         }
-      }.padding(.horizontal, 16).padding(.bottom, 8)
+      }.padding(.horizontal, 16).padding(.bottom, 12)
+        .overlay(alignment: .bottom) { Divider() }
     }
     private var schedule: some View {
       NavigationStack {
@@ -252,18 +251,25 @@
                       EventDetails(event: event)
                     } label: {
                       EventRow(event: event)
-                    }.listRowBackground(cardBackground).listRowSeparator(.hidden)
+                    }.listRowBackground(campusCanvas).listRowSeparatorTint(campusBlue.opacity(0.12))
                   }
                 } header: {
-                  HStack {
-                    Text(displayDate(day, template: "EEEE, dd. MMM", zone: store.calendar.timeZone))
-                      .font(.subheadline.weight(.semibold)).foregroundStyle(campusBlue)
-                    if store.calendar.isDateInToday(day) {
-                      Text("Heute").font(.caption.weight(.semibold)).foregroundStyle(campusBlue)
-                        .padding(.horizontal, 8).padding(.vertical, 4)
-                        .background(campusBlue.opacity(0.08), in: Capsule())
+                  HStack(alignment: .firstTextBaseline, spacing: 12) {
+                    Text(displayDate(day, template: "dd", zone: store.calendar.timeZone))
+                      .font(.title2.weight(.semibold).monospacedDigit())
+                      .foregroundStyle(store.calendar.isDateInToday(day) ? campusBlue : campusInk)
+                    VStack(alignment: .leading, spacing: 2) {
+                      Text(displayDate(day, template: "EEEE", zone: store.calendar.timeZone))
+                        .font(.subheadline.weight(.semibold)).foregroundStyle(campusInk)
+                      Text(displayDate(day, template: "MMMM yyyy", zone: store.calendar.timeZone))
+                        .font(.caption).foregroundStyle(.secondary)
                     }
-                  }.textCase(nil)
+                    Spacer()
+                    if store.calendar.isDateInToday(day) {
+                      Text("Heute").font(.caption.weight(.medium)).foregroundStyle(campusBlue)
+                    }
+                  }.padding(.top, 20).padding(.bottom, 8).textCase(nil)
+                    .accessibilityElement(children: .combine)
                 }
               }
             } else if !store.busy {
@@ -271,10 +277,10 @@
                 title: "Noch kein Stundenplan geladen", symbol: "calendar",
                 detail: "Ziehe die Ansicht nach unten zum Aktualisieren."
               )
-              .listRowBackground(cardBackground).listRowSeparator(.hidden)
+              .listRowBackground(campusCanvas).listRowSeparatorTint(campusBlue.opacity(0.12))
             }
-          }.listStyle(.plain).listRowSpacing(8)
-            .contentMargins(.horizontal, 20, for: .scrollContent).scrollContentBackground(.hidden)
+          }.listStyle(.plain).listRowSpacing(0)
+            .contentMargins(.horizontal, 8, for: .scrollContent).scrollContentBackground(.hidden)
             .refreshable { await store.refresh() }
         }
         .background(campusCanvas).navigationTitle("Stundenplan")
@@ -298,20 +304,20 @@
                     title: "Keine Prüfungstermine", symbol: "graduationcap",
                     detail: "Im geladenen Zeitraum sind keine Prüfungen veröffentlicht."
                   )
-                  .listRowBackground(cardBackground).listRowSeparator(.hidden)
+                  .listRowBackground(campusCanvas).listRowSeparatorTint(campusBlue.opacity(0.12))
                 }
                 ForEach(events) { event in
                   NavigationLink {
                     EventDetails(event: event)
                   } label: {
-                    VStack(alignment: .leading, spacing: 6) {
+                    VStack(alignment: .leading, spacing: 4) {
                       Text(
                         displayDate(
                           event.start, template: "EEE, dd. MMM yyyy", zone: store.calendar.timeZone)
-                      ).font(.subheadline.weight(.semibold)).foregroundStyle(campusBlue)
+                      ).font(.subheadline.weight(.medium)).foregroundStyle(.secondary)
                       EventRow(event: event)
                     }
-                  }.listRowBackground(cardBackground).listRowSeparator(.hidden)
+                  }.listRowBackground(campusCanvas).listRowSeparatorTint(campusBlue.opacity(0.12))
                 }
               }
               Section {
@@ -325,10 +331,10 @@
                 title: "Noch keine Prüfungen geladen", symbol: "graduationcap",
                 detail: "Ziehe die Ansicht nach unten zum Aktualisieren."
               )
-              .listRowBackground(cardBackground).listRowSeparator(.hidden)
+              .listRowBackground(campusCanvas).listRowSeparatorTint(campusBlue.opacity(0.12))
             }
-          }.listStyle(.plain).listRowSpacing(12)
-            .contentMargins(.horizontal, 20, for: .scrollContent).scrollContentBackground(.hidden)
+          }.listStyle(.plain).listRowSpacing(0)
+            .contentMargins(.horizontal, 8, for: .scrollContent).scrollContentBackground(.hidden)
             .refreshable { await store.refresh() }
         }
         .background(campusCanvas).navigationTitle("Prüfungen")
@@ -349,11 +355,11 @@
                   title: "Keine Mitteilungen", symbol: "bell",
                   detail: "Neue Hinweise deiner Verwaltung erscheinen hier."
                 )
-                .listRowBackground(cardBackground).listRowSeparator(.hidden)
+                .listRowBackground(campusCanvas).listRowSeparatorTint(campusBlue.opacity(0.12))
               }
               ForEach(feed.notices) { notice in
                 VStack(alignment: .leading, spacing: 10) {
-                  Text(notice.title).font(.headline).foregroundStyle(campusBlue)
+                  Text(notice.title).font(.headline).foregroundStyle(campusInk)
                   Text(notice.body).textSelection(.enabled)
                   Text(
                     displayDate(
@@ -361,17 +367,18 @@
                   ).font(
                     .caption
                   ).foregroundStyle(.secondary)
-                }.padding(.vertical, 8).listRowBackground(cardBackground).listRowSeparator(.hidden)
+                }.padding(.vertical, 16).listRowBackground(campusCanvas).listRowSeparatorTint(
+                  campusBlue.opacity(0.12))
               }
             } else if !store.busy {
               StudentEmptyState(
                 title: "Noch keine Mitteilungen geladen", symbol: "bell",
                 detail: "Ziehe die Ansicht nach unten zum Aktualisieren."
               )
-              .listRowBackground(cardBackground).listRowSeparator(.hidden)
+              .listRowBackground(campusCanvas).listRowSeparatorTint(campusBlue.opacity(0.12))
             }
-          }.listStyle(.plain).listRowSpacing(12)
-            .contentMargins(.horizontal, 20, for: .scrollContent).scrollContentBackground(.hidden)
+          }.listStyle(.plain).listRowSpacing(0)
+            .contentMargins(.horizontal, 8, for: .scrollContent).scrollContentBackground(.hidden)
             .refreshable { await store.refresh() }
         }
         .background(campusCanvas).navigationTitle("Mitteilungen")
@@ -399,15 +406,16 @@
     @Environment(\.timeZone) private var zone
     @ScaledMetric(relativeTo: .subheadline) private var timeWidth: CGFloat = 56
     var body: some View {
-      HStack(alignment: .top, spacing: 12) {
+      HStack(alignment: .top, spacing: 16) {
         VStack(alignment: .leading, spacing: 4) {
           Text(displayDate(event.start, template: "HH:mm", zone: zone))
             .font(.subheadline.weight(.semibold).monospacedDigit())
           Text(displayDate(event.end, template: "HH:mm", zone: zone))
             .font(.caption.monospacedDigit()).foregroundStyle(.secondary)
         }.frame(width: timeWidth, alignment: .leading)
+          .foregroundStyle(event.cancelled ? Color(red: 0.7, green: 0.13, blue: 0.17) : campusBlue)
         VStack(alignment: .leading, spacing: 8) {
-          Text(event.name).font(.headline).strikethrough(event.cancelled)
+          Text(event.name).font(.body.weight(.medium)).strikethrough(event.cancelled)
             .fixedSize(horizontal: false, vertical: true)
           if event.cancelled {
             Label("Abgesagt", systemImage: "xmark.circle").font(.subheadline.weight(.medium))
@@ -416,11 +424,11 @@
           }
           if let rooms = event.roomNames, !rooms.isEmpty {
             Label(rooms.joined(separator: ", "), systemImage: "door.left.hand.open")
-              .font(.subheadline).foregroundStyle(.secondary)
+              .font(.footnote).foregroundStyle(.secondary)
           }
         }
-      }.foregroundStyle(event.cancelled ? Color(red: 0.7, green: 0.13, blue: 0.17) : campusBlue)
-        .padding(.vertical, 10)
+      }.foregroundStyle(event.cancelled ? Color(red: 0.7, green: 0.13, blue: 0.17) : campusInk)
+        .padding(.vertical, 16)
     }
   }
   private struct StudentEmptyState: View {
@@ -432,10 +440,10 @@
         Image(systemName: symbol).font(.title3).foregroundStyle(campusBlue)
           .accessibilityHidden(true)
         VStack(alignment: .leading, spacing: 6) {
-          Text(title).font(.headline).foregroundStyle(campusBlue)
+          Text(title).font(.body.weight(.medium)).foregroundStyle(campusInk)
           Text(detail).font(.subheadline).foregroundStyle(.secondary)
         }
-      }.padding(.vertical, 12)
+      }.padding(.vertical, 24)
     }
   }
   struct EventDetails: View {

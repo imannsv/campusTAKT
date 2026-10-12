@@ -19,10 +19,14 @@ final class StudentCoreTests: XCTestCase {
   func testPublishedFeedDatesAndCancelledEvent() throws {
     let json = """
       {"institution":"Testhochschule","scope":"WI26 A1","timezone":"Europe/Berlin","updated":"2026-10-25T12:00:00.123Z",
-      "rows":[{"id":"1:2","name":"Mathematik","start":"2026-10-25T09:00:00+01:00","end":"2026-10-25T10:30:00+01:00","kind":"teaching","cancelled":true,"room_names":["R 1.1"],"group_names":["WI26 A1"],"teacher_names":[]}],"notices":[]}
+      "rows":[{"id":"1:2","name":"Mathematik","start":"2026-10-25T09:00:00+01:00","end":"2026-10-25T10:30:00+01:00","kind":"teaching","cancelled":true,"room_names":["R 1.1"],"group_names":["WI26 A1"],"teacher_names":[]}],"notices":[{"id":7,"title":"Raumänderung","body":"Die Vorlesung findet in R 1.1 statt.","created":"2026-10-25T08:00:00Z"}]}
       """
     let feed = try feedDecoder().decode(StudentFeed.self, from: Data(json.utf8))
     XCTAssertTrue(feed.rows[0].cancelled)
+    XCTAssertEqual(feed.rows[0].name, "Mathematik")
+    XCTAssertEqual(feed.notices.first?.id, 7)
+    XCTAssertEqual(feed.notices.first?.title, "Raumänderung")
+    XCTAssertEqual(feed.notices.first?.body, "Die Vorlesung findet in R 1.1 statt.")
     XCTAssertEqual(feed.rows[0].end.timeIntervalSince(feed.rows[0].start), 90 * 60)
     let calendar = institutionCalendar(feed.timezone)
     let interval = try XCTUnwrap(calendar.dateInterval(of: .weekOfYear, for: feed.rows[0].start))
