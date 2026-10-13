@@ -34,6 +34,9 @@ test("administration provides QR access and notices without exposing stored secr
     provided.getByRole("img", { name: /Anmelde-QR-Code/ }),
   ).toBeVisible();
   await expect(provided).toContainText(result.password);
+  await expect
+    .poll(() => provided.evaluate((el) => el.contains(document.activeElement)))
+    .toBe(true);
   await provided.getByRole("button", { name: "Fertig", exact: true }).click();
   const listing = await (
     await page.request.get("/api/student-app/accesses/")
@@ -49,7 +52,7 @@ test("administration provides QR access and notices without exposing stored secr
     .getByLabel("Titel", { exact: true })
     .fill("Raumänderung für Donnerstag");
   await notice
-    .getByLabel("Mitteilung", { exact: true })
+    .getByRole("textbox", { name: "Mitteilung", exact: true })
     .fill("Die Vorlesung findet in R 1.1 statt.");
   await notice
     .getByRole("button", { name: "Veröffentlichen", exact: true })
@@ -72,4 +75,65 @@ test("administration provides QR access and notices without exposing stored secr
   page.once("dialog", (dialog) => dialog.accept());
   await rows.getByRole("button", { name: "Sperren", exact: true }).click();
   await expect(rows).toContainText("Gesperrt");
+});
+
+test("notice dialog keeps focus while typing and protects current unsaved changes", async ({
+  page,
+}) => {
+  await page.goto("/");
+  await page.getByLabel("Passwort", { exact: true }).fill("WikiBuildOnly2026!");
+  await page.getByRole("button", { name: "Anmelden", exact: true }).click();
+  await page
+    .getByRole("navigation", { name: "Arbeitsbereiche" })
+    .getByRole("button", { name: "Studierenden-App", exact: true })
+    .click();
+  const opener = page.getByRole("button", {
+    name: "Mitteilung erstellen",
+    exact: true,
+  });
+  await opener.click();
+  const notice = page.getByRole("dialog", {
+    name: "Mitteilung veröffentlichen",
+  });
+  const close = notice.getByRole("button", { name: "Schließen", exact: true });
+  const publish = notice.getByRole("button", {
+    name: "Veröffentlichen",
+    exact: true,
+  });
+  await expect(close).toBeFocused();
+  await page.keyboard.press("Shift+Tab");
+  await expect(publish).toBeFocused();
+  await page.keyboard.press("Tab");
+  await expect(close).toBeFocused();
+  const title = notice.getByRole("textbox", { name: "Titel", exact: true });
+  await title.focus();
+  for (const letter of "Raumänderung") {
+    await page.keyboard.type(letter);
+    await expect(title).toBeFocused();
+  }
+  await expect(title).toHaveValue("Raumänderung");
+  const body = notice.getByRole("textbox", { name: "Mitteilung", exact: true });
+  await body.focus();
+  for (const letter of "Zeile eins\nZeile zwei") {
+    await page.keyboard.type(letter);
+    await expect(body).toBeFocused();
+  }
+  await expect(body).toHaveValue("Zeile eins\nZeile zwei");
+  const discardRejected = page.waitForEvent("dialog");
+  page.once("dialog", (dialog) => dialog.dismiss());
+  await page.keyboard.press("Escape");
+  expect((await discardRejected).message()).toBe(
+    "Ungespeicherte Eingaben verwerfen?",
+  );
+  await expect(notice).toBeVisible();
+  await expect(body).toBeFocused();
+  await expect(body).toHaveValue("Zeile eins\nZeile zwei");
+  const discardAccepted = page.waitForEvent("dialog");
+  page.once("dialog", (dialog) => dialog.accept());
+  await page.keyboard.press("Escape");
+  expect((await discardAccepted).message()).toBe(
+    "Ungespeicherte Eingaben verwerfen?",
+  );
+  await expect(notice).toHaveCount(0);
+  await expect(opener).toBeFocused();
 });

@@ -1,4 +1,11 @@
-import { useState, useEffect, useLayoutEffect, useRef, FormEvent } from "react";
+import {
+  useState,
+  useEffect,
+  useEffectEvent,
+  useLayoutEffect,
+  useRef,
+  FormEvent,
+} from "react";
 import { DateTime } from "luxon";
 import {
   X,
@@ -28,6 +35,9 @@ export function Modal({
   busy?: boolean;
 }) {
   const section = useRef<HTMLElement>(null);
+  const closeFromKeyboard = useEffectEvent(() => {
+    if (!busy) onClose();
+  });
   useEffect(() => {
     const previous = document.activeElement as HTMLElement | null;
     const controls = () =>
@@ -38,7 +48,7 @@ export function Modal({
       ).filter((el) => el.offsetParent !== null);
     controls()[0]?.focus();
     const listener = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
+      if (e.key === "Escape") closeFromKeyboard();
       if (e.key === "Tab") {
         const elements = controls(),
           first = elements[0],
@@ -60,7 +70,7 @@ export function Modal({
       document.body.style.overflow = old;
       previous?.focus();
     };
-  }, [onClose]);
+  }, [title]);
   return (
     <div
       className="modal-backdrop"

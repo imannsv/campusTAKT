@@ -77,6 +77,7 @@ test("resource timelines use the authenticated backend and save appointments in 
 test("teacher block times cancel real appointments without deleting them", async ({
   page,
 }) => {
+  await page.clock.setFixedTime(new Date("2026-10-09T10:00:00+02:00"));
   await login(page);
   const data = await (
     await page.request.get(
