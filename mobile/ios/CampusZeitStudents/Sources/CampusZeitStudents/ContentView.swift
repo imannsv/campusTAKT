@@ -8,8 +8,8 @@
   private let campusInk = Color(red: 31 / 255, green: 47 / 255, blue: 61 / 255)
 
   struct ContentView: View {
-    @StateObject private var store: StudentStore
-    @StateObject private var permissions: StudentPermissions
+    @ObservedObject var store: StudentStore
+    @ObservedObject var permissions: StudentPermissions
     @Environment(\.scenePhase) private var scenePhase
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var tab = 0
@@ -19,11 +19,7 @@
     @State private var daySummary: ScheduleDaySummary?
     @State private var calendarOpen = false
 
-    init() {
-      let permissions = StudentPermissions()
-      _permissions = StateObject(wrappedValue: permissions)
-      _store = StateObject(wrappedValue: StudentStore(permissions: permissions))
-    }
+    let scheduleBackgroundRefresh: () -> Void
 
     var body: some View {
       Group {
@@ -53,7 +49,11 @@
       .environment(\.locale, Locale(identifier: "de_DE"))
       .environment(\.calendar, store.calendar)
       .environment(\.timeZone, store.calendar.timeZone)
-      .task { await permissions.prepare() }
+      .task {
+        if scenePhase == .active { store.restoreCredentialIfNeeded() }
+        await permissions.prepare()
+        scheduleBackgroundRefresh()
+      }
       .sheet(isPresented: $permissions.setupOpen) { permissionSetup }
       .onChange(of: permissions.openInbox) { _, open in
         if open {
@@ -100,10 +100,11 @@
         noticeSearch = ""
         calendarOpen = false
         daySummary = nil
+        scheduleBackgroundRefresh()
       }
       .task(id: store.credential?.login.token) {
         guard store.credential != nil else { return }
-        await store.refresh()
+        if scenePhase == .active { await store.refresh() }
         while !Task.isCancelled {
           do { try await Task.sleep(for: .seconds(60)) } catch { return }
           if scenePhase == .active { await store.refresh() }
@@ -133,9 +134,12 @@
       .onChange(of: scenePhase) { _, next in
         if next == .active {
           Task {
+            store.restoreCredentialIfNeeded()
             await permissions.refreshStatus()
             await store.refresh()
           }
+        } else if next == .background {
+          scheduleBackgroundRefresh()
         }
       }
     }
@@ -242,7 +246,7 @@
             StudentEmptyState(
               title: "Diese Woche ist noch nicht gespeichert", symbol: "calendar",
               detail:
-                "Wähle eine heruntergeladene Woche oder aktualisiere mit Verbindung zum Server."
+                "Diese Woche wird automatisch geladen, sobald der Server erreichbar ist."
             ).padding(24)
             Spacer()
           }
@@ -593,21 +597,13 @@
               } else {
                 Text("Noch kein Offline-Stand vorhanden.")
               }
-              Button {
-                Task { await store.refresh() }
-              } label: {
-                HStack {
-                  Label(
-                    store.busy ? "Wird heruntergeladen …" : "Für offline herunterladen",
-                    systemImage: "arrow.down.circle")
-                  if store.busy {
-                    Spacer()
-                    ProgressView()
-                  }
-                }
-              }.disabled(store.busy)
+              LabeledContent(
+                "Hintergrundaktualisierung",
+                value:
+                  UIApplication.shared.backgroundRefreshStatus == .available
+                  ? "Von iOS gesteuert" : "Von iOS eingeschränkt")
               Text(
-                "Stundenplan, Prüfungen und Mitteilungen werden bei jeder Aktualisierung automatisch gespeichert. Der Download umfasst die aktuelle Woche und die nächsten 17 Wochen. Neue Änderungen werden erst mit Verbindung sichtbar."
+                "Stundenplan, Prüfungen und Mitteilungen werden automatisch geladen und gespeichert – beim Öffnen, während der Nutzung und wenn iOS einen Hintergrundabruf erlaubt. Du musst nichts herunterladen. Gespeichert werden die aktuelle und die nächsten 17 Wochen. Neue Änderungen benötigen Verbindung zum Server."
               )
               .font(.footnote).foregroundStyle(.secondary)
               if let error = store.cacheError {
@@ -628,7 +624,7 @@
                 Text(error).font(.subheadline).foregroundStyle(.red)
               }
               Text(
-                "Neue Mitteilungen werden beim Öffnen und Aktualisieren abgerufen. Push bei geschlossener App ist noch nicht verfügbar."
+                "Neue Mitteilungen werden automatisch abgerufen. Hintergrundabrufe sind von iOS abhängig; sofortige Push-Zustellung ist noch nicht verfügbar."
               )
               .font(.footnote).foregroundStyle(.secondary)
             }

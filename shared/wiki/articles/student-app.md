@@ -26,19 +26,21 @@ Die erste Version ist als native iPhone-App mit Xtool gebaut. Release-Build, lok
 
 **Mitteilungen** zeigt die veröffentlichten Hinweise für die Einrichtung und die zugehörige Gruppe beziehungsweise den Jahrgang. Die App aktualisiert bei erneuter Aktivierung, per Herunterziehen und im Vordergrund regelmäßig. Bei Verbindungsproblemen bleiben die gespeicherten Inhalte samt Datenstand sichtbar, auch nach einem vollständigen Neustart der App.
 
-## Daten für offline herunterladen
+## Automatisch offline nutzen
 
 1. Öffne CampusZeit mit Verbindung zu deinem Server und melde dich an.
-2. Öffne **Profil → Offline verfügbar** und tippe **Für offline herunterladen**. Auch normale Aktualisierungen speichern automatisch.
-3. Prüfe den Speicherzeitpunkt. Der Download umfasst die aktuelle Woche und die nächsten 17 Wochen, Prüfungen und veröffentlichte Mitteilungen. Zusätzlich besuchte Wochen bleiben bis zur Grenze von 30 gespeicherten Wochen erhalten; dazwischen können nicht geladene Wochen liegen.
+2. Die App lädt und speichert die Daten selbst beim Öffnen und während der Nutzung. Auch im Hintergrund werden Aktualisierungen angefragt; iOS bestimmt, wann sie laufen. Du musst keinen Download anstoßen.
+3. Unter **Profil → Offline verfügbar** kannst du den Speicherzeitpunkt nachsehen. Der Download umfasst die aktuelle Woche und die nächsten 17 Wochen, Prüfungen und veröffentlichte Mitteilungen. Zusätzlich besuchte Wochen bleiben bis zur Grenze von 30 gespeicherten Wochen erhalten; dazwischen können nicht geladene Wochen liegen.
 4. Ohne Verbindung kannst du diese Wochen, Details, Prüfungen und Mitteilungstexte weiterhin öffnen. Die App zeigt den letzten geladenen Stand. Noch nicht heruntergeladene Wochen werden als solche gekennzeichnet.
-5. Sobald der Server wieder erreichbar ist, aktualisiere die App. Erst dann werden neue Mitteilungen, Änderungen, Absagen oder zurückgezogene Inhalte übernommen.
+5. Sobald der Server wieder erreichbar ist, aktualisiert sich die geöffnete App automatisch. Erst dann werden neue Mitteilungen, Änderungen, Absagen oder zurückgezogene Inhalte übernommen.
 
 Abmelden entfernt den Offline-Stand. Das Ablaufdatum des Zugangs gilt auch ohne Verbindung; eine zwischenzeitliche Sperre wird beim nächsten Serverkontakt erkannt. Bei Serverwartung bleiben die zuvor heruntergeladenen Daten nutzbar.
 
+Hintergrundabrufe haben keine feste Uhrzeit und können durch iOS-Einstellungen oder Energiesparregeln verzögert werden. Beim Öffnen wird der Abruf immer automatisch versucht. Der gespeicherte Stand bleibt verfügbar, wenn der Server nicht erreichbar ist.
+
 ## Mitteilung veröffentlichen oder zurückziehen
 
-Klicke in der Verwaltung auf **Mitteilung erstellen**. Wähle eine Zielgruppe oder **Alle Studierenden**, erfasse Titel und Text und klicke **Veröffentlichen**. Mit **Zurückziehen** entfernst du die Mitteilung aus der App. Es werden noch keine Push-Nachrichten auf den Sperrbildschirm versendet.
+Klicke in der Verwaltung auf **Mitteilung erstellen**. Wähle eine Zielgruppe oder **Alle Studierenden**, erfasse Titel und Text und klicke **Veröffentlichen**. Mit **Zurückziehen** entfernst du die Mitteilung aus der App. Neu abgerufene Mitteilungen können nach erteilter Freigabe lokale Banner auslösen, auch nach einem von iOS erlaubten Hintergrundabruf. Sofortige Push-Zustellung ist noch nicht eingerichtet.
 
 ## Zugang sperren oder ersetzen
 

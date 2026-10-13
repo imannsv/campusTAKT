@@ -22,11 +22,15 @@
     static func save(_ credential: DeviceCredential) throws {
       let data = try JSONEncoder().encode(credential)
       var status = SecItemUpdate(
-        query as CFDictionary, [kSecValueData as String: data] as CFDictionary)
+        query as CFDictionary,
+        [
+          kSecValueData as String: data,
+          kSecAttrAccessible as String: kSecAttrAccessibleAfterFirstUnlockThisDeviceOnly,
+        ] as CFDictionary)
       if status == errSecItemNotFound {
         var record = query
         record[kSecValueData as String] = data
-        record[kSecAttrAccessible as String] = kSecAttrAccessibleWhenUnlockedThisDeviceOnly
+        record[kSecAttrAccessible as String] = kSecAttrAccessibleAfterFirstUnlockThisDeviceOnly
         status = SecItemAdd(record as CFDictionary, nil)
       }
       guard status == errSecSuccess else { throw failure(status) }

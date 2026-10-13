@@ -1,6 +1,7 @@
 #if canImport(UIKit)
   import CryptoKit
   import SwiftUI
+  import UIKit
   import StudentCore
 
   @MainActor
@@ -22,6 +23,7 @@
       archive?.weeks.first { $0.start <= selectedDate && selectedDate < $0.end }?.savedAt
     }
     var todaySaved: Bool { archive?.feed(for: calendar.startOfDay(for: Date())) != nil }
+    private(set) var credentialRestoreDeferred = false
     let permissions: StudentPermissions
     private static let cacheURL = FileManager.default.urls(
       for: .applicationSupportDirectory, in: .userDomainMask
@@ -34,12 +36,27 @@
 
     init(permissions: StudentPermissions) {
       self.permissions = permissions
+      restoreCredentialIfNeeded()
+    }
+
+    func restoreCredentialIfNeeded() {
+      guard credential == nil || archive == nil else { return }
+      credentialRestoreDeferred = false
       do {
         if let saved = try DeviceKeychain.read() {
           _ = try serverURL(saved.server.absoluteString)
-          if saved.login.expires > Date() { credential = saved } else { try DeviceKeychain.clear() }
+          if saved.login.expires > Date() {
+            try DeviceKeychain.save(saved)
+            credential = saved
+          } else {
+            try DeviceKeychain.clear()
+          }
         }
-      } catch { self.error = error.localizedDescription }
+      } catch {
+        credentialRestoreDeferred = !UIApplication.shared.isProtectedDataAvailable
+        self.error = error.localizedDescription
+        return  // Keep the saved stand when protected storage is temporarily unavailable.
+      }
       guard let saved = credential else {
         permissions.clearNotifications()
         try? StudentOfflineArchive.clear(at: Self.cacheURL)
@@ -51,10 +68,13 @@
         if archive == nil { try StudentOfflineArchive.clear(at: Self.cacheURL) }
         usingSavedData = archive != nil
         selectSavedWeek()
-      } catch {
+        if let archive { persist(archive) }
+      } catch is DecodingError {
         try? StudentOfflineArchive.clear(at: Self.cacheURL)
+        cacheError = "Der gespeicherte Stand ist beschädigt und wird automatisch neu geladen."
+      } catch {
         cacheError =
-          "Der gespeicherte Stand konnte nicht gelesen werden. Bitte erneut herunterladen."
+          "Der Offline-Speicher ist momentan nicht verfügbar. Die App versucht es automatisch erneut."
       }
     }
 
@@ -89,6 +109,7 @@
           throw error
         }
         permissions.clearNotifications()
+        credentialRestoreDeferred = false
         archive = nil
         feed = nil
         upcomingRows = []
@@ -104,6 +125,7 @@
       try? DeviceKeychain.clear()
       try? StudentOfflineArchive.clear(at: Self.cacheURL)
       permissions.clearNotifications()
+      credentialRestoreDeferred = false
       credential = nil
       archive = nil
       feed = nil
@@ -114,17 +136,20 @@
       error = StudentError.expired.localizedDescription
     }
 
-    func refresh() async {
-      guard let saved = credential, !busy else { return }
+    @discardableResult
+    func refresh(background: Bool = false) async -> Bool {
+      guard let saved = credential, !busy, !Task.isCancelled else { return false }
       guard saved.login.expires > Date() else {
         expire()
-        return
+        return false
       }
       let requestedDate = selectedDate
       busy = true
       defer {
         busy = false
-        if selectedDate != requestedDate, credential != nil { Task { await refresh() } }
+        if !background, !Task.isCancelled, selectedDate != requestedDate, credential != nil {
+          Task { await refresh() }
+        }
       }
       selectSavedWeek()
       do {
@@ -136,10 +161,11 @@
         let api = StudentAPI(server: saved.server)
         let upcoming = try await api.feed(
           token: saved.login.token, start: downloadStart, end: horizon, zone: saved.login.timezone)
-        guard credential?.login.token == saved.login.token else { return }
+        try Task.checkCancellation()
+        guard credential?.login.token == saved.login.token else { return false }
         guard saved.login.expires > Date() else {
           expire()
-          return
+          return false
         }
         var snapshot = archive ?? StudentOfflineArchive(session: cacheSession(saved))
         snapshot.update(upcoming, start: downloadStart, end: horizon, savedAt: Date())
@@ -150,14 +176,16 @@
         error = nil
         persist(snapshot)
         await permissions.receive(upcoming.notices, credential: saved)
-        guard credential?.login.token == saved.login.token else { return }
-        if start < downloadStart || end > horizon {
+        try Task.checkCancellation()
+        guard credential?.login.token == saved.login.token else { return false }
+        if !background, start < downloadStart || end > horizon {
           let week = try await api.feed(
             token: saved.login.token, start: start, end: end, zone: saved.login.timezone)
-          guard credential?.login.token == saved.login.token else { return }
+          try Task.checkCancellation()
+          guard credential?.login.token == saved.login.token else { return false }
           guard saved.login.expires > Date() else {
             expire()
-            return
+            return false
           }
           snapshot.update(week, start: start, end: end, savedAt: Date())
           archive = snapshot
@@ -165,6 +193,7 @@
           selectSavedWeek()
           persist(snapshot)
         }
+        return cacheError == nil && !Task.isCancelled
       } catch StudentError.expired {
         if credential?.login.token == saved.login.token { expire() }
       } catch is CancellationError {} catch {
@@ -173,9 +202,10 @@
           connectionUnavailable = true
           self.error =
             archive == nil
-            ? "Der Server ist momentan nicht erreichbar. Bitte später erneut aktualisieren." : nil
+            ? "Der Server ist momentan nicht erreichbar. Die App versucht es automatisch erneut." : nil
         }
       }
+      return false
     }
 
     private func persist(_ snapshot: StudentOfflineArchive) {
@@ -184,7 +214,7 @@
         cacheError = nil
       } catch {
         cacheError =
-          "Der Offline-Stand konnte nicht gespeichert werden. Die geladenen Daten bleiben bis zum Schließen verfügbar. Bitte erneut herunterladen."
+          "Der Offline-Stand konnte nicht gespeichert werden. Die geladenen Daten bleiben bis zum Schließen verfügbar. Die App versucht das Speichern automatisch erneut."
       }
     }
 
@@ -198,6 +228,7 @@
         return
       }
       permissions.clearNotifications()
+      credentialRestoreDeferred = false
       credential = nil
       archive = nil
       feed = nil

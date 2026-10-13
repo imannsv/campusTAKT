@@ -79,8 +79,10 @@ public struct StudentOfflineArchive: Codable, Sendable {
     try backupURL.setResourceValues(values)
     #if os(iOS)
       try FileManager.default.setAttributes(
-        [.protectionKey: FileProtectionType.complete], ofItemAtPath: directory.path)
-      try data.write(to: url, options: [.atomic, .completeFileProtection])
+        [.protectionKey: FileProtectionType.completeUntilFirstUserAuthentication],
+        ofItemAtPath: directory.path)
+      try data.write(
+        to: url, options: [.atomic, .completeFileProtectionUntilFirstUserAuthentication])
     #else
       try data.write(to: url, options: .atomic)
     #endif

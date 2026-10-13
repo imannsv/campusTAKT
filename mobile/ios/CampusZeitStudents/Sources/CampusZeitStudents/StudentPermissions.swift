@@ -17,8 +17,10 @@
     private var currentScope: String?
     private let setupKey = "campuszeit.permissions.configured"
 
+    func installDelegate() { center.delegate = self }
+
     func prepare() async {
-      center.delegate = self
+      installDelegate()
       await refreshStatus()
       setupOpen = !UserDefaults.standard.bool(forKey: setupKey)
     }
@@ -76,14 +78,14 @@
         return
       }
       await refreshStatus()
-      guard currentScope == scope else { return }
+      guard !Task.isCancelled, currentScope == scope else { return }
       if !notificationsGranted {
         UserDefaults.standard.set(Array(known.union(notices.map(\.id))), forKey: key)
         return
       }
-      // shortcut: notifications arrive when the app fetches; closed-app delivery needs APNs.
+      // shortcut: banners depend on a fetch; immediate remote delivery needs APNs.
       for notice in incoming {
-        guard currentScope == scope else { return }
+        guard !Task.isCancelled, currentScope == scope else { return }
         let content = UNMutableNotificationContent()
         content.title = notice.title
         content.body = String(notice.body.prefix(200))
@@ -93,7 +95,7 @@
           try await center.add(
             UNNotificationRequest(
               identifier: identifier, content: content, trigger: nil))
-          guard currentScope == scope else {
+          guard !Task.isCancelled, currentScope == scope else {
             center.removePendingNotificationRequests(withIdentifiers: [identifier])
             center.removeDeliveredNotifications(withIdentifiers: [identifier])
             return
