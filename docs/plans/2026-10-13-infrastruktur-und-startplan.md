@@ -133,6 +133,57 @@ VOM VORHANDENEN PROJEKT ZUM BETRIEB
 
 Updateweg: freigegebener Commit > Test-VM > Abnahme > zusätzliches Backup > angekündigtes Wartungsfenster > Migration > neue Container > Funktionstest. Bei Datenbankmigrationen keine parallelen Schreibvorgänge; Rückkehr zur alten Version nur mit geprüftem Schema-/Restoreplan.
 
+## Neue Einrichtung aus einer Vorlage
+
+GLEICHE SOFTWARE - EIGENE LEERE DATEN
+
+> Ziel: einmal den Betriebsaufbau vorbereiten. Danach startet ein Assistent pro Schule oder Hochschule die geprüfte Basis mit eigener Datenbank und eigenem Verwaltungszugang. Alle Funktionen sind vorhanden; fachliche Daten werden erst von der Einrichtung erfasst.
+
+### Drei Teile des Bereitstellungspakets
+
+| Teil | Einmal vorbereiten | Je Einrichtung |
+| --- | --- | --- |
+| CampusZeit-Image | Freigegebene Version in GitHub Container Registry | Dasselbe Image für Webdienst und Worker; feste Versions-ID |
+| Betriebsvorlage | Compose-Dateien für App-/Daten-VM plus Sicherungsregeln | Eigene Dienste, Datenbank, Redis, Medien und Backups |
+| Einrichtungsassistent | Geführter Ablauf mit Prüfung, Protokoll und Wiederaufnahme | Name, Schulart, Domain, Verwaltungsadresse und Lizenzende |
+
+Ein Docker-Image enthält den Programmstand und seine Laufzeit. Kundendaten und Zugangsschlüssel liegen außerhalb in eigenen Datenträgern und geschützten Einstellungen. Eine neue Instanz nutzt frische leere Datenträger. Das Image wird aus einem geprüften Release gebaut und über seinen Digest festgelegt; ein wechselndes latest ist keine verbindliche Freigabe. [22]
+
+### So soll die Anlage für dich ablaufen
+
+1. Neue Einrichtung starten: Name, Schule/Hochschule, Domain, Verwaltungs-E-Mail und Lizenzende eingeben. Der Assistent schlägt eine eindeutige Kennung vor und prüft freie Ressourcen sowie vorhandene Instanzen.
+2. Vorbereiten: eigene App-/Daten-Umgebung, Geheimnisse und Sicherungsziele erzeugen; DNS, Gateway und Tailscale-Zugriffsregeln für genau diese Instanz prüfen.
+3. Initialisieren: freigegebenes Image laden, leere Datenbank migrieren und die Einrichtung samt Verwaltungszugang über provision anlegen. Keine Demo- oder Kundendaten kopieren.
+4. Prüfen: HTTPS, Anmeldung, Worker, Datenabgrenzung und Sicherung testen. Erst dann Betriebsadresse und Zugang sicher übergeben; Ergebnis und installierte Version dokumentieren.
+
+Vorhanden: Dockerfile, Compose und provision. Am 13.10.2026 wurde provision nach Migration auf einer separaten frischen SQLite-Testdatenbank geprüft: eine Einrichtung, ein Verwaltungszugang ohne Superuserrechte und keine fachlichen Datensätze. Noch zu bauen: Release-Image-Pipeline, wiederverwendbare Produktionsdateien und Assistent. Docker-/Serverbetrieb ist durch diese Prüfung nicht nachgewiesen. [R1, R3]
+
+## Instanzanlage verlässlich betreiben
+
+ISOLATION, UPDATES UND PRÜFBARER ERFOLG
+
+### Eine Schule erhält ihre eigene Umgebung
+
+Passend zur geplanten VM-Trennung erhält jede Einrichtung ein eigenes App-/Daten-Paar, eigene Netzwerkfreigaben und eigene Einstellungen. Ein gemeinsames Image liefert den gleichen Funktionsumfang. Auf den jeweiligen Docker-Hosts bekommen die Stacks eindeutige Compose-Projektnamen. Keine fest gemeinsam benannten oder extern wiederverwendeten Kundendatenträger; Ports, Konten und Netzregeln separat festlegen. Projektnamen erleichtern Trennung, ersetzen aber keine Zugriffskontrolle. [23, 24]
+
+### Die Vorlage selbst bleibt neutral
+
+Als zusätzliche Beschleunigung ist eine Ubuntu-VM-Vorlage mit Docker möglich. Sie enthält keine Kundenvolumes, persönlichen SSH-Schlüssel oder aktive Tailscale-Geräteidentitäten. Jeder Klon erhält eigene Maschinenidentität, SSH-Hostschlüssel und Tailscale-Registrierung. Bestehende Kunden-VMs oder deren Sicherungen werden nicht als Vorlage für einen neuen Kunden verwendet.
+
+### Fehler dürfen keine vorhandenen Daten ersetzen
+
+1. Vor Änderungen Kennung, Zieladressen und Datenträgerzuordnung prüfen. Bei bereits vorhandener Einrichtung abbrechen oder nur einen dokumentierten unvollständigen Anlagenlauf fortsetzen.
+2. Geheimnisse automatisch neu erzeugen, geschützt speichern und aus Logs/Git fernhalten. Ein Wiederholungsversuch setzt keine Datenbank zurück und ändert nicht still ein vorhandenes Passwort.
+3. Zwischenschritte und Fehler klar protokollieren. Eine fehlgeschlagene Einrichtung bleibt als unvollständig erkennbar; kein Erfolg nur deshalb, weil ein Container läuft.
+
+### Updates werden je Instanz übernommen
+
+Eine neue Version wird einmal gebaut, gegen eine leere Installation und ein Upgrade bestehender Testdaten geprüft und erst danach freigegeben. Jede Instanz behält zunächst ihre Version. Update mit Backup, Wartungsfenster, einmaligen Migrationen und Funktionsprüfung. Persistente Daten bleiben beim Austausch des Images bestehen. Ein alter Image-Digest alleine ist kein Rollback einer inkompatiblen Datenbankmigration. [22, 25]
+
+### Abnahme für das Paket
+
+Zwei Einrichtungen aus derselben Vorlage aufbauen: beide fachlich leer, getrennte Konten und Datenträger; Anmeldung oder Datenzugriff auf die jeweils andere Einrichtung schlägt fehl. Zusätzlich doppelte Anlage, falsche Domain, fehlende Ressourcen, Unterbrechung/Wiederaufnahme, Neustart, Update mit erhaltenen Daten und Restore testen. Als Arbeitsziel sollen normale Neuanlagen nur die Eingaben und eine abschließende Prüfung benötigen; die Dauer wird erst nach einem echten Durchlauf zugesagt.
+
 ## Domain und öffentlicher Zugang
 
 WEBSITE, PILOTADRESSE UND E-MAIL
@@ -233,7 +284,7 @@ Grundbudget etwa 21-63 EUR monatlich einschließlich anteiliger Domain, ohne Tai
 
 1. Du und Jakob: RAM, Laufwerke und freie Kapazitäten erfassen, Jakobs Anschluss/Router prüfen, Daten sichern und Erstinstallation vor Ort planen. Dann entscheiden wir die endgültigen VM-Größen.
 2. Gemeinsam: Hauptdomain und monatliches Budget einschließlich Tailscale-Tarif festlegen; dann Fernverwaltung und Gateway-Zugang abnehmen. Erst danach kaufen und DNS ändern.
-3. Umsetzung: eigene Betriebsdateien für App-/Daten-VM, Backupplan und Restore-Protokoll erstellen; danach die öffentliche Demo und erste Pilotgespräche vorbereiten.
+3. Umsetzung: Release-Image, Produktionsvorlagen und Einrichtungsassistent bauen; leere Anlage, Update und Restore prüfen. Danach Demo und erste Pilotgespräche vorbereiten.
 
 > Vor dem Datenpilot abhaken: HTTPS und Anmeldung extern getestet; keine offenen Datenports; Kunde ohne Superuserrechte; Geheimnisse geschützt; Wiederherstellung bestanden; Monitoring alarmiert; Hochschulfreigabe und Pilotumfang dokumentiert.
 
@@ -304,3 +355,25 @@ Precision und HP Mini stehen voraussichtlich bei Jakob. Das Tailnet gehört zum 
 Ein öffentlicher Gateway gibt CampusZeit eine stabile HTTPS-Adresse. Er ersetzt keinen redundanten Heimanschluss und keinen Ersatzserver. Ausgehende Verbindung, direkte oder Relay-Verbindung und Uploadleistung werden am tatsächlichen Standort getestet.
 
 Standortergänzung vom 13.10.2026. Keine Betriebssysteme, Tailscale-Konten, DNS-Einträge, Routerfreigaben oder VPS wurden durch die Dokumenterstellung eingerichtet.
+
+## Quellen zur wiederholbaren Anlage
+
+RELEASE-IMAGE UND AUTOMATISIERTE BEREITSTELLUNG
+
+[22] GitHub Container Registry: Images und feste Digests: [Quelle](https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-container-registry)
+
+[23] Docker Compose: eindeutige Projektnamen: [Quelle](https://docs.docker.com/compose/how-tos/project-name/)
+
+[24] Docker Compose: Datenträger und Namenszuordnung: [Quelle](https://docs.docker.com/reference/compose-file/volumes/)
+
+[25] Docker Compose: Betrieb und Updates: [Quelle](https://docs.docker.com/compose/how-tos/production/)
+
+[R3] Vorhandene Kundenanlage: provision: [Quelle](https://github.com/imannsv/campusTIME/blob/main/backend/planner/management/commands/provision.py)
+
+### Geprüfte Grundlage und noch offene Umsetzung
+
+Dockerfile und vorhandene Compose-Konfiguration wurden gelesen. Der provision-Befehl wurde nach allen Migrationen gegen eine ausschließlich dafür erzeugte, frische Testdatenbank ausgeführt. Geprüft: Einrichtung und Lizenzlaufzeit vorhanden, genau ein Kundenkonto mit Rolle admin, kein staff-/Superuserrecht, alle Ressourcen der fachlichen API ohne Datensätze. Der vorhandene lokale Datenbestand wurde dabei nicht verwendet.
+
+Diese Prüfung bestätigt die leere Kundenanlage über Django. Sie bestätigt noch kein veröffentlichtes Container-Image, keine automatische VM-Bereitstellung, keine wiederaufnehmbare Installation und keinen Kundenzugriff über HTTPS. Docker ist auf dem Entwicklungsrechner installiert, sein Linux-Dienst lief beim Test nicht.
+
+Planergänzung vom 13.10.2026. Registry-Paket, Einrichtungsassistent und Produktionsvorlagen sind hier als nächste Implementierung beschrieben. Es wurden keine Kundeninstanzen, Registry-Zugänge oder öffentlichen Domains angelegt.
