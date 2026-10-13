@@ -26,9 +26,19 @@ Der Kamerabereich zeigt einen Scanrahmen und einen kurzen Hinweis; die Serverbes
 2. Additive Migration anwenden: `.venv/Scripts/python.exe backend/manage.py migrate`.
 3. Verwaltung öffnen und unter **Veröffentlichung → Studierenden-App** einen Zugang für eine Gruppe oder einen Jahrgang erstellen.
 4. Die von Geräten erreichbare Serveradresse angeben. QR-Code speichern oder Zugangsdaten kopieren; sie werden nur bei Erstellung ausgegeben. Für einen Ersatz alten Zugang sperren und neuen erstellen.
-5. Erst veröffentlichte Pläne werden ausgeliefert. Mitteilungen werden hier gesondert erstellt und veröffentlicht.
+5. Erst veröffentlichte Pläne werden ausgeliefert. Allgemeine Mitteilungen werden hier erstellt und veröffentlicht; Absagen bereits veröffentlichter Termine erzeugen automatisch Ausfallmitteilungen für deren Gruppen.
 
 Die Migration fügt ausschließlich Tabellen für Zugänge, Gerätesitzungen und Mitteilungen hinzu. Vorhandene Planungsdaten werden nicht verändert. Der neue Menüpunkt ist in der statischen Browser-Demo sichtbar, aber die Zugangsverwaltung dort deaktiviert.
+
+## Automatische Ausfallmitteilungen
+
+Seit 13.10.2026 erzeugen manuelle Terminabsagen sowie Lehrenden-Blockzeiten (separate Blockzeit-Aktion, Verfügbarkeitsformular und Personenimport) automatisch `StudentNotice`-Einträge für die im neuesten veröffentlichten Snapshot zugeordneten Gruppen. Jahrgangszugänge erhalten sie über den vorhandenen Gruppenfilter. Titel, Datum, Uhrzeit (Zeitzone der Einrichtung) und Raum kommen ausschließlich aus diesem Snapshot. Entwürfe, Teilnehmerlisten und persönliche Blockzeitgründe werden nicht übertragen. Termine ohne Veröffentlichung oder ohne Gruppenzuordnung erzeugen keine Nachricht.
+
+Die Erzeugung erfolgt in derselben Transaktion wie die Absage. Beim manuellen Speichern wird der vorherige Absagestatus nach dem Einrichtungs-Lock neu gelesen; nur der Übergang zu `cancelled=True` löst eine Mitteilung aus. Blockzeiten berücksichtigen ausschließlich bisher aktive Termine. `cancellation_session` und eine bedingte Eindeutigkeitsregel sichern eine aktive Ausfallmitteilung je Termin und Gruppe. Wiederholtes Speichern und Vorschauaufrufe erzeugen keine Duplikate. Aufheben einer Absage zieht verknüpfte Nachrichten zurück; eine spätere erneute Absage erzeugt neue IDs. Löschen eines Termins erhält die Nachrichten als Historie ohne Verknüpfung.
+
+Migration `0014` ergänzt ausschließlich die optionale Verknüpfung und die Eindeutigkeitsregel; bestehende Absagen werden nicht nachträglich gemeldet. Die installierte iPhone-App verwendet den unveränderten Feed und übernimmt neue Mitteilungen beim automatischen Abruf. Dafür ist kein App-Update nötig. Lokale Banner benötigen weiterhin die Benachrichtigungsfreigabe und einen erfolgreichen Abruf; unmittelbare APNs-Zustellung bei geschlossener App bleibt offen.
+
+Frische Prüfung am 13.10.2026: 31 Backendtests (Gruppengrenzen, manuelle Absage, Blockzeit/Vorschau/Verfügbarkeit, Duplikate, Rücknahme/erneute Absage, Transaktions-Rollback, veröffentlichte Daten, mehrere Gruppen und Prüfungen) sowie vier relevante Browsertests bestanden. Der Blockzeit-Browsertest prüft auch die automatisch sichtbare Ausfallmitteilung. Regulärer Build, Demo-Build, Wiki/Freddy, Ruff und Migrationsprüfung bestanden. Migration lokal angewandt; alle 1280 vorhandenen Termine und die vorhandenen Mitteilungen unverändert, keine nachträglichen Nachrichten. Der Neustart des lokalen Servers mit `--noreload` wurde von der automatischen Freigabeprüfung abgelehnt (`blocked by policy`) und steht zur Aktivierung noch aus. Es wurde keine echte Veranstaltung zu Testzwecken abgesagt. Kein neuer iPhone-Build nötig; Gerätestest dieser automatischen Ausfallmitteilung noch offen.
 
 ## Xtool unter WSL
 

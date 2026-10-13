@@ -485,6 +485,9 @@ class StudentNotice(models.Model):
     institution = models.ForeignKey(Institution, on_delete=models.CASCADE)
     group = models.ForeignKey(Group, null=True, blank=True, on_delete=models.PROTECT)
     cohort = models.ForeignKey(Cohort, null=True, blank=True, on_delete=models.PROTECT)
+    cancellation_session = models.ForeignKey(
+        Session, null=True, blank=True, on_delete=models.SET_NULL
+    )
     title = models.CharField(max_length=160)
     body = models.TextField(max_length=5000)
     active = models.BooleanField(default=True)
@@ -495,5 +498,10 @@ class StudentNotice(models.Model):
             models.CheckConstraint(
                 condition=models.Q(group__isnull=True) | models.Q(cohort__isnull=True),
                 name="student_notice_at_most_one_scope",
-            )
+            ),
+            models.UniqueConstraint(
+                fields=["cancellation_session", "group"],
+                condition=models.Q(active=True, cancellation_session__isnull=False),
+                name="student_notice_active_cancellation_unique",
+            ),
         ]

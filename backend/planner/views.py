@@ -226,6 +226,10 @@ class ResourceViewSet(viewsets.ModelViewSet):
             institution = lock_tenant(self.request)
             from .study import validate_study
 
+            was_cancelled = False
+            if isinstance(serializer.instance, m.Session):
+                serializer.instance.refresh_from_db()
+                was_cancelled = serializer.instance.cancelled
             validate_study(
                 RESOURCES[self.resource],
                 serializer.instance,
@@ -307,6 +311,13 @@ class ResourceViewSet(viewsets.ModelViewSet):
                 errors = validate_rows(instance.plan, rows)
                 if errors:
                     raise serializers.ValidationError({"conflicts": errors})
+                if instance.cancelled and not was_cancelled:
+                    from .cancellation_notices import notify_cancellations
+                    notify_cancellations(institution, [instance])
+                elif was_cancelled and not instance.cancelled:
+                    m.StudentNotice.objects.filter(
+                        institution=institution, cancellation_session=instance, active=True,
+                    ).update(active=False)
             bump(
                 self.request, institution, f"{self.resource}: {instance.pk} gespeichert"
             )
@@ -869,8 +880,9 @@ def resource_occupancy(request):
 
 @api_view(["GET", "POST"])
 def teacher_block_time(request, pk):
-    from .teacher_availability import affected_session_ids, cancel_for_teacher
     from uuid import uuid4
+
+    from .teacher_availability import affected_session_ids, cancel_for_teacher
 
     with transaction.atomic():
         institution = lock_tenant(request) if request.method == "POST" else tenant(request)

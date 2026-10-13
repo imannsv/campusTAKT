@@ -114,6 +114,196 @@ class StudentAppTests(TestCase):
             ]
         )
 
+    def published_session(self):
+        return m.Session.objects.filter(course__name="Programmierung · A1").first()
+
+    def cancel(self, session, **changes):
+        return self.manager.patch(
+            f"/api/sessions/{session.id}/",
+            {"cancelled": True, **changes},
+            format="json",
+        )
+
+    def test_manual_cancellation_notifies_only_published_audience_once(self):
+        self.sign_in()
+        session = self.published_session()
+        published_row = next(
+            row
+            for row in self.feed().data["rows"]
+            if row["id"].endswith(f":{session.id}")
+        )
+        response = self.cancel(session, name="Geheimer Entwurf")
+        self.assertEqual(response.status_code, 200, response.data)
+        notices = self.feed().data["notices"]
+        self.assertEqual(len(notices), 1)
+        notice = notices[0]
+        self.assertIn("entfällt", notice["title"])
+        self.assertIn(published_row["name"], notice["body"])
+        from .services import local
+
+        start = local(published_row["start"], self.institution)
+        self.assertIn(start.strftime("%d.%m.%Y"), notice["body"])
+        self.assertIn(start.strftime("%H:%M"), notice["body"])
+        for room in published_row["room_names"]:
+            self.assertIn(room, notice["body"])
+        self.assertNotIn("Geheimer Entwurf", notice["body"])
+        self.assertNotIn("learner_ids", str(notice))
+        self.assertEqual(m.StudentNotice.objects.get().group_id, self.group.id)
+        self.assertEqual(self.cancel(session).status_code, 200)
+        self.assertEqual(self.feed().data["notices"], notices)
+        self.sign_in(self.create_access(group=self.other.id))
+        self.assertEqual(self.feed().data["notices"], [])
+        self.sign_in(self.create_access(cohort=self.group.cohort_id))
+        self.assertEqual(len(self.feed().data["notices"]), 1)
+
+    def test_block_preview_and_repeated_blocks_do_not_duplicate_notices(self):
+        self.sign_in()
+        session = self.published_session()
+        teacher = session.course.teachers.first()
+        url = f"/api/people/{teacher.id}/block-time/"
+        payload = {"start": session.start.isoformat(), "end": session.end.isoformat()}
+        preview = self.manager.get(url, payload)
+        self.assertEqual(preview.status_code, 200, preview.data)
+        self.assertGreater(preview.data["affected_count"], 0)
+        self.assertFalse(m.StudentNotice.objects.exists())
+        response = self.manager.post(url, payload, format="json")
+        self.assertEqual(response.status_code, 200, response.data)
+        session.refresh_from_db()
+        self.assertTrue(session.cancelled)
+        notices = list(m.StudentNotice.objects.values_list("id", flat=True))
+        self.assertTrue(notices)
+        self.assertTrue(self.feed().data["notices"])
+        self.assertEqual(
+            self.manager.post(url, payload, format="json").status_code, 200
+        )
+        self.assertEqual(
+            list(m.StudentNotice.objects.values_list("id", flat=True)), notices
+        )
+
+    def test_availability_update_also_generates_cancellation_notice(self):
+        session = self.published_session()
+        teacher = session.course.teachers.first()
+        response = self.manager.patch(
+            f"/api/people/{teacher.id}/",
+            {
+                "availability": {
+                    "unrestricted": True,
+                    "exclusions": [
+                        {
+                            "start": session.start.isoformat(),
+                            "end": session.end.isoformat(),
+                        }
+                    ],
+                },
+            },
+            format="json",
+        )
+        self.assertEqual(response.status_code, 200, response.data)
+        self.assertTrue(m.StudentNotice.objects.filter(group=self.group).exists())
+
+    def test_unpublished_and_foreign_cancellations_do_not_send_notices(self):
+        session = self.published_session()
+        m.Publication.objects.filter(plan=session.plan).delete()
+        self.assertEqual(self.cancel(session).status_code, 200)
+        self.assertFalse(m.StudentNotice.objects.exists())
+        foreign = m.Institution.objects.create(name="Andere", slug="notice-other")
+        m.Membership.objects.filter(user=self.admin).update(institution=foreign)
+        self.assertEqual(self.cancel(session).status_code, 404)
+        self.assertFalse(m.StudentNotice.objects.exists())
+
+    def test_failed_cancellation_rolls_back_session_and_notice(self):
+        from unittest.mock import patch
+
+        session = self.published_session()
+        with patch("planner.views.validate_rows", return_value=["Konflikt"]):
+            self.assertEqual(self.cancel(session).status_code, 400)
+        session.refresh_from_db()
+        self.assertFalse(session.cancelled)
+        self.assertFalse(m.StudentNotice.objects.exists())
+
+    def test_restore_withdraws_notice_and_new_cancellation_gets_new_notice(self):
+        self.sign_in()
+        session = self.published_session()
+        self.assertEqual(self.cancel(session).status_code, 200)
+        first = m.StudentNotice.objects.get()
+        self.manager.post(f"/api/student-app/notices/{first.id}/withdraw/")
+        self.assertEqual(self.cancel(session).status_code, 200)
+        self.assertEqual(m.StudentNotice.objects.count(), 1)
+        self.assertFalse(m.StudentNotice.objects.get().active)
+        response = self.manager.patch(
+            f"/api/sessions/{session.id}/", {"cancelled": False}, format="json"
+        )
+        self.assertEqual(response.status_code, 200, response.data)
+        first.refresh_from_db()
+        self.assertFalse(first.active)
+        self.assertEqual(self.feed().data["notices"], [])
+        self.assertEqual(self.cancel(session).status_code, 200)
+        self.assertNotEqual(self.feed().data["notices"][0]["id"], first.id)
+
+    def test_latest_frozen_audience_survives_draft_group_changes(self):
+        from .overview import enrich_snapshot
+        from .services import plan_rows
+
+        session = self.published_session()
+        session.course.groups.add(self.other)
+        snapshot = enrich_snapshot(plan_rows(session.plan), self.institution.id)
+        m.Publication.objects.create(
+            institution=self.institution, plan=session.plan, number=2, snapshot=snapshot
+        )
+        session.course.groups.remove(self.other)
+        self.assertEqual(self.cancel(session).status_code, 200)
+        self.assertEqual(
+            set(m.StudentNotice.objects.values_list("group_id", flat=True)),
+            {self.group.id, self.other.id},
+        )
+
+    def test_latest_publication_without_audience_does_not_broadcast(self):
+        session = self.published_session()
+        publication = m.Publication.objects.get(plan=session.plan, number=1)
+        snapshot = publication.snapshot
+        for row in snapshot:
+            if row["id"] == session.id:
+                row["overview_scope"]["groups"] = []
+        m.Publication.objects.create(
+            institution=self.institution, plan=session.plan, number=2, snapshot=snapshot
+        )
+        self.assertEqual(self.cancel(session).status_code, 200)
+        self.assertFalse(m.StudentNotice.objects.exists())
+
+    def test_cancelled_exam_uses_published_learner_groups(self):
+        from .overview import enrich_snapshot
+        from .services import plan_rows
+
+        original = self.published_session()
+        exam = m.Exam.objects.create(
+            institution=self.institution,
+            code="NOTICE-EXAM",
+            name="Prüfung Mathematik",
+            plan=original.plan,
+            window_start="2026-10-01",
+            window_end="2026-11-01",
+        )
+        exam.learners.set(self.group.people.all())
+        session = m.Session.objects.create(
+            institution=self.institution,
+            plan=original.plan,
+            exam=exam,
+            start=original.start,
+            end=original.end,
+        )
+        session.rooms.set(original.rooms.all())
+        snapshot = enrich_snapshot(plan_rows(original.plan), self.institution.id)
+        m.Publication.objects.create(
+            institution=self.institution,
+            plan=original.plan,
+            number=2,
+            snapshot=snapshot,
+        )
+        self.assertEqual(self.cancel(session).status_code, 200)
+        notice = m.StudentNotice.objects.get()
+        self.assertEqual(notice.group_id, self.group.id)
+        self.assertIn(exam.name, notice.body)
+
     def test_cohort_access_and_notice_audiences(self):
         cohort = self.create_access(cohort=self.group.cohort_id)
         for title, scope in [

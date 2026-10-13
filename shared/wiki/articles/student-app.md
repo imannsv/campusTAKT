@@ -42,6 +42,16 @@ Hintergrundabrufe haben keine feste Uhrzeit und können durch iOS-Einstellungen 
 
 Klicke in der Verwaltung auf **Mitteilung erstellen**. Wähle eine Zielgruppe oder **Alle Studierenden**, erfasse Titel und Text und klicke **Veröffentlichen**. Mit **Zurückziehen** entfernst du die Mitteilung aus der App. Neu abgerufene Mitteilungen können nach erteilter Freigabe lokale Banner auslösen, auch nach einem von iOS erlaubten Hintergrundabruf. Sofortige Push-Zustellung ist noch nicht eingerichtet.
 
+## Automatische Ausfallmitteilungen
+
+Wenn die Verwaltung einen bereits veröffentlichten Termin absagt, erstellt CampusZeit automatisch eine Mitteilung für jede betroffene Gruppe. Das gilt auch für Absagen durch eine Lehrenden-Blockzeit oder eine gespeicherte Verfügbarkeit mit Blockzeiten. Jahrgangszugänge erhalten die Mitteilungen ihrer Gruppen ebenfalls.
+
+Die Nachricht enthält den veröffentlichten Titel, Datum, Uhrzeit und Raum. Unveröffentlichte Änderungen und persönliche Gründe für Blockzeiten werden nicht übertragen. Der abgesagte Termin bleibt rot und durchgestrichen im Plan erhalten. Wiederholtes Speichern und die Blockzeit-Vorschau erzeugen keine weiteren Nachrichten.
+
+Die Mitteilung erscheint auch in der Verwaltung unter **Studierenden-App** und kann dort zurückgezogen werden. Wird die Absage am Termin aufgehoben und erfolgreich gespeichert, zieht CampusZeit die zugehörige Ausfallmitteilung zurück. Eine spätere erneute Absage erzeugt eine neue Nachricht. Für unveröffentlichte Termine oder Termine ohne zugeordnete Gruppe wird keine Nachricht verschickt; alte Absagen werden beim Update nicht nachträglich gemeldet.
+
+Die App übernimmt die neue Mitteilung beim nächsten erfolgreichen automatischen Abruf. Ohne Verbindung bleibt ihr gespeicherter Stand erhalten. Ein sofortiger Push bei geschlossener App ist weiterhin nicht eingerichtet; Hintergrundabrufe werden von iOS bestimmt.
+
 ## Zugang sperren oder ersetzen
 
 **Sperren** beendet alle Gerätesitzungen dieses Gruppenzugangs. Für neue Zugangsdaten sperre den bisherigen Zugang und erstelle einen neuen. Auf einem iPhone beendet **Mein Zugang → Auf diesem Gerät abmelden** nur die eigene Sitzung. Gerätesitzungen laufen nach 90 Tagen ab und erfordern dann eine erneute Anmeldung.

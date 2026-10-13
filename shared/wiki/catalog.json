@@ -578,9 +578,12 @@
       "zugangscode",
       "mitteilung",
       "offline",
-      "download"
+      "download",
+      "ausfall",
+      "absage",
+      "blockzeit"
     ],
-    "summary": "Öffne Studierenden-App. Erstelle einen Zugang für eine Gruppe oder einen Jahrgang und gib die erreichbare HTTPS-Serveradresse an. Speichere den einmalig angezeigten QR-Code oder kopiere die Zugangsdaten und teile sie ausschließlich mit dieser Zielgruppe. Die App zeigt freigegebene Stundenpläne, Prüfungen und veröffentlichte Mitteilungen. Sperren beendet alle verbundenen Gerätesitzungen. Der iPhone-Release-Build, die lokale Testsignierung und Installation bestehen; die Anmeldung wurde auf dem iPhone geöffnet. Der vollständige Gerätetest steht noch aus. Android folgt später. Die iPhone-App lädt und speichert beim Öffnen, während der Nutzung und bei von iOS erlaubten Hintergrundabrufen automatisch die aktuelle und nächsten 17 Wochen, Prüfungen und Mitteilungen für offline, auch nach Neustart. Ein Download-Button ist nicht nötig; Profil → Offline verfügbar zeigt den Speicherstand. Nicht gespeicherte Wochen werden gekennzeichnet. Abmelden entfernt den Stand; neue Änderungen erfordern Verbindung zum Server.",
+    "summary": "Öffne Studierenden-App. Erstelle einen Zugang für eine Gruppe oder einen Jahrgang und gib die erreichbare HTTPS-Serveradresse an. Speichere den einmalig angezeigten QR-Code oder kopiere die Zugangsdaten und teile sie ausschließlich mit dieser Zielgruppe. Die App zeigt freigegebene Stundenpläne, Prüfungen und veröffentlichte Mitteilungen. Sperren beendet alle verbundenen Gerätesitzungen. Der iPhone-Release-Build, die lokale Testsignierung und Installation bestehen; die Anmeldung wurde auf dem iPhone geöffnet. Der vollständige Gerätetest steht noch aus. Android folgt später. Die iPhone-App lädt und speichert beim Öffnen, während der Nutzung und bei von iOS erlaubten Hintergrundabrufen automatisch die aktuelle und nächsten 17 Wochen, Prüfungen und Mitteilungen für offline, auch nach Neustart. Ein Download-Button ist nicht nötig; Profil → Offline verfügbar zeigt den Speicherstand. Nicht gespeicherte Wochen werden gekennzeichnet. Abmelden entfernt den Stand; neue Änderungen erfordern Verbindung zum Server. Absagen bereits veröffentlichter Termine erzeugen automatisch Ausfallmitteilungen für die veröffentlichten Gruppen, auch durch Lehrenden-Blockzeiten. Die Nachricht enthält veröffentlichte Termindaten. Wiederholtes Speichern erzeugt keine Duplikate; eine aufgehobene Absage zieht die Nachricht zurück. Keine nachträglichen Meldungen alter Absagen und keine sofortige Push-Zustellung bei geschlossener App.",
     "updatedAt": "2026-10-13",
     "related": [
       "students",
