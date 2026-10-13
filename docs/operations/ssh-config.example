@@ -1,0 +1,27 @@
+# Beispielvorlage, noch kein eingerichteter Serverzugang.
+# .example.invalid durch die bestaetigten Tailscale-Namen ersetzen.
+# Schluessel und known_hosts werden lokal eingerichtet, niemals in Git.
+
+Host campuszeit-pve
+    HostName pve-jakob.example.invalid
+
+Host campuszeit-backup
+    HostName backup-jakob.example.invalid
+
+Host campuszeit-gateway
+    HostName gateway.example.invalid
+
+Host campuszeit-pilot-a
+    HostName app-pilot-a.example.invalid
+
+Host campuszeit-pve campuszeit-backup campuszeit-gateway campuszeit-pilot-a
+    User campuszeit-ops
+    Port 22
+    IdentityFile ~/.ssh/campuszeit_ops_ed25519
+    IdentitiesOnly yes
+    ForwardAgent no
+    BatchMode yes
+    StrictHostKeyChecking yes
+    ConnectTimeout 10
+    ServerAliveInterval 15
+    ServerAliveCountMax 2

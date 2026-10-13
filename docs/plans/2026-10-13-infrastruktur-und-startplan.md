@@ -110,6 +110,32 @@ Die Gerätenamen sind Beispiele für MagicDNS. Standardzertifikate von Proxmox/P
 
 Subnet-Router ist eine Alternative, kein zusätzlich benötigter Dienst im empfohlenen Direktaufbau. Proxmox-Konsolen helfen bei VM-Problemen; ein komplett ausgefallener Precision lässt sich darüber nicht reparieren. Jakob benötigt eine kurze Notfallanleitung.
 
+## Server mit Codex verwalten
+
+FERNZUGRIFF ALS FESTE BETRIEBSANFORDERUNG
+
+> Die Infrastruktur wird so vorbereitet, dass Iman sie mit Hilfe von Codex vom freigegebenen Arbeitsrechner aus betreiben kann: Status prüfen, Fehler untersuchen, Instanzen anlegen, Updates einspielen und Sicherungen kontrollieren.
+
+Codex nutzt den SSH-Client für deinen konkreten Auftrag. Voraussetzung: der Arbeits- oder verbundene Ausführungsrechner ist in der Sitzung erreichbar, Tailscale läuft und die nötigen Rechte sind verfügbar. Ein unabhängiger Dauerzugang oder unbeaufsichtigte Hintergrundüberwachung entsteht dadurch nicht.
+
+| Vorbereitung | Zweck |
+| --- | --- |
+| SSH-Aliasse: campuszeit-pve, -backup, -gateway, -pilot-a | Zielserver schnell und eindeutig wählen |
+| Widerrufbares Betriebskonto und lokaler SSH-Schlüssel | Zugang außerhalb von Chat und GitHub verwalten |
+| Server-/Instanzinventar ohne Passwörter | Rolle, Einrichtungskennung, Projekt, Version und Backupziel zuordnen |
+| Geprüfte Hostschlüssel und nichtinteraktive Anmeldung | Automatisierte Befehle stoppen bei fehlender Freigabe |
+
+### Einmal einrichten, danach gezielte Aufträge
+
+1. Getrennte Benutzer und Tailscale-Regeln einrichten. Server mit Betriebskonto und lokal erzeugtem, geschütztem Schlüssel verbinden; nur öffentliche Schlüssel auf Servern hinterlegen.
+2. Host-Fingerprints vertrauenswürdig prüfen und SSH-Aliasse konfigurieren. Für Befehle BatchMode und strikte Hostprüfung verwenden, keine Agentweitergabe. Benötigte Schlüssel lokal entsperren. [26]
+3. Lesende Diagnosen und gezielte Wartungsrechte einrichten. Docker-Zugriff entspricht umfassender Hostmacht; eingeschränkte Rechte benötigen bewusst definierte Werkzeuge. [27]
+4. Im selben Ausführungskontext Verbindung, Zielidentität, Version, Logs und Backupstatus prüfen. Nach einem Neustart erneut testen; bei Ausfall von Internet oder Hardware übernimmt Jakob die Arbeiten vor Ort.
+
+Ein Auftrag wie "Prüfe pilot-a" betrifft genau die passende Instanz. Updates folgen Freigabeversion, Backup und Funktionsprüfung. Unklare Ziele oder Datenüberschreibungen werden geklärt; Geheimnisse und nicht benötigte Kundeninhalte bleiben geschützt.
+
+Vorbereitet: separate Betriebsanleitung, SSH-Beispiel und Beispielinventar unter docs/operations. Der lokale SSH-Client ist vorhanden; die Alias-Syntax wurde ohne Verbindung geprüft. Tatsächliche Serveradressen, Konten, Schlüssel und Rechte fehlen noch. Keine Serververbindung wurde aufgebaut. [R4]
+
 ## CampusZeit in den VMs betreiben
 
 VOM VORHANDENEN PROJEKT ZUM BETRIEB
@@ -284,7 +310,7 @@ Grundbudget etwa 21-63 EUR monatlich einschließlich anteiliger Domain, ohne Tai
 
 1. Du und Jakob: RAM, Laufwerke und freie Kapazitäten erfassen, Jakobs Anschluss/Router prüfen, Daten sichern und Erstinstallation vor Ort planen. Dann entscheiden wir die endgültigen VM-Größen.
 2. Gemeinsam: Hauptdomain und monatliches Budget einschließlich Tailscale-Tarif festlegen; dann Fernverwaltung und Gateway-Zugang abnehmen. Erst danach kaufen und DNS ändern.
-3. Umsetzung: Release-Image, Produktionsvorlagen und Einrichtungsassistent bauen; leere Anlage, Update und Restore prüfen. Danach Demo und erste Pilotgespräche vorbereiten.
+3. Umsetzung: Betriebszugang für Iman/Codex, Release-Image, Produktionsvorlagen und Instanzassistent vorbereiten; leere Anlage, Update und Restore prüfen. Danach Demo und Pilotgespräche.
 
 > Vor dem Datenpilot abhaken: HTTPS und Anmeldung extern getestet; keine offenen Datenports; Kunde ohne Superuserrechte; Geheimnisse geschützt; Wiederherstellung bestanden; Monitoring alarmiert; Hochschulfreigabe und Pilotumfang dokumentiert.
 
@@ -369,6 +395,12 @@ RELEASE-IMAGE UND AUTOMATISIERTE BEREITSTELLUNG
 [25] Docker Compose: Betrieb und Updates: [Quelle](https://docs.docker.com/compose/how-tos/production/)
 
 [R3] Vorhandene Kundenanlage: provision: [Quelle](https://github.com/imannsv/campusTIME/blob/main/backend/planner/management/commands/provision.py)
+
+[26] OpenSSH: Client- und Serverkonfiguration: [Quelle](https://man.openbsd.org/ssh_config), [Quelle](https://man.openbsd.org/sshd_config)
+
+[27] Docker Engine: Betriebsrechte und Sicherheit: [Quelle](https://docs.docker.com/engine/security/)
+
+[R4] CampusZeit: vorbereitete Betriebsanleitung und SSH-Beispiele: [Quelle](https://github.com/imannsv/campusTIME/tree/codex/infrastructure-plan/docs/operations)
 
 ### Geprüfte Grundlage und noch offene Umsetzung
 

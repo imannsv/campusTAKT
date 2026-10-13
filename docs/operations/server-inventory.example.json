@@ -1,0 +1,54 @@
+{
+  "schema_version": 1,
+  "configured": false,
+  "description": "Nicht vertrauliche Beispielzuordnung; echte Adressen und Rechte vor Nutzung lokal verifizieren.",
+  "servers": [
+    {
+      "ssh_alias": "campuszeit-pve",
+      "role": "hypervisor",
+      "location": "jakob",
+      "hostname": "pve-jakob.example.invalid",
+      "ssh_user": "campuszeit-ops",
+      "allowed_instances": []
+    },
+    {
+      "ssh_alias": "campuszeit-backup",
+      "role": "backup",
+      "location": "jakob",
+      "hostname": "backup-jakob.example.invalid",
+      "ssh_user": "campuszeit-ops",
+      "allowed_instances": ["pilot-a"]
+    },
+    {
+      "ssh_alias": "campuszeit-gateway",
+      "role": "public_gateway",
+      "location": "eu_datacenter",
+      "hostname": "gateway.example.invalid",
+      "ssh_user": "campuszeit-ops",
+      "allowed_instances": ["pilot-a"]
+    },
+    {
+      "ssh_alias": "campuszeit-pilot-a",
+      "role": "application",
+      "location": "jakob",
+      "hostname": "app-pilot-a.example.invalid",
+      "ssh_user": "campuszeit-ops",
+      "allowed_instances": ["pilot-a"]
+    }
+  ],
+  "instances": [
+    {
+      "id": "pilot-a",
+      "configured": false,
+      "expected_institution_slug": "pilot-a",
+      "application_server": "campuszeit-pilot-a",
+      "data_server": null,
+      "application_directory": "/srv/campuszeit/pilot-a",
+      "application_compose_project": "pilot-a-app",
+      "data_compose_project": "pilot-a-data",
+      "release_digest": null,
+      "public_url": "https://pilot-a.example.invalid",
+      "backup_profile": null
+    }
+  ]
+}
