@@ -7,108 +7,6 @@
   private let campusCanvas = Color(red: 242 / 255, green: 243 / 255, blue: 246 / 255)
   private let campusInk = Color(red: 31 / 255, green: 47 / 255, blue: 61 / 255)
 
-  @MainActor
-  final class StudentStore: ObservableObject {
-    @Published var credential: DeviceCredential?
-    @Published var feed: StudentFeed?
-    @Published var upcomingRows: [StudentEvent] = []
-    var examRows: [StudentEvent] { upcomingRows.filter { $0.kind == "exam" } }
-    @Published var busy = false
-    @Published var error: String?
-    @Published var selectedDate = Date()
-    var calendar: Calendar { institutionCalendar(credential?.login.timezone ?? "Europe/Berlin") }
-    let permissions: StudentPermissions
-
-    init(permissions: StudentPermissions) {
-      self.permissions = permissions
-      defer { if credential == nil { permissions.clearNotifications() } }
-      do {
-        if let saved = try DeviceKeychain.read() {
-          _ = try serverURL(saved.server.absoluteString)
-          if saved.login.expires > Date() { credential = saved } else { try DeviceKeychain.clear() }
-        }
-      } catch { self.error = error.localizedDescription }
-    }
-    func login(server: String, code: String, password: String, qr: LoginQR? = nil) async {
-      guard !busy else { return }
-      busy = true
-      error = nil
-      defer { busy = false }
-      do {
-        let url = try serverURL(server)
-        let api = StudentAPI(server: url)
-        let reply: LoginReply
-        if let qr {
-          reply = try await api.login(qr: qr)
-        } else {
-          reply = try await api.login(code: code, password: password)
-        }
-        let saved = DeviceCredential(server: url, login: reply)
-        do { try DeviceKeychain.save(saved) } catch {
-          try? await api.logout(token: reply.token)
-          throw error
-        }
-        permissions.clearNotifications()
-        feed = nil
-        upcomingRows = []
-        selectedDate = Date()
-        credential = saved
-      } catch is CancellationError {} catch { self.error = error.localizedDescription }
-    }
-    func refresh() async {
-      guard let saved = credential, !busy else { return }
-      let requestedDate = selectedDate
-      busy = true
-      defer {
-        busy = false
-        if selectedDate != requestedDate { Task { await refresh() } }
-      }
-      do {
-        let start = calendar.dateInterval(of: .weekOfYear, for: selectedDate)!.start
-        let end = calendar.date(byAdding: .day, value: 7, to: start)!
-        let today = calendar.startOfDay(for: Date())
-        let horizon = calendar.date(byAdding: .day, value: 120, to: today)!
-        let api = StudentAPI(server: saved.server)
-        async let week = api.feed(
-          token: saved.login.token, start: start, end: end, zone: saved.login.timezone)
-        async let future = api.feed(
-          token: saved.login.token, start: today, end: horizon, zone: saved.login.timezone)
-        let (result, upcoming) = try await (week, future)
-        guard credential?.login.token == saved.login.token else { return }
-        feed = result
-        upcomingRows = upcoming.rows
-        error = nil
-        await permissions.receive(result.notices, credential: saved)
-      } catch StudentError.expired {
-        guard credential?.login.token == saved.login.token else { return }
-        try? DeviceKeychain.clear()
-        permissions.clearNotifications()
-        credential = nil
-        feed = nil
-        upcomingRows = []
-        error = StudentError.expired.localizedDescription
-      } catch is CancellationError {} catch {
-        if credential?.login.token == saved.login.token { self.error = error.localizedDescription }
-      }
-    }
-    func logout() async {
-      guard let saved = credential else { return }
-      do { try DeviceKeychain.clear() } catch {
-        self.error = error.localizedDescription
-        return
-      }
-      permissions.clearNotifications()
-      credential = nil
-      feed = nil
-      upcomingRows = []
-      error = nil
-      do { try await StudentAPI(server: saved.server).logout(token: saved.login.token) } catch {
-        self.error =
-          "Auf diesem Gerät abgemeldet. Die Serverabmeldung war nicht erreichbar. Die Verwaltung kann den Zugang bei Bedarf sperren."
-      }
-    }
-  }
-
   struct ContentView: View {
     @StateObject private var store: StudentStore
     @StateObject private var permissions: StudentPermissions
@@ -225,6 +123,7 @@
         }.presentationDetents([.medium, .large])
       }
       .onChange(of: store.selectedDate) { previous, next in
+        store.selectSavedWeek()
         if store.calendar.dateInterval(of: .weekOfYear, for: previous)?.start
           != store.calendar.dateInterval(of: .weekOfYear, for: next)?.start
         {
@@ -246,7 +145,24 @@
       }
     }
     @ViewBuilder private var header: some View {
-      if store.error != nil { status.padding(.horizontal, 24).padding(.vertical, 8) }
+      if store.usingSavedData,
+        let savedAt = (tab == 1 ? store.selectedWeekSavedAt : store.archive?.savedAt)
+          ?? store.archive?.savedAt
+      {
+        Label(
+          "\(store.connectionUnavailable ? "Offline" : "Geladener Stand") · "
+            + displayDate(savedAt, template: "dd.MM., HH:mm", zone: store.calendar.timeZone),
+          systemImage: store.connectionUnavailable ? "wifi.slash" : "arrow.down.circle"
+        ).font(.footnote).foregroundStyle(campusBlue)
+          .frame(maxWidth: .infinity, alignment: .leading).padding(.horizontal, 20).padding(
+            .vertical, 8
+          )
+          .accessibilityHint(
+            "Letzter geladener Stand. Neue Änderungen werden erst mit Verbindung sichtbar.")
+      }
+      if store.error != nil {
+        status.padding(.horizontal, 24).padding(.vertical, 8)
+      }
     }
     private var groupIdentity: some View {
       Button {
@@ -324,8 +240,9 @@
             ProgressView().frame(maxWidth: .infinity, maxHeight: .infinity)
           } else {
             StudentEmptyState(
-              title: "Noch kein Stundenplan geladen", symbol: "calendar",
-              detail: "Öffne das Menü oben rechts und wähle Aktualisieren."
+              title: "Diese Woche ist noch nicht gespeichert", symbol: "calendar",
+              detail:
+                "Wähle eine heruntergeladene Woche oder aktualisiere mit Verbindung zum Server."
             ).padding(24)
             Spacer()
           }
@@ -347,7 +264,7 @@
             ScrollView {
               VStack(alignment: .leading, spacing: 16) {
                 Text("Prüfungen").font(.title2.weight(.semibold)).foregroundStyle(campusInk)
-                if store.feed != nil {
+                if store.metadata != nil {
                   let today = store.calendar.startOfDay(for: clock.date)
                   let events = store.examRows.filter { $0.end >= today }
                   let nextID = events.first { !$0.cancelled && $0.end >= clock.date }?.id
@@ -365,7 +282,7 @@
                         prominent: event.id == nextID)
                     }.buttonStyle(.plain)
                   }
-                  Text("Veröffentlichte Prüfungen der nächsten 120 Tage.")
+                  Text("Veröffentlichte Prüfungen im heruntergeladenen Zeitraum.")
                     .font(.footnote).foregroundStyle(.secondary).padding(.top, 4)
                 } else if !store.busy {
                   StudentEmptyState(
@@ -404,7 +321,7 @@
             }
           }.padding(12).background(.white, in: RoundedRectangle(cornerRadius: 10)).padding(16)
           List {
-            if let feed = store.feed {
+            if let feed = store.metadata {
               let matches = feed.notices.filter {
                 noticeSearch.isEmpty || $0.title.localizedStandardContains(noticeSearch)
                   || $0.body.localizedStandardContains(noticeSearch)
@@ -513,13 +430,13 @@
                         }
                       } else {
                         Text(
-                          store.feed == nil
+                          !store.todaySaved
                             ? (store.busy ? "Stundenplan wird geladen" : "Noch keine Daten geladen")
                             : rows.isEmpty
                               ? "Heute keine Termine" : "Heute keine weiteren Termine"
                         ).font(.headline)
                         Text(
-                          store.feed == nil
+                          !store.todaySaved
                             ? "Ziehe die Ansicht zum Aktualisieren nach unten."
                             : "\(rows.count) veröffentlichte Termine heute"
                         ).font(.subheadline)
@@ -530,7 +447,8 @@
                   }.padding(20).foregroundStyle(campusInk)
                     .background(.white, in: RoundedRectangle(cornerRadius: 18))
                     .shadow(color: .black.opacity(0.04), radius: 8, y: 4)
-                }.buttonStyle(.plain).accessibilityHint("Alle heutigen Termine öffnen")
+                }.buttonStyle(.plain).disabled(!store.todaySaved).accessibilityHint(
+                  "Alle heutigen Termine öffnen")
                 VStack(spacing: 0) {
                   homeLink("Mein Stundenplan", symbol: "calendar", destination: 1)
                   Divider().padding(.leading, 52)
@@ -635,7 +553,12 @@
             }
             Section("Verbindung") {
               LabeledContent("Server", value: store.credential?.server.host ?? "")
-              if let feed = store.feed {
+              LabeledContent(
+                "Status",
+                value: store.connectionUnavailable
+                  ? "Server nicht erreichbar"
+                  : store.usingSavedData ? "Gespeicherter Stand" : "Verbunden")
+              if let feed = store.metadata {
                 LabeledContent(
                   "Aktualisiert",
                   value: displayDate(
@@ -645,6 +568,51 @@
               Button("Jetzt aktualisieren", systemImage: "arrow.clockwise") {
                 Task { await store.refresh() }
               }.disabled(store.busy)
+            }
+            Section("Offline verfügbar") {
+              if let archive = store.archive, let savedAt = archive.savedAt {
+                LabeledContent(
+                  "Gespeichert",
+                  value: displayDate(
+                    savedAt,
+                    template: "dd.MM.yyyy, HH:mm", zone: store.calendar.timeZone))
+                if let first = archive.weeks.map(\.start).min(),
+                  let end = archive.weeks.map(\.end).max()
+                {
+                  let last = store.calendar.date(byAdding: .day, value: -1, to: end)!
+                  LabeledContent(
+                    "Zeitraum",
+                    value: displayDate(first, template: "dd.MM.", zone: store.calendar.timeZone)
+                      + "–"
+                      + displayDate(last, template: "dd.MM.yyyy", zone: store.calendar.timeZone))
+                  Text(
+                    "\(archive.weeks.count) gespeicherte Wochen. Bereits geladene frühere Wochen können ebenfalls enthalten sein; dazwischen sind Lücken möglich."
+                  )
+                  .font(.footnote).foregroundStyle(.secondary)
+                }
+              } else {
+                Text("Noch kein Offline-Stand vorhanden.")
+              }
+              Button {
+                Task { await store.refresh() }
+              } label: {
+                HStack {
+                  Label(
+                    store.busy ? "Wird heruntergeladen …" : "Für offline herunterladen",
+                    systemImage: "arrow.down.circle")
+                  if store.busy {
+                    Spacer()
+                    ProgressView()
+                  }
+                }
+              }.disabled(store.busy)
+              Text(
+                "Stundenplan, Prüfungen und Mitteilungen werden bei jeder Aktualisierung automatisch gespeichert. Der Download umfasst die aktuelle Woche und die nächsten 17 Wochen. Neue Änderungen werden erst mit Verbindung sichtbar."
+              )
+              .font(.footnote).foregroundStyle(.secondary)
+              if let error = store.cacheError {
+                Text(error).font(.subheadline).foregroundStyle(.red)
+              }
             }
             Section("App-Freigaben") {
               LabeledContent(

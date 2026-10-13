@@ -20,11 +20,21 @@ Die erste Version ist als native iPhone-App mit Xtool gebaut. Release-Build, lok
 
 ## Was Studierende sehen
 
-**Stundenplan** zeigt die ausgewählte Woche mit chronologischen Tageslisten. Beim Öffnen ist die aktuelle Woche ausgewählt. Im Kalender lässt sich eine andere Woche auswählen; **Diese Woche** führt zurück. Ein Termin öffnet seine Details.
+**Stundenplan** zeigt die ausgewählte Woche als Zeitraster mit Montag bis Freitag; Samstag erscheint nur bei vorhandenen Terminen. Beim Öffnen ist die aktuelle Woche ausgewählt. Im Kalender lässt sich eine andere Woche auswählen; **Diese Woche** führt zurück. Ein Termin öffnet seine Details.
 
-**Prüfungen** zeigt freigegebene zeitgebundene Prüfungen für heute und die nächsten 120 Tage. Änderungen an Entwürfen erscheinen erst nach [Veröffentlichung](/wiki/publication). Abgesagte Termine bleiben sichtbar, rot markiert und durchgestrichen. Persönliche Noten, Teilnehmerlisten und unveröffentlichte Prüfungsanforderungen werden nicht übertragen.
+**Prüfungen** zeigt freigegebene zeitgebundene Prüfungen im heruntergeladenen Zeitraum der aktuellen und nächsten 17 Wochen. Änderungen an Entwürfen erscheinen erst nach [Veröffentlichung](/wiki/publication). Abgesagte Termine bleiben sichtbar, rot markiert und durchgestrichen. Persönliche Noten, Teilnehmerlisten und unveröffentlichte Prüfungsanforderungen werden nicht übertragen.
 
-**Mitteilungen** zeigt die veröffentlichten Hinweise für die Einrichtung und die zugehörige Gruppe beziehungsweise den Jahrgang. Die App aktualisiert bei erneuter Aktivierung, per Herunterziehen und im Vordergrund regelmäßig. Bei Verbindungsproblemen bleiben die zuletzt geladenen Inhalte der geöffneten App mit ihrem Datenstand sichtbar. Nach einem Neustart ist eine Verbindung zum Laden erforderlich.
+**Mitteilungen** zeigt die veröffentlichten Hinweise für die Einrichtung und die zugehörige Gruppe beziehungsweise den Jahrgang. Die App aktualisiert bei erneuter Aktivierung, per Herunterziehen und im Vordergrund regelmäßig. Bei Verbindungsproblemen bleiben die gespeicherten Inhalte samt Datenstand sichtbar, auch nach einem vollständigen Neustart der App.
+
+## Daten für offline herunterladen
+
+1. Öffne CampusZeit mit Verbindung zu deinem Server und melde dich an.
+2. Öffne **Profil → Offline verfügbar** und tippe **Für offline herunterladen**. Auch normale Aktualisierungen speichern automatisch.
+3. Prüfe den Speicherzeitpunkt. Der Download umfasst die aktuelle Woche und die nächsten 17 Wochen, Prüfungen und veröffentlichte Mitteilungen. Zusätzlich besuchte Wochen bleiben bis zur Grenze von 30 gespeicherten Wochen erhalten; dazwischen können nicht geladene Wochen liegen.
+4. Ohne Verbindung kannst du diese Wochen, Details, Prüfungen und Mitteilungstexte weiterhin öffnen. Die App zeigt den letzten geladenen Stand. Noch nicht heruntergeladene Wochen werden als solche gekennzeichnet.
+5. Sobald der Server wieder erreichbar ist, aktualisiere die App. Erst dann werden neue Mitteilungen, Änderungen, Absagen oder zurückgezogene Inhalte übernommen.
+
+Abmelden entfernt den Offline-Stand. Das Ablaufdatum des Zugangs gilt auch ohne Verbindung; eine zwischenzeitliche Sperre wird beim nächsten Serverkontakt erkannt. Bei Serverwartung bleiben die zuvor heruntergeladenen Daten nutzbar.
 
 ## Mitteilung veröffentlichen oder zurückziehen
 
