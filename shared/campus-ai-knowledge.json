@@ -167,7 +167,7 @@
       "soll"
     ],
     "page": "schedule",
-    "answer": "In Schritt 6 legst du einen Semesterplan mit Jahrgang, Fachsemester und Kalenderzeitraum an. Veranstaltungen übernehmen kopiert das passende Unterrichtssoll; vorhandene Anpassungen bleiben erhalten. Unter Stundenplanung nutzt Automatisch planen Lehrende, Verfügbarkeiten, Räume, Ausstattung, Teilnehmer und Sperren. Ein Vorschlag muss geprüft, übernommen und veröffentlicht werden. Die Browser-Demo hat keine automatische Terminplanung. Die angezeigte Konfliktprüfung benennt Probleme und fehlendes Unterrichtssoll; sie ist kein Beweis, dass überhaupt keine Lösung existiert."
+    "answer": "Wähle zuerst eine Gruppe oder einen Jahrgang in der nach Aufnahmejahr und Studiengang geordneten Auswahl. Gruppe wechseln führt zurück; Gesamtübersicht öffnen zeigt alle Pläne. In Schritt 6 legst du einen Semesterplan mit Jahrgang, Fachsemester und Kalenderzeitraum an. Veranstaltungen übernehmen kopiert das passende Unterrichtssoll; vorhandene Anpassungen bleiben erhalten. Unter Stundenplanung nutzt Automatisch planen Lehrende, Verfügbarkeiten, Räume, Ausstattung, Teilnehmer und Sperren. Ein Vorschlag muss geprüft, übernommen und veröffentlicht werden. Die Browser-Demo hat keine automatische Terminplanung. Die angezeigte Konfliktprüfung benennt Probleme und fehlendes Unterrichtssoll; sie ist kein Beweis, dass überhaupt keine Lösung existiert."
   },
   {
     "id": "electives",
@@ -230,7 +230,7 @@
       "portfolio"
     ],
     "page": "exams",
-    "answer": "Wähle auf der Prüfungsseite den Semesterplan. Unter Prüfungen findest du angelegte Klausuren und Nachschreiber; Prüfung hinzufügen erfasst eine manuelle Prüfung, Automatisch planen erstellt einen Vorschlag. Unter Anforderungen lassen sich über Lehrplan übernehmen Vorlagen vorbereiten und daraus Prüfungen anlegen. Prüfe Dauer, Zeitraum, Teilnehmer und Aufsichten. Abgaben & Fristen enthält Hausarbeiten und andere Leistungen ohne Raumtermin; dort kannst du Lehrplanvorgaben übernehmen und interne Fristen setzen. Bestehende Vorlagen und Fristen bleiben erhalten. Zusätzliche Hinweise sind aufklappbar."
+    "answer": "Wähle zuerst eine Gruppe oder einen Jahrgang in der nach Aufnahmejahr und Studiengang geordneten Auswahl. Gruppe wechseln führt zurück; Gesamtübersicht öffnen zeigt alle Pläne. Wähle auf der Prüfungsseite den Semesterplan. Unter Prüfungen findest du angelegte Klausuren und Nachschreiber; Prüfung hinzufügen erfasst eine manuelle Prüfung, Automatisch planen erstellt einen Vorschlag. Unter Anforderungen lassen sich über Lehrplan übernehmen Vorlagen vorbereiten und daraus Prüfungen anlegen. Prüfe Dauer, Zeitraum, Teilnehmer und Aufsichten. Abgaben & Fristen enthält Hausarbeiten und andere Leistungen ohne Raumtermin; dort kannst du Lehrplanvorgaben übernehmen und interne Fristen setzen. Bestehende Vorlagen und Fristen bleiben erhalten. Zusätzliche Hinweise sind aufklappbar."
   },
   {
     "id": "display",

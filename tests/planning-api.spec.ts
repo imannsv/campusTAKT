@@ -78,6 +78,9 @@ test("Popup API: Abbrechen schützt Eingaben; danach ist Abmelden möglich", asy
 }) => {
   const api = await planningAPI(page);
   await page.goto("/");
+  await page
+    .getByRole("button", { name: "Gesamtübersicht öffnen", exact: true })
+    .click();
   await page.locator(".calendar-event").first().click();
   const editor = page.getByRole("dialog", {
     name: "Termin bearbeiten",
@@ -100,6 +103,9 @@ test("Popup API: Abbrechen schützt Eingaben; danach ist Abmelden möglich", asy
   expect(api.logouts()).toBe(1);
   await page.getByLabel("Passwort", { exact: true }).fill("fixture-password");
   await page.getByRole("button", { name: "Anmelden", exact: true }).click();
+  await page
+    .getByRole("button", { name: "Gesamtübersicht öffnen", exact: true })
+    .click();
   await expect(page.locator(".calendar-event")).toHaveCount(1);
   await expect(editor).toHaveCount(0);
 });
@@ -109,6 +115,9 @@ test("Popup API: Laufender Speichervorgang ist gegen Schließen geschützt", asy
 }) => {
   const api = await planningAPI(page, true);
   await page.goto("/");
+  await page
+    .getByRole("button", { name: "Gesamtübersicht öffnen", exact: true })
+    .click();
   await page.locator(".calendar-event").first().click();
   const editor = page.getByRole("dialog", {
     name: "Termin bearbeiten",

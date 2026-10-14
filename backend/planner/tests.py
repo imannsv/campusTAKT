@@ -35,6 +35,47 @@ class PlatformTests(TestCase):
         rows = [session_row(s) for s in self.plan.sessions.all()]
         self.assertEqual(validate_rows(self.plan, rows, coverage=True), [])
 
+    def test_exam_group_selection_uses_explicit_learners_before_course_groups(self):
+        groups = list(m.Group.objects.filter(institution=self.institution)[:2])
+        course = m.Course.objects.filter(plan=self.plan).first()
+        course.groups.set(groups)
+        learner = m.Person.objects.create(
+            institution=self.institution, code="SELECTION", name="Test", kind="learner"
+        )
+        learner.groups.set([groups[1]])
+        exam = m.Exam.objects.create(
+            institution=self.institution,
+            code="SELECTION",
+            name="Nur zweite Gruppe",
+            plan=self.plan,
+            course=course,
+            window_start="2026-10-12",
+            window_end="2026-10-13",
+        )
+        exam.learners.set([learner])
+        response = self.client.get(
+            f"/api/exams/?plan={self.plan.id}&groups={groups[0].id}"
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertNotIn(exam.id, [row["id"] for row in response.data["results"]])
+        response = self.client.get(
+            f"/api/exams/?plan={self.plan.id}&groups={groups[1].id}"
+        )
+        self.assertIn(exam.id, [row["id"] for row in response.data["results"]])
+        exam.learners.clear()
+        response = self.client.get(
+            f"/api/exams/?plan={self.plan.id}&groups={groups[0].id}"
+        )
+        self.assertIn(exam.id, [row["id"] for row in response.data["results"]])
+        self.assertEqual(self.client.get("/api/exams/?groups=invalid").status_code, 400)
+
+    def test_planning_check_exposes_group_scope_without_changing_conflicts(self):
+        response = self.client.get(f"/api/plans/{self.plan.id}/check/")
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(response.data["rows"])
+        self.assertTrue(all("overview_scope" in row for row in response.data["rows"]))
+        self.assertEqual(response.data["conflicts"], [])
+
     def test_tenant_records_and_relations_are_isolated(self):
         other = m.Institution.objects.create(name="Andere Einrichtung", slug="other")
         area = m.Area.objects.create(

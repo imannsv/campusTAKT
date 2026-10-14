@@ -918,7 +918,8 @@ export async function demoApi(
     const conflicts = conflictsFor(state, id);
     const publication =
       state.publications.find((item) => item.plan_id === id) || null;
-    if (operation === "check") return { rows, conflicts, publication };
+    if (operation === "check")
+      return { rows: enrichDemoSnapshot(state, rows), conflicts, publication };
     if (operation === "publish") {
       if (conflicts.length) throw new Error(conflicts.join("\n"));
       const number = (publication?.number || 0) + 1;
@@ -976,9 +977,29 @@ export async function demoApi(
       "semester",
       "status",
     ])
-      if (query.has(field))
+      if (query.has(field) && !(resource === "exams" && field === "cohort"))
         rows = rows.filter((row) => String(row[field]) === query.get(field));
-    if (query.has("groups"))
+    if (resource === "exams" && (query.has("groups") || query.has("cohort"))) {
+      const groups = state.data.groups.filter((group) =>
+        query.has("groups")
+          ? group.id === Number(query.get("groups"))
+          : group.cohort === Number(query.get("cohort")),
+      );
+      const ids = new Set(groups.map((group) => group.id));
+      rows = rows.filter((row) =>
+        row.learners?.length
+          ? state.data.people.some(
+              (person) =>
+                row.learners.includes(person.id) &&
+                person.groups?.some((id: number) => ids.has(id)),
+            )
+          : state.data.courses.some(
+              (course) =>
+                course.id === row.course &&
+                course.groups?.some((id: number) => ids.has(id)),
+            ),
+      );
+    } else if (query.has("groups"))
       rows = rows.filter((row) =>
         row.groups?.includes(Number(query.get("groups"))),
       );

@@ -409,6 +409,9 @@ test("Verwaltung: Kalender, Pflege, Raumkacheln und öffentliche Anzeige", async
   await expect(page.locator("#planning-status")).toContainText(
     "Keine Überschneidungen. Unterrichtssoll und Kapazitäten sind geprüft.",
   );
+  await page
+    .getByRole("button", { name: "Gesamtübersicht öffnen", exact: true })
+    .click();
   await expect(page.locator(".calendar-event")).toHaveCount(10);
   await page.screenshot({
     path: "test-results/stundenplan.png",
@@ -477,6 +480,9 @@ test("Mobiler Einstieg bleibt bedienbar", async ({ page }) => {
   ).toBeLessThanOrEqual(390);
   await page.getByRole("button", { name: "Menü öffnen" }).click();
   await page.getByRole("button", { name: "Prüfungen", exact: true }).click();
+  await page
+    .getByRole("button", { name: "Gesamtübersicht öffnen", exact: true })
+    .click();
   await expect(
     page.getByRole("heading", { name: "Prüfungen", exact: true }),
   ).toBeVisible();

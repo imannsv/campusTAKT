@@ -195,6 +195,16 @@ class ResourceViewSet(viewsets.ModelViewSet):
         ]:
             if query.get(field) and hasattr(model, field):
                 qs = qs.filter(**{field: query[field]})
+        if model is m.Exam and (query.get("groups") or query.get("cohort")):
+            field = "groups" if query.get("groups") else "cohort"
+            value = serializers.IntegerField(min_value=1).run_validation(query[field])
+            membership = (
+                "learners__groups" if field == "groups" else "learners__groups__cohort"
+            )
+            course = "course__groups" if field == "groups" else "course__groups__cohort"
+            qs = qs.filter(
+                Q(**{membership: value}) | Q(learners__isnull=True, **{course: value})
+            ).distinct()
         if self.resource == "sessions":
             if query.get("since"):
                 qs = qs.filter(
@@ -544,7 +554,7 @@ def plan_action(request, pk, operation):
         return Response(
             {
                 "conflicts": validate_rows(plan, rows, coverage=True),
-                "rows": rows,
+                "rows": enrich_snapshot(rows, institution.id),
                 "publication": m.Publication.objects.filter(plan=plan)
                 .order_by("-number")
                 .values("number", "created")

@@ -1,6 +1,12 @@
 # Prüfungen und Abgaben aus dem Lehrplan
 
-Unter **Prüfungen** einen Semesterplan auswählen und **Prüfungsanforderungen
+Unter **Prüfungen** zuerst Gruppe oder Jahrgang und dann einen zugeordneten
+Semesterplan auswählen. **Gruppe wechseln** führt zurück zur Auswahl;
+**Gesamtübersicht öffnen** zeigt alle Pläne. Konkrete Prüfungen werden anhand
+ihrer Teilnehmer gefiltert; ohne Teilnehmerliste gilt die Kurszuordnung.
+Anforderungen und Abgaben beziehen sich weiterhin auf den ganzen Semesterplan.
+
+**Prüfungsanforderungen
 übernehmen** wählen. Der Plan benötigt einen Jahrgang mit freigegebener
 Lehrplanversion. Alternativ führt **Prüfungen und Abgaben öffnen** in Schritt 6
 der Einrichtung direkt zum gewählten Semesterplan.

@@ -12,6 +12,12 @@ Anzeigezeitraum eine Wochenübersicht. Details: [Studierendenübersicht](STUDENT
 
 Alle Verwaltungsanfragen verwenden die Django-Sitzung. Schreibende Anfragen benötigen zusätzlich `X-CSRFToken` aus dem `csrftoken`-Cookie. Zuerst `GET /api/auth/me/` aufrufen. Der Server bestimmt die Einrichtung aus der Anmeldung; eine vom Client eingereichte Einrichtungs-ID wird nicht übernommen.
 
+Prüfungslisten unterstützen zusätzlich `groups=<Gruppen-ID>` oder
+`cohort=<Jahrgangs-ID>`. Explizite Prüfungsteilnehmer bestimmen die Zuordnung;
+nur ohne Teilnehmerliste wird die Gruppe des Kurses verwendet. Gruppenauswahl
+hat Vorrang vor Jahrgangsauswahl. Die interne Planprüfung liefert je Termin
+auch `overview_scope` mit den zugehörigen Gruppen für die Kalenderfilterung.
+
 | Schnittstelle | Verhalten |
 | --- | --- |
 | `GET /api/auth/me/` | Anmeldung, Benutzer, Rolle, Einrichtungseinstellungen und Kartenquelle |

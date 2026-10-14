@@ -15,6 +15,9 @@ try {
   await page.getByLabel("Passwort", { exact: true }).fill("WikiBuildOnly2026!");
   await page.getByRole("button", { name: "Anmelden", exact: true }).click();
   await page.getByRole("navigation", { name: "Arbeitsbereiche" }).waitFor();
+  await page
+    .getByRole("button", { name: "Gesamtübersicht öffnen", exact: true })
+    .click();
   await page.getByRole("button", { name: "Termin", exact: true }).waitFor();
   const capture = async (...names) => {
     await page.evaluate(() => document.fonts.ready);
@@ -119,6 +122,9 @@ try {
   await step(6, "Semester planen");
   await capture("start-09");
   await nav("Prüfungen");
+  await page
+    .getByRole("button", { name: "Gesamtübersicht öffnen", exact: true })
+    .click();
   await capture("assessments", "start-11");
   await nav("Öffentliche Anzeige");
   await capture("display", "start-12");
