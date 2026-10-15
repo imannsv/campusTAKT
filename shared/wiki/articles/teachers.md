@@ -4,10 +4,15 @@
 
 ## Lehrende hinzufügen
 1. Öffne **Einrichtung & Studienstruktur → Schritt 2: Lehrende**.
-2. Wähle **Lehrende hinzufügen**. Erfasse Kennung und Namen.
+2. Wähle **Lehrende hinzufügen**. Erfasse Kennung und Namen. Optional kannst du Vorname, Nachname und E-Mail getrennt eintragen; bestehende Namen bleiben erhalten.
 3. Trage die abgestimmten Verfügbarkeitsfenster je Wochentag ein. Mehrere Fenster an einem Tag sind möglich.
 4. Ergänze datierte Sperrzeiten für Urlaub, Hauptberuf oder andere Abwesenheit. Speichere.
 5. Ordne Lehrende den konkreten Veranstaltungen des Semesterplans zu.
+## Persönlicher App-Zugang
+Nach dem Speichern öffnet **Persönlicher Zugang** im Personenformular die Zugangsverwaltung. Der Einstieg ist auch über **Lehrendenübersicht → Verfügbarkeit** erreichbar. Ungespeicherte Änderungen müssen zuvor gespeichert oder verworfen werden. Nur die Verwaltung darf Zugänge erstellen, zurücksetzen und sperren.
+
+Wähle einen Benutzernamen aus Vor-/Nachname oder Kennung, prüfe die erreichbare Serveradresse und erstelle den Zugang. Das Startpasswort wird nur einmal angezeigt und nicht per E-Mail verschickt. Lehrende müssen bei der ersten App-Anmeldung ein eigenes Passwort setzen. Sie sehen ausschließlich ihre eigenen veröffentlichten Termine sowie allgemeine Mitteilungen der Einrichtung; Entwürfe und Verwaltungsrechte sind nicht enthalten. Unter **Profil** können sie das Passwort später erneut ändern. Zurücksetzen oder Sperren meldet alle Geräte dieses Zugangs ab.
+
 ## Zeitfenster richtig verstehen
 Bei eingeschränkter Verfügbarkeit muss ein Termin vollständig in erlaubten Zeitfenstern liegen. Ein Termin von 09:00–12:15 passt nicht in ein Fenster von 09:00–12:00. Ohne Zeitfenster ist die Person nicht verfügbar, außer bei aktivierter uneingeschränkter Verfügbarkeit. Die Verwaltung pflegt die Zeiten nach Abstimmung mit den Lehrenden.
 ## Verfügbarkeit und einzelne Blockzeiten in der Übersicht

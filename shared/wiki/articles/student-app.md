@@ -1,4 +1,4 @@
-Die Studierenden-App bietet ausschließlich Lesezugriff: Stundenplan, Prüfungen und wichtige Mitteilungen. Es gibt keine Einzelkonten für Lernende. Die Verwaltung stellt einen gemeinsamen Zugang für eine Gruppe oder einen Jahrgang bereit.
+Die Studierenden-App bietet Lesezugriff auf Stundenplan, Prüfungen und wichtige Mitteilungen. Die Verwaltung kann gemeinsame Gruppen-/Jahrgangszugänge und persönliche Zugänge für Lernende und Lehrende bereitstellen. App-Zugänge vergeben keine Verwaltungsrechte.
 
 ![Verwaltung von App-Zugängen und Mitteilungen in der fiktiven Beispieleinrichtung](/api/wiki/assets/student-app.png)
 
@@ -19,6 +19,18 @@ Für einen lokalen Test müssen Server und iPhone im selben Netzwerk sein. **loc
 Die App akzeptiert HTTP ausschließlich für lokale Testadressen: eindeutige private IPv4-Adressen, **localhost** und Namen mit **.local**. Eine externe Domain wird nicht lokal, nur weil ihr Name mit einer privaten IP beginnt. Serveradressen mit Anmeldedaten, zusätzlichem Pfad, Abfrageparametern oder Fragment werden abgewiesen.
 
 ## Auf dem iPhone anmelden
+
+### Persönlicher Zugang
+
+Die Verwaltung erstellt den Zugang bei einer gespeicherten Person über **Persönlicher Zugang**. Benutzername und einmaliges Startpasswort werden zusammen mit der Serveradresse weitergegeben. Es werden keine E-Mails versendet. Wähle in der App **Mit Zugangsdaten anmelden** und gib **Benutzername oder Zugangscode** und Passwort ein. Ein persönlicher Zugang hat keinen Gruppen-QR.
+
+Vor dem ersten Datenzugriff verlangt die App ein eigenes Passwort mit mindestens zehn Zeichen. Ein zu einfaches Passwort oder eines, das den Personendaten zu ähnlich ist, wird abgelehnt. Bis zum erfolgreichen Wechsel sind Datenabruf, Offline-Wiederherstellung und Push-Anmeldung gesperrt. Später kannst du unter **Profil → Passwort ändern** erneut wechseln. Ein Wechsel meldet die anderen Geräte ab und erneuert die eigene Sitzung.
+
+Lernende sehen veröffentlichte Termine ihrer aktuellen Gruppen und ausdrücklich zugeordnete veröffentlichte Termine. Lehrende sehen nur ihre eigenen veröffentlichten Termine. Lernende erhalten Hinweise für ihre Einrichtung, Gruppen und Jahrgänge; Lehrende die allgemeinen Einrichtungshinweise. Interne Teilnehmerlisten und E-Mail-Adressen werden nicht übertragen.
+
+Ein vergessenes Passwort setzt die Verwaltung über **Persönlicher Zugang → Passwort zurücksetzen** zurück. Das beendet alle bisherigen Sitzungen und verlangt beim nächsten Anmelden wieder einen Passwortwechsel. **Zugang sperren** beendet alle Sitzungen; Zurücksetzen kann einen gesperrten Zugang wieder aktivieren. Der Benutzername bleibt bei Änderungen des Namens oder der Kennung stabil.
+
+### Gemeinsamer Gruppen- oder Jahrgangszugang
 
 Öffne die installierte CampusZeit-App und wähle **QR-Code scannen**. Erlaube den Kamerazugriff, scanne den bereitgestellten Code und bestätige die angezeigte Serveradresse. Alternativ gib Serveradresse, Zugangscode und Passwort ein. Ein QR-Code ist ein Zugangsschlüssel; veröffentliche ihn nicht außerhalb der Zielgruppe.
 
@@ -46,7 +58,7 @@ Bei kommenden Prüfungen zeigt **In X Tagen** die verbleibenden Kalendertage in 
 
 **Mitteilungen** zeigt die veröffentlichten Hinweise für die Einrichtung und die zugehörige Gruppe beziehungsweise den Jahrgang. Die App aktualisiert bei erneuter Aktivierung, per Herunterziehen und im Vordergrund regelmäßig. Bei Verbindungsproblemen bleiben die gespeicherten Inhalte samt Datenstand sichtbar, auch nach einem vollständigen Neustart der App.
 
-**Profil** bündelt Gruppenzugang, Verbindung, Offline-Stand, Darstellung und App-Freigaben. Unter **Über CampusZeit** findest du **Was gibt es Neues**, **Hilfe** und **Open-Source-Lizenzen**. Die Lizenzansicht nennt die tatsächlich in dieser App verwendeten Komponenten; Bibliotheken aus anderen Apps werden nicht übernommen.
+**Profil** bündelt den persönlichen oder gemeinsamen Zugang, Verbindung, Offline-Stand, Darstellung und App-Freigaben. Unter **Über CampusZeit** findest du **Was gibt es Neues**, **Hilfe** und **Open-Source-Lizenzen**. Die Lizenzansicht nennt die tatsächlich in dieser App verwendeten Komponenten; Bibliotheken aus anderen Apps werden nicht übernommen.
 
 ## Automatisch offline nutzen
 
@@ -87,4 +99,4 @@ Die App übernimmt den vollständigen Inhalt beim nächsten erfolgreichen automa
 
 **Sperren** beendet alle Gerätesitzungen dieses Gruppenzugangs. Für neue Zugangsdaten sperre den bisherigen Zugang und erstelle einen neuen. Auf einem iPhone beendet **Mein Zugang → Auf diesem Gerät abmelden** nur die eigene Sitzung. Gerätesitzungen laufen nach 90 Tagen ab und erfordern dann eine erneute Anmeldung.
 
-Ein geteilter Zugang kann von Empfängern weitergegeben werden. Ohne Einzelkonten kann die App keine individuelle Wahlpflichtbelegung oder persönliche Prüfungszulassung nachweisen; sie zeigt die freigegebenen Termine der gesamten zugeordneten Gruppe beziehungsweise des Jahrgangs.
+Ein geteilter Gruppenzugang kann von Empfängern weitergegeben werden; er zeigt weiterhin die freigegebenen Termine der gesamten Gruppe beziehungsweise des Jahrgangs. Ein persönlicher Zugang grenzt die Ansicht auf die zugeordneten Termine ein. Die Anmeldung selbst ist kein Nachweis einer Prüfungszulassung und zeigt keine persönlichen Noten.
