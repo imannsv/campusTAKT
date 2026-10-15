@@ -12,21 +12,41 @@ Die Studierenden-App bietet ausschließlich Lesezugriff: Stundenplan, Prüfungen
 
 Bei älteren Zugängen ergänze beim ersten erneuten Öffnen einmalig die erreichbare Serveradresse. Der neu angezeigte QR-Code funktioniert zusätzlich zu bereits verteilten Codes. Passwort und angemeldete Geräte bleiben erhalten. Ein vergessenes Passwort lässt sich aus seiner gespeicherten Prüfsumme nicht wiederherstellen; nutze dann den QR-Code. Gesperrte Zugänge können nicht erneut bereitgestellt werden.
 
+Falls **Zugangsdaten kopieren** oder **Zugangscode kopieren** nicht auf die Zwischenablage zugreifen kann, erscheint ein Hinweis zum manuellen Kopieren. Die Angaben bleiben im Dialog auswählbar; der QR-Download ist weiterhin nutzbar. Bei einem später erfolgreichen Kopierversuch verschwindet der Hinweis.
+
 Für einen lokalen Test müssen Server und iPhone im selben Netzwerk sein. **localhost** und **127.0.0.1** bezeichnen auf dem iPhone das iPhone selbst. Der lokale Server muss unter seiner Netzwerkadresse erreichbar und dafür konfiguriert sein. Verwende im öffentlichen Betrieb HTTPS.
+
+Die App akzeptiert HTTP ausschließlich für lokale Testadressen: eindeutige private IPv4-Adressen, **localhost** und Namen mit **.local**. Eine externe Domain wird nicht lokal, nur weil ihr Name mit einer privaten IP beginnt. Serveradressen mit Anmeldedaten, zusätzlichem Pfad, Abfrageparametern oder Fragment werden abgewiesen.
 
 ## Auf dem iPhone anmelden
 
 Öffne die installierte CampusZeit-App und wähle **QR-Code scannen**. Erlaube den Kamerazugriff, scanne den bereitgestellten Code und bestätige die angezeigte Serveradresse. Alternativ gib Serveradresse, Zugangscode und Passwort ein. Ein QR-Code ist ein Zugangsschlüssel; veröffentliche ihn nicht außerhalb der Zielgruppe.
 
-Die erste Version ist als native iPhone-App mit Xtool gebaut. Release-Build, lokale Testsignierung und Installation bestehen; die Anmeldung wurde auf dem iPhone geöffnet. Der vollständige Gerätetest steht noch aus. Eine Testsignierung läuft ab und ersetzt keine spätere App-Store-Veröffentlichung. Android ist der anschließende Schritt. Die Browser-Demo kann keine echten App-Zugänge bereitstellen.
+Die native App wird als separate Anwendung installiert. Eine lokale Testsignierung läuft ab und ersetzt keine spätere App-Store-Veröffentlichung. Die hier beschriebenen Funktionen gehören zum aktuellen Entwicklungsstand; bereits installierte Testfassungen erhalten neue Funktionen erst mit einem App-Update. Android ist ein späterer Schritt. Die Browser-Demo kann keine echten App-Zugänge bereitstellen.
+
+## Ersteinrichtung und Darstellung
+
+Beim ersten Start erklärt **CampusZeit einrichten** die benötigten Freigaben. **Freigaben einrichten** öffnet die iOS-Abfragen für Kamera und Benachrichtigungen; **Später einrichten** lässt dich ohne diese Freigaben fortfahren. Die manuelle Anmeldung benötigt keine Kamera. Die Freigabe für das lokale Netzwerk fragt iOS bei einer entsprechenden Serververbindung an.
+
+Unter **Profil → App-Freigaben** siehst du den Status und kannst **Freigaben einrichten** erneut öffnen oder zu den iOS-Einstellungen wechseln. Eine zuvor abgelehnte Freigabe musst du dort ändern.
+
+Unter **Profil → Darstellung** wählst du **System**, **Hell** oder **Dunkel**. System folgt der Geräteeinstellung. Diese Auswahl ist unabhängig vom Browser der Verwaltung und verändert weder den Gruppenzugang noch die gespeicherten Daten.
 
 ## Was Studierende sehen
 
-**Stundenplan** zeigt die ausgewählte Woche als Zeitraster mit Montag bis Freitag; Samstag erscheint nur bei vorhandenen Terminen. Beim Öffnen ist die aktuelle Woche ausgewählt. Im Kalender lässt sich eine andere Woche auswählen; **Diese Woche** führt zurück. Ein Termin öffnet seine Details.
+**Start** zeigt die Einrichtung, eine Begrüßung mit wechselnden kurzen Sprüchen, den heutigen beziehungsweise nächsten aktiven Termin und Schnellzugriffe. Für die Leibniz-FH ist ein Campusfoto hinterlegt. Die Tageskarte bleibt beim heutigen Datum, auch wenn du im Stundenplan eine andere Woche ansiehst.
+
+**Stundenplan** bietet im Menü oben rechts **Tag**, **2 Tage**, **3 Tage** und **Woche**. Wischen nach links oder rechts wechselt den angezeigten Zeitraum. Über **Datum auswählen** springst du zu einem Datum; der Menüpunkt für heute beziehungsweise die aktuelle Woche führt zurück. Ein Termin öffnet seine Details. Die Tagesüberschrift und **Termine & Details** öffnen die lesbare Tagesliste.
+
+Die Wochenübersicht zeigt Montag bis Freitag; Samstag erscheint nur bei vorhandenen Terminen in dieser Woche. Das Raster beginnt beim frühesten sichtbaren Termin und endet beim spätesten. Eine leere Woche verwendet einen Ersatzbereich von 08–18 Uhr. Die rote Zeitlinie markiert die aktuelle Uhrzeit; liegt sie außerhalb des dargestellten Bereichs, erscheint ein kurzer Hinweis vor Beginn beziehungsweise nach Ende.
 
 **Prüfungen** zeigt freigegebene zeitgebundene Prüfungen im heruntergeladenen Zeitraum der aktuellen und nächsten 17 Wochen. Änderungen an Entwürfen erscheinen erst nach [Veröffentlichung](/wiki/publication). Abgesagte Termine bleiben sichtbar, rot markiert und durchgestrichen. Persönliche Noten, Teilnehmerlisten und unveröffentlichte Prüfungsanforderungen werden nicht übertragen.
 
+Bei kommenden Prüfungen zeigt **In X Tagen** die verbleibenden Kalendertage in der Zeitzone der Einrichtung. Heute, abgesagte und beendete Termine haben ihren entsprechenden Status. Tippe eine Prüfung an, um die vollständigen Angaben zu lesen.
+
 **Mitteilungen** zeigt die veröffentlichten Hinweise für die Einrichtung und die zugehörige Gruppe beziehungsweise den Jahrgang. Die App aktualisiert bei erneuter Aktivierung, per Herunterziehen und im Vordergrund regelmäßig. Bei Verbindungsproblemen bleiben die gespeicherten Inhalte samt Datenstand sichtbar, auch nach einem vollständigen Neustart der App.
+
+**Profil** bündelt Gruppenzugang, Verbindung, Offline-Stand, Darstellung und App-Freigaben. Unter **Über CampusZeit** findest du **Was gibt es Neues**, **Hilfe** und **Open-Source-Lizenzen**. Die Lizenzansicht nennt die tatsächlich in dieser App verwendeten Komponenten; Bibliotheken aus anderen Apps werden nicht übernommen.
 
 ## Automatisch offline nutzen
 
@@ -43,6 +63,15 @@ Hintergrundabrufe haben keine feste Uhrzeit und können durch iOS-Einstellungen 
 ## Mitteilung veröffentlichen oder zurückziehen
 
 Klicke in der Verwaltung auf **Mitteilung erstellen**. Wähle eine Zielgruppe oder **Alle Studierenden**, erfasse Titel und Text und klicke **Veröffentlichen**. Mit **Zurückziehen** entfernst du die Mitteilung aus der App. Mit freigeschaltetem Apple-Push-Dienst können neue Mitteilungen auch bei geschlossener App eintreffen. Ohne diese zusätzliche Einrichtung erscheinen nach erteilter Freigabe lokale Banner beim automatischen Abruf. Im App-Profil steht der Push-Status.
+
+## Benachrichtigungen richtig prüfen
+
+1. Öffne **Profil → App-Freigaben** und prüfe **Benachrichtigungen** sowie **Push-Zustellung**.
+2. Wenn kein Push-Dienst eingerichtet ist, teste eine neue Mitteilung bei geöffneter App und erreichbarem Server. Die App kann den lokalen Banner erst beim erfolgreichen Abruf anzeigen. Der erste vorhandene Mitteilungsbestand dient als Ausgangspunkt und löst keine rückwirkenden Banner aus; erneutes Laden meldet dieselbe Nachricht nicht nochmals.
+3. Ein Banner erst beim Öffnen bestätigt den Abruf und die lokale Benachrichtigung, aber noch keine Zustellung bei geschlossener App.
+4. Für Push bei geschlossener App benötigt der Betreiber zusätzlich Apple-Developer-Mitgliedschaft, passende App-Signierung und einen eingerichteten Push-Dienst. Die Anbindung ist vorbereitet und standardmäßig deaktiviert. Die Gerätefreigabe allein schaltet sie nicht frei.
+
+Bei eingerichtetem Push-Dienst enthält der Sperrbildschirm nur einen allgemeinen Hinweis. Den vollständigen Inhalt liest du nach dem Öffnen im Posteingang. Ohne Verbindung sind nur bereits gespeicherte Mitteilungen verfügbar; eine neue Nachricht kann nicht vor ihrer Übertragung angezeigt werden.
 
 ## Automatische Ausfallmitteilungen
 

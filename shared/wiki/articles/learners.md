@@ -6,6 +6,10 @@ Oben wechselst du zwischen **Kacheln** und **Liste**. Die Kachelansicht verwende
 
 Die bestehende Listenansicht behält Suche, Filter und Bearbeiten. Beim Umschalten bleiben die Listenfilter erhalten. Deine gewählte Darstellung wird in diesem Browser gemerkt. **Studierendenliste verwalten** aus der Jahrgangseinrichtung öffnet weiterhin direkt die gefilterte Liste.
 
+![Kachelansicht der Personenverwaltung nach Aufnahmejahr, Studiengang und Gruppe mit fiktiven Daten](/api/wiki/assets/learners-tiles.png)
+
+![Personenliste mit Suche, Zuordnungsfiltern und Bearbeiten in einer fiktiven Einrichtung](/api/wiki/assets/learners-list.png)
+
 ## Person hinzufügen
 
 1. Öffne **Schüler & Studierende** und wähle **Person hinzufügen**.
