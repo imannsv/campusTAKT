@@ -30,6 +30,21 @@
     "answer": "Öffne Schüler & Studierende in der Verwaltung. Person hinzufügen erfasst Name und optional eine eindeutige Kennung; ohne Eingabe wird eine Kennung automatisch vergeben. Wähle einen Jahrgang, um die Gruppen-/Klassenauswahl einzugrenzen, und füge eine oder mehrere Gruppen hinzu. Bearbeiten ändert Name, Kennung und Zuordnungen; eine Gruppenmarke anklicken entfernt die Zuordnung. Suche, Jahrgang und Gruppe filtern die Personenübersicht, Ohne Zuordnung zeigt Personen ohne Gruppe. Der Jahrgang ergibt sich aus den zugeordneten Gruppen. Studierendenliste verwalten in der Einrichtung öffnet dieselbe Ansicht mit Gruppenfilter. Diese Personen sind Verwaltungsdatensätze; der App-Zugang bleibt der bestehende Gruppen-QR. Gruppengrößen und bereits veröffentlichte Pläne werden nicht automatisch überschrieben. Über Kacheln / Liste wechselst du zwischen der Jahrgangs-/Studiengangs-/Gruppenübersicht wie in der Stundenplanung und der bisherigen Personenliste. Gruppenkacheln öffnen die passend gefilterte Liste; Alle Personen und Ohne Zuordnung bleiben erreichbar. Die Darstellungswahl wird im Browser gemerkt."
   },
   {
+    "id": "group-admin",
+    "title": "Gruppen & Jahrgänge verwalten",
+    "keywords": [
+      "gruppen",
+      "jahrgänge",
+      "klassen",
+      "gruppe hinzufügen",
+      "jahrgang hinzufügen",
+      "aufnahmejahr",
+      "gruppenverwaltung"
+    ],
+    "page": "groups",
+    "answer": "Öffne Gruppen & Jahrgänge in der Seitenleiste unter Verwaltung. Die Übersicht zeigt Jahrgänge mit Aufnahmejahr, Studien-/Bildungsgang und zugehörigen Gruppen. Suche und Filter grenzen sie ein. Jahrgang hinzufügen öffnet ein kurzes Formular mit Name, vorgeschlagener Kennung, Aufnahmejahr und Studien-/Bildungsgang; eine freigegebene Lehrplanversion ist optional. Gruppe hinzufügen auf einer Jahrgangskarte wählt den Jahrgang vor. Name und Gruppengröße ergänzen und speichern. Stiftsymbole öffnen die Bearbeitung; zusätzliche Studien- und Planungsdaten bleiben erhalten. Das Personensymbol einer Gruppe öffnet die gefilterte Personenverwaltung. Ohne Studien-/Bildungsgang bietet die Seite zuerst dessen Anlage an."
+  },
+  {
     "id": "setup",
     "title": "Einrichtung Schritt für Schritt",
     "keywords": [

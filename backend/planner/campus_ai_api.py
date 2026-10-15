@@ -27,6 +27,7 @@ class Selection(serializers.Serializer):
             "schedule",
             "teachers",
             "learners",
+            "groups",
             "data",
             "exams",
             "map",

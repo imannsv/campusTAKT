@@ -19,6 +19,7 @@ const guidePages = new Set([
   "overview",
   "students",
   "learners",
+  "groups",
   "student-app",
   "settings",
 ]);

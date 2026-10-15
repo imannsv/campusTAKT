@@ -8,6 +8,7 @@ export default defineConfig({
     "student-app.spec.ts",
     "learners.spec.ts",
     "dashboard.spec.ts",
+    "groups.spec.ts",
   ],
   workers: 1,
   fullyParallel: false,

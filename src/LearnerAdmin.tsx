@@ -176,8 +176,8 @@ export function LearnerForm({
               </small>
               {!data.groups?.length && (
                 <p>
-                  Noch keine Gruppen vorhanden. Lege sie unter „Einrichtung &
-                  Studienstruktur“ an; du kannst diese Person auch zunächst ohne
+                  Noch keine Gruppen vorhanden. Lege sie unter „Gruppen &
+                  Jahrgänge“ an; du kannst diese Person auch zunächst ohne
                   Zuordnung speichern.
                 </p>
               )}

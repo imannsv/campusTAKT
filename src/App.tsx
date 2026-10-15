@@ -62,6 +62,7 @@ import AssessmentBoard from "./AssessmentBoard";
 import StudentAppAdmin from "./StudentAppAdmin";
 import LearnerAdmin, { LearnerForm } from "./LearnerAdmin";
 import Dashboard from "./Dashboard";
+import GroupAdmin from "./GroupAdmin";
 import CampusAI from "./CampusAI";
 import { ThemePicker, ThemeSettings } from "./Theme";
 import { campusActions } from "./campus-ai-actions";
@@ -89,6 +90,12 @@ const nav = [
     group: "Planung",
   },
   { id: "map", label: "Räume", icon: Building2, group: "Verwaltung" },
+  {
+    id: "groups",
+    label: "Gruppen & Jahrgänge",
+    icon: Layers,
+    group: "Verwaltung",
+  },
   {
     id: "learners",
     label: "Schüler & Studierende",
@@ -1187,7 +1194,13 @@ function Workspace() {
     } else if (res === "people" && (row?.kind || defaults.kind) === "learner") {
       setModal({ type: "learner", record: row, defaults });
     } else {
-      setModal({ type: "record", resource: res, record: row, defaults });
+      setModal({
+        type: "record",
+        resource: res,
+        record: row,
+        defaults,
+        simpleGroups: page === "groups" && ["cohorts", "groups"].includes(res),
+      });
     }
   };
   const go = (id: string) => {
@@ -2089,6 +2102,17 @@ function Workspace() {
               onEdit={edit}
               revision={refresh}
             />
+          ) : page === "groups" ? (
+            <GroupAdmin
+              data={data}
+              query={search}
+              currentYear={DateTime.now().setZone(zone).year}
+              onEdit={edit}
+              onOpenPeople={(group) => {
+                go("learners");
+                setDataFilters({ groups: String(group), kind: "learner" });
+              }}
+            />
           ) : page === "learners" ? (
             <LearnerAdmin
               data={data}
@@ -2555,12 +2579,33 @@ function Workspace() {
         <RecordForm
           key={`${modal.resource}-${modal.record?.id}`}
           resource={modal.resource}
-          fields={boot.schema[modal.resource]}
+          title={
+            modal.simpleGroups
+              ? `${modal.resource === "cohorts" ? "Jahrgang" : "Gruppe"} ${modal.record ? "bearbeiten" : "hinzufügen"}`
+              : undefined
+          }
+          fields={
+            modal.simpleGroups
+              ? boot.schema[modal.resource].filter((field: Field) =>
+                  (modal.resource === "cohorts"
+                    ? ["name", "code", "program", "entry_year", "study_version"]
+                    : ["name", "code", "cohort", "size"]
+                  ).includes(field.name),
+                )
+              : boot.schema[modal.resource]
+          }
           record={modal.record}
           defaults={modal.defaults}
           zone={zone}
-          onClose={() => setModal(null)}
+          onStateChange={modal.simpleGroups ? updateEditorState : undefined}
+          onClose={() => {
+            if (modal.simpleGroups && !canLeaveEditor()) return;
+            if (modal.simpleGroups) clearEditor();
+            setModal(null);
+          }}
           onSaved={(saved) => {
+            if (modal.simpleGroups)
+              editorState.current = { dirty: false, busy: false };
             if (modal.resource === "buildings" && !modal.record && saved)
               setAreaId(saved.id);
             reload();

@@ -20,6 +20,17 @@
     "guides": ["learners"]
   },
   {
+    "id": "group_admin",
+    "label": "Gruppen & Jahrgänge öffnen",
+    "page": "groups",
+    "targets": [
+      "gruppen und jahrgänge",
+      "gruppenverwaltung",
+      "klassenverwaltung"
+    ],
+    "guides": ["group-admin"]
+  },
+  {
     "id": "rooms",
     "label": "Räume öffnen",
     "page": "map",

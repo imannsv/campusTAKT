@@ -13,7 +13,7 @@ Die bestehende Listenansicht behält Suche, Filter und Bearbeiten. Beim Umschalt
 3. Wähle einen **Jahrgang**, um die verfügbaren Gruppen und Klassen einzugrenzen.
 4. Füge unter **Gruppen / Klassen** eine oder mehrere Gruppen hinzu und klicke auf **Speichern**. Eine Person kann auch zunächst ohne Gruppe angelegt werden.
 
-Der Jahrgang ergibt sich aus den gewählten Gruppen. Die Jahrgangsauswahl im Formular dient dazu, passende Gruppen leichter zu finden; bereits ausgewählte Gruppen bleiben beim Wechsel erhalten. Wenn noch keine Gruppen vorhanden sind, lege sie unter **Einrichtung & Studienstruktur** an.
+Der Jahrgang ergibt sich aus den gewählten Gruppen. Die Jahrgangsauswahl im Formular dient dazu, passende Gruppen leichter zu finden; bereits ausgewählte Gruppen bleiben beim Wechsel erhalten. Neue Gruppen und Jahrgänge kannst du direkt unter [Gruppen & Jahrgänge](/wiki/group-admin) in der Seitenleiste anlegen.
 
 ## Zuordnungen bearbeiten
 

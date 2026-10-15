@@ -736,6 +736,7 @@ function FreeDaysEditor({
 }
 
 export function RecordForm({
+  title,
   resource,
   fields,
   record,
@@ -747,6 +748,7 @@ export function RecordForm({
   onStateChange,
   onAssist,
 }: {
+  title?: string;
   resource: string;
   fields: Field[];
   record?: Row;
@@ -778,7 +780,7 @@ export function RecordForm({
   }, [dirty, busy, onStateChange]);
   useEffect(() => {
     if (
-      (presentation !== "panel" && resource !== "sessions") ||
+      (presentation !== "panel" && resource !== "sessions" && !onStateChange) ||
       (!dirty && !busy)
     )
       return;
@@ -788,7 +790,7 @@ export function RecordForm({
     };
     window.addEventListener("beforeunload", warn);
     return () => window.removeEventListener("beforeunload", warn);
-  }, [presentation, resource, dirty, busy]);
+  }, [presentation, resource, dirty, busy, onStateChange]);
   const change = (key: string, value: any) =>
     setValues((v) => ({
       ...v,
@@ -882,13 +884,14 @@ export function RecordForm({
   return (
     <Container
       title={
-        resource === "sessions"
+        title ||
+        (resource === "sessions"
           ? record
             ? "Termin bearbeiten"
             : "Termin hinzufügen"
           : record
             ? "Eintrag bearbeiten"
-            : `${labels[resource]} hinzufügen`
+            : `${labels[resource]} hinzufügen`)
       }
       subtitle={
         resource === "sessions"

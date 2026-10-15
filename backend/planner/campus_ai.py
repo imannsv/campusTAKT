@@ -117,6 +117,7 @@ def help_for(question, history=None, context=None):
             "schedule": "schedule",
             "teachers": "teachers",
             "learners": "learners",
+            "groups": "group-admin",
             "students": "display",
             "student-app": "student-app",
             "displays": "display",
