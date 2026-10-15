@@ -4,6 +4,22 @@ Der Wochenplan nutzt die gesamte Arbeitsbreite. Es gibt keinen permanenten
 rechten Detailbereich. Logo, Produktfarben, die aktuelle Woche, rote Zeitlinie
 und die einklappbare Navigation bleiben erhalten.
 
+## Jahrgang und Gruppe auswählen
+
+Stundenplanung und Prüfungen beginnen mit derselben Gruppenauswahl. Die
+Aufnahmejahre stehen absteigend und lassen sich auf- und zuklappen. Darunter
+stehen die Studiengänge mit ihren Gruppen; „Ganzer Jahrgang“ öffnet alle
+Gruppen dieses Jahrgangs. Die Suche im Kopf findet Jahrgänge, Studiengänge
+und Gruppen. Fehlende Aufnahmejahre werden als „Ohne Aufnahmejahr“ geführt.
+
+Ein Klick auf eine Gruppe öffnet einen passenden Semesterplan und dessen
+gefilterte Termine bzw. Prüfungen. Die Semesterwahl zeigt nur zugeordnete
+Pläne, einschließlich gemeinsamer Veranstaltungen. Ohne passenden Plan
+erscheint ein leerer Zustand. „Gruppe wechseln“ führt zur Auswahl zurück;
+„Gesamtübersicht öffnen“ erhält den Zugriff auf alle Pläne. Direkte Links aus
+der Studienstruktur öffnen weiterhin den gewählten Plan. Abgaben und
+Prüfungsanforderungen bleiben Vorgaben des ganzen Semesterplans.
+
 ## Terminbearbeitung
 
 - Ein Klick auf einen Kalendertermin öffnet das Formular als modales Popup.

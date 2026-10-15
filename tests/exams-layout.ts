@@ -8,6 +8,9 @@ test("Prüfungsseite trennt Prüfungen, Anforderungen und Abgaben und behält di
     .getByRole("navigation")
     .getByRole("button", { name: "Prüfungen", exact: true })
     .click();
+  await page
+    .getByRole("button", { name: "Gesamtübersicht öffnen", exact: true })
+    .click();
   const views = page.getByRole("group", { name: "Prüfungsbereich wählen" });
   const plan = page.getByLabel("Semesterplan für Prüfungen", { exact: true });
   await expect(
@@ -75,6 +78,9 @@ test("Prüfungsseite trennt Prüfungen, Anforderungen und Abgaben und behält di
     .getByRole("navigation")
     .getByRole("button", { name: "Prüfungen", exact: true })
     .click();
+  await page
+    .getByRole("button", { name: "Gesamtübersicht öffnen", exact: true })
+    .click();
   await plan.selectOption("2");
   await expect(
     page.getByRole("cell", {
@@ -91,6 +97,9 @@ test("Prüfungsansichten bleiben auf kleinen Bildschirmen bedienbar und funktion
   await page
     .getByRole("navigation")
     .getByRole("button", { name: "Prüfungen", exact: true })
+    .click();
+  await page
+    .getByRole("button", { name: "Gesamtübersicht öffnen", exact: true })
     .click();
   await page
     .getByLabel("Semesterplan für Prüfungen", { exact: true })

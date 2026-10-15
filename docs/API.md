@@ -12,6 +12,33 @@ Anzeigezeitraum eine Wochenübersicht. Details: [Studierendenübersicht](STUDENT
 
 Alle Verwaltungsanfragen verwenden die Django-Sitzung. Schreibende Anfragen benötigen zusätzlich `X-CSRFToken` aus dem `csrftoken`-Cookie. Zuerst `GET /api/auth/me/` aufrufen. Der Server bestimmt die Einrichtung aus der Anmeldung; eine vom Client eingereichte Einrichtungs-ID wird nicht übernommen.
 
+Ein aktiver App-Gruppenzugang kann über
+`GET /api/student-app/accesses/<uuid>/credentials/` erneut als QR-Code
+bereitgestellt werden. Ausschließlich die eigene Verwaltungssitzung erhält
+diese nicht cachebare Antwort; Geräte-Bearer-Token sind dafür nicht gültig.
+`POST` mit `{server}` speichert nach Prüfung die erreichbare Serveradresse,
+auch für ältere Zugänge ohne gespeicherte Adresse. Passwort und vorhandene
+Gerätesitzungen bleiben erhalten. Die gewöhnliche Zugangsliste enthält keine
+QR-Schlüssel oder Passwörter. Details: [Studierenden-App](STUDENT_APP.md).
+
+Prüfungslisten unterstützen zusätzlich `groups=<Gruppen-ID>` oder
+`cohort=<Jahrgangs-ID>`. Explizite Prüfungsteilnehmer bestimmen die Zuordnung;
+nur ohne Teilnehmerliste wird die Gruppe des Kurses verwendet. Gruppenauswahl
+hat Vorrang vor Jahrgangsauswahl. Die interne Planprüfung liefert je Termin
+auch `overview_scope` mit den zugehörigen Gruppen für die Kalenderfilterung.
+
+Die Personenverwaltung verwendet weiterhin `/api/people/` und
+`/api/people/<id>/`. Lernende werden mit `kind=learner`, `name`, einer
+einrichtungsweit eindeutigen `code`-Kennung und `groups: [<id>, ...]` angelegt.
+Die neue Oberfläche vergibt bei leerer Kennung eine zufällig erzeugte Kennung;
+die API benötigt weiterhin `code`. Mehrere Gruppen sind erlaubt und werden
+gegen die eigene Einrichtung geprüft. Listen unterstützen `kind=learner`,
+`search`, `groups=<id>`, `cohort=<id>` (über die Gruppenzuordnung) und
+`unassigned=1` (ohne Gruppe), jeweils mit bestehender Paginierung.
+Jahrgangsfilter liefern Personen nur einmal, auch bei mehreren passenden
+Gruppen. Personen sind Verwaltungsdaten und erhalten keinen eigenen App-Login;
+Gruppen-QR-Zugänge, Gruppengrößen und Veröffentlichungen bleiben erhalten.
+
 | Schnittstelle | Verhalten |
 | --- | --- |
 | `GET /api/auth/me/` | Anmeldung, Benutzer, Rolle, Einrichtungseinstellungen und Kartenquelle |
@@ -128,6 +155,10 @@ Semesterzuordnung. Bereits übernommene Veranstaltungen können durch den
 Jahrgangsverlauf nicht verschoben werden. Grenzen sind weich; Verletzungen
 der Voraussetzungen, ungültige Zuordnungen und veraltete Stände sind Fehler.
 
+## Studierenden-App
+
+Die separate, ausschließlich lesende App-API und die Verwaltung gemeinsamer Gruppenzugänge stehen in [Studierenden-App / API v1](STUDENT_APP.md#api-v1). Gerätezugänge sind keine Verwaltungskonten.
+
 ## campusAI (intern, nur lesend)
 
 - `GET /api/campusai/status/`: lokaler Modellstatus und expliziter Verfügbarkeitsgrund.
@@ -155,3 +186,7 @@ mit `service_note` gesetzt. Anmeldung, Mandantenzuordnung und beim POST
 CSRF sind erforderlich. Fremde Plan-/Jahrgangs-IDs ergeben 404; ungültige
 Eingaben 400, mehr als zwölf Chat-Anfragen pro Minute 429. Kein Modelldownload
 und keine Datenmutation durch diese Endpunkte. [Grenzen und Konfiguration](CAMPUS_AI.md).
+
+## Push-Mitteilungen der App
+
+`POST /api/student-app/v1/push/` benötigt die Bearer-Gerätesitzung und `{token, environment, topic}`. Es liefert die aktuelle Gerätebindung `{binding}`; Zielgruppe und Apple-Adresse werden serverseitig bestimmt. Bei deaktiviertem/unvollständigem Push-Dienst folgt 503, bei abweichender Signierungsumgebung/Bundle-ID 400. `DELETE` entfernt die eigene Push-Bindung. Kein Verwaltungszugriff; Antworten sind nicht cachebar. [Einrichtung und Zustellgrenzen](STUDENT_PUSH.md).

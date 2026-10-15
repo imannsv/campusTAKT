@@ -77,6 +77,7 @@ test("resource timelines use the authenticated backend and save appointments in 
 test("teacher block times cancel real appointments without deleting them", async ({
   page,
 }) => {
+  await page.clock.setFixedTime(new Date("2026-10-09T10:00:00+02:00"));
   await login(page);
   const data = await (
     await page.request.get(
@@ -132,6 +133,27 @@ test("teacher block times cancel real appointments without deleting them", async
   ).json();
   expect(saved.cancelled).toBe(true);
   expect(Date.parse(saved.start)).toBe(Date.parse(session.start));
+  const notices = await (
+    await page.request.get("/api/student-app/notices/")
+  ).json();
+  expect(
+    notices.some(
+      (notice: any) =>
+        notice.active &&
+        notice.title.includes("entfällt") &&
+        notice.body.includes(session.name),
+    ),
+  ).toBe(true);
+  await page
+    .getByRole("navigation", { name: "Arbeitsbereiche" })
+    .getByRole("button", { name: "Studierenden-App", exact: true })
+    .click();
+  await expect(
+    page
+      .locator(".student-admin-row")
+      .filter({ hasText: "Termin entfällt:" })
+      .first(),
+  ).toBeVisible();
 });
 
 test("deep links require login, preserve destination, and show protected images", async ({

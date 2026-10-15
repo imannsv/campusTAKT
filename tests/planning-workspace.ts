@@ -9,6 +9,9 @@ test.describe("Terminbearbeitung", () => {
     page,
   }) => {
     await page.goto("/");
+    await page
+      .getByRole("button", { name: "Gesamtübersicht öffnen", exact: true })
+      .click();
     await expect(
       page.getByRole("complementary", { name: "Termindetails" }),
     ).toHaveCount(0);
@@ -47,6 +50,9 @@ test.describe("Terminbearbeitung", () => {
     await expect(editor).toHaveCount(0);
     await expect(event).toBeFocused();
     await page.reload();
+    await page
+      .getByRole("button", { name: "Gesamtübersicht öffnen", exact: true })
+      .click();
     await event.click();
     await expect(fixed).toBeChecked({ checked: !previous });
   });
@@ -55,6 +61,9 @@ test.describe("Terminbearbeitung", () => {
     page,
   }) => {
     await page.goto("/");
+    await page
+      .getByRole("button", { name: "Gesamtübersicht öffnen", exact: true })
+      .click();
     const first = page
       .locator(".calendar-event")
       .filter({ hasText: "Mathematik I" })
@@ -108,6 +117,9 @@ test.describe("Terminbearbeitung", () => {
     page,
   }) => {
     await page.goto("/");
+    await page
+      .getByRole("button", { name: "Gesamtübersicht öffnen", exact: true })
+      .click();
     await page.getByRole("button", { name: "Termin", exact: true }).click();
     const editor = page.getByRole("dialog", {
       name: "Termin hinzufügen",
@@ -158,6 +170,9 @@ test.describe("Terminbearbeitung", () => {
         .filter({ hasText: "Planungszentrale Testtermin" }),
     ).toHaveCount(1);
     await page.reload();
+    await page
+      .getByRole("button", { name: "Gesamtübersicht öffnen", exact: true })
+      .click();
     await expect(
       page
         .locator(".calendar-event")
@@ -170,6 +185,9 @@ test.describe("Terminbearbeitung", () => {
   }) => {
     await page.setViewportSize({ width: 390, height: 844 });
     await page.goto("/");
+    await page
+      .getByRole("button", { name: "Gesamtübersicht öffnen", exact: true })
+      .click();
     await page
       .locator(".calendar-event")
       .filter({ hasText: "Mathematik I" })

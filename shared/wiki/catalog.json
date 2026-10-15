@@ -1,5 +1,79 @@
 [
   {
+    "id": "dashboard",
+    "title": "Dashboard und Tagesüberblick",
+    "keywords": [
+      "dashboard",
+      "tagesüberblick",
+      "campusübersicht",
+      "heute",
+      "schnellzugriff",
+      "ausfälle"
+    ],
+    "page": "dashboard",
+    "section": "Erste Schritte",
+    "parentId": null,
+    "summary": "Das Dashboard steht zuerst in der Sidebar unter Überblick. Es zeigt die aktuelle Tagesplanung aller Pläne, laufende Termine und Ausfälle, echte Struktur- und Planungshinweise, den Prüfungsausblick für sieben Kalendertage, Kennzahlen der Einrichtung, Schnellzugriffe und letzte Änderungen. Personen umfasst Lernende und Lehrende. Tagesdaten und Hinweise aktualisieren sich alle 30 Sekunden; Fehler sind ausdrücklich gekennzeichnet. Entwurf und Freigabe bleiben unterscheidbar.",
+    "updatedAt": "2026-10-14",
+    "related": [
+      "schedule",
+      "assessments",
+      "setup",
+      "learners"
+    ],
+    "images": []
+  },
+  {
+    "id": "learners",
+    "title": "Schüler & Studierende verwalten",
+    "keywords": [
+      "schüler",
+      "studierende",
+      "studenten",
+      "personenverwaltung",
+      "studierendenliste",
+      "matrikelnummer",
+      "gruppenzuordnung",
+      "personen hinzufügen"
+    ],
+    "page": "learners",
+    "section": "Räume und Personen",
+    "parentId": null,
+    "summary": "Öffne Schüler & Studierende in der Verwaltung. Person hinzufügen erfasst Name und optional eine eindeutige Kennung; ohne Eingabe wird eine Kennung automatisch vergeben. Wähle einen Jahrgang, um die Gruppen-/Klassenauswahl einzugrenzen, und füge eine oder mehrere Gruppen hinzu. Bearbeiten ändert Name, Kennung und Zuordnungen; eine Gruppenmarke anklicken entfernt die Zuordnung. Suche, Jahrgang und Gruppe filtern die Personenübersicht, Ohne Zuordnung zeigt Personen ohne Gruppe. Der Jahrgang ergibt sich aus den zugeordneten Gruppen. Studierendenliste verwalten in der Einrichtung öffnet dieselbe Ansicht mit Gruppenfilter. Diese Personen sind Verwaltungsdatensätze; der App-Zugang bleibt der bestehende Gruppen-QR. Gruppengrößen und bereits veröffentlichte Pläne werden nicht automatisch überschrieben. Über Kacheln / Liste wechselst du zwischen der Jahrgangs-/Studiengangs-/Gruppenübersicht wie in der Stundenplanung und der bisherigen Personenliste. Gruppenkacheln öffnen die passend gefilterte Liste; Alle Personen und Ohne Zuordnung bleiben erreichbar. Die Darstellungswahl wird im Browser gemerkt.",
+    "updatedAt": "2026-10-14",
+    "related": [
+      "setup",
+      "student-app",
+      "imports"
+    ],
+    "images": []
+  },
+  {
+    "id": "group-admin",
+    "title": "Gruppen & Jahrgänge verwalten",
+    "keywords": [
+      "gruppen",
+      "jahrgänge",
+      "klassen",
+      "gruppe hinzufügen",
+      "jahrgang hinzufügen",
+      "aufnahmejahr",
+      "gruppenverwaltung"
+    ],
+    "page": "groups",
+    "section": "Räume und Personen",
+    "parentId": null,
+    "summary": "Öffne Gruppen & Jahrgänge in der Seitenleiste unter Verwaltung. Die Übersicht zeigt Jahrgänge mit Aufnahmejahr, Studien-/Bildungsgang und zugehörigen Gruppen. Suche und Filter grenzen sie ein. Jahrgang hinzufügen öffnet ein kurzes Formular mit Name, vorgeschlagener Kennung, Aufnahmejahr und Studien-/Bildungsgang; eine freigegebene Lehrplanversion ist optional. Gruppe hinzufügen auf einer Jahrgangskarte wählt den Jahrgang vor. Name und Gruppengröße ergänzen und speichern. Stiftsymbole öffnen die Bearbeitung; zusätzliche Studien- und Planungsdaten bleiben erhalten. Das Personensymbol einer Gruppe öffnet die gefilterte Personenverwaltung. Ohne Studien-/Bildungsgang bietet die Seite zuerst dessen Anlage an.",
+    "updatedAt": "2026-10-15",
+    "related": [
+      "learners",
+      "cohort",
+      "setup",
+      "student-app"
+    ],
+    "images": []
+  },
+  {
     "id": "setup",
     "title": "Einrichtung Schritt für Schritt",
     "keywords": [
@@ -277,8 +351,8 @@
     "page": "schedule",
     "section": "Stundenplanung",
     "parentId": null,
-    "summary": "In Schritt 6 legst du einen Semesterplan mit Jahrgang, Fachsemester und Kalenderzeitraum an. Veranstaltungen übernehmen kopiert das passende Unterrichtssoll; vorhandene Anpassungen bleiben erhalten. Unter Stundenplanung nutzt Automatisch planen Lehrende, Verfügbarkeiten, Räume, Ausstattung, Teilnehmer und Sperren. Ein Vorschlag muss geprüft, übernommen und veröffentlicht werden. Die Browser-Demo hat keine automatische Terminplanung. Die angezeigte Konfliktprüfung benennt Probleme und fehlendes Unterrichtssoll; sie ist kein Beweis, dass überhaupt keine Lösung existiert.",
-    "updatedAt": "2026-10-08",
+    "summary": "Wähle zuerst eine Gruppe oder einen Jahrgang in der nach Aufnahmejahr und Studiengang geordneten Auswahl. Gruppe wechseln führt zurück; Gesamtübersicht öffnen zeigt alle Pläne. In Schritt 6 legst du einen Semesterplan mit Jahrgang, Fachsemester und Kalenderzeitraum an. Veranstaltungen übernehmen kopiert das passende Unterrichtssoll; vorhandene Anpassungen bleiben erhalten. Unter Stundenplanung nutzt Automatisch planen Lehrende, Verfügbarkeiten, Räume, Ausstattung, Teilnehmer und Sperren. Ein Vorschlag muss geprüft, übernommen und veröffentlicht werden. Die Browser-Demo hat keine automatische Terminplanung. Die angezeigte Konfliktprüfung benennt Probleme und fehlendes Unterrichtssoll; sie ist kein Beweis, dass überhaupt keine Lösung existiert.",
+    "updatedAt": "2026-10-14",
     "related": [
       "manual",
       "publication"
@@ -377,8 +451,8 @@
     "page": "exams",
     "section": "Prüfungen",
     "parentId": null,
-    "summary": "Wähle auf der Prüfungsseite den Semesterplan. Unter Prüfungen findest du angelegte Klausuren und Nachschreiber; Prüfung hinzufügen erfasst eine manuelle Prüfung, Automatisch planen erstellt einen Vorschlag. Unter Anforderungen lassen sich über Lehrplan übernehmen Vorlagen vorbereiten und daraus Prüfungen anlegen. Prüfe Dauer, Zeitraum, Teilnehmer und Aufsichten. Abgaben & Fristen enthält Hausarbeiten und andere Leistungen ohne Raumtermin; dort kannst du Lehrplanvorgaben übernehmen und interne Fristen setzen. Bestehende Vorlagen und Fristen bleiben erhalten. Zusätzliche Hinweise sind aufklappbar.",
-    "updatedAt": "2026-10-10",
+    "summary": "Wähle zuerst eine Gruppe oder einen Jahrgang in der nach Aufnahmejahr und Studiengang geordneten Auswahl. Gruppe wechseln führt zurück; Gesamtübersicht öffnen zeigt alle Pläne. Wähle auf der Prüfungsseite den Semesterplan. Unter Prüfungen findest du angelegte Klausuren und Nachschreiber; Prüfung hinzufügen erfasst eine manuelle Prüfung, Automatisch planen erstellt einen Vorschlag. Unter Anforderungen lassen sich über Lehrplan übernehmen Vorlagen vorbereiten und daraus Prüfungen anlegen. Prüfe Dauer, Zeitraum, Teilnehmer und Aufsichten. Abgaben & Fristen enthält Hausarbeiten und andere Leistungen ohne Raumtermin; dort kannst du Lehrplanvorgaben übernehmen und interne Fristen setzen. Bestehende Vorlagen und Fristen bleiben erhalten. Zusätzliche Hinweise sind aufklappbar.",
+    "updatedAt": "2026-10-14",
     "related": [
       "study",
       "publication"
@@ -562,6 +636,36 @@
     ],
     "images": [
       "accounts.png"
+    ]
+  },
+  {
+    "id": "student-app",
+    "title": "Studierenden-App und Gruppenzugänge",
+    "section": "Verwaltung und Hilfe",
+    "parentId": "accounts",
+    "page": "student-app",
+    "keywords": [
+      "app",
+      "iphone",
+      "qr",
+      "gruppenzugang",
+      "zugangscode",
+      "mitteilung",
+      "offline",
+      "download",
+      "ausfall",
+      "absage",
+      "blockzeit"
+    ],
+    "summary": "Öffne Studierenden-App. Erstelle einen Zugang für eine Gruppe oder einen Jahrgang und gib die erreichbare HTTPS-Serveradresse an. Der QR-Code ist über Zugang anzeigen später erneut abrufbar; bei älteren Zugängen muss einmal die erreichbare Serveradresse ergänzt werden. Das Passwort wird nur bei Erstellung angezeigt. Bereits verteilte QR-Codes und Gerätesitzungen bleiben erhalten. Teile Zugänge ausschließlich mit dieser Zielgruppe. Die App zeigt freigegebene Stundenpläne, Prüfungen und veröffentlichte Mitteilungen. Sperren beendet alle verbundenen Gerätesitzungen. Der iPhone-Release-Build, die lokale Testsignierung und Installation bestehen; die Anmeldung wurde auf dem iPhone geöffnet. Der vollständige Gerätetest steht noch aus. Android folgt später. Die iPhone-App lädt und speichert beim Öffnen, während der Nutzung und bei von iOS erlaubten Hintergrundabrufen automatisch die aktuelle und nächsten 17 Wochen, Prüfungen und Mitteilungen für offline, auch nach Neustart. Ein Download-Button ist nicht nötig; Profil → Offline verfügbar zeigt den Speicherstand. Nicht gespeicherte Wochen werden gekennzeichnet. Abmelden entfernt den Stand; neue Änderungen erfordern Verbindung zum Server. Absagen bereits veröffentlichter Termine erzeugen automatisch Ausfallmitteilungen für die veröffentlichten Gruppen, auch durch Lehrenden-Blockzeiten. Die Nachricht enthält veröffentlichte Termindaten. Wiederholtes Speichern erzeugt keine Duplikate; eine aufgehobene Absage zieht die Nachricht zurück. Keine nachträglichen Meldungen alter Absagen und keine sofortige Push-Zustellung bei geschlossener App.",
+    "updatedAt": "2026-10-14",
+    "related": [
+      "students",
+      "publication",
+      "accounts"
+    ],
+    "images": [
+      "student-app.png"
     ]
   },
   {

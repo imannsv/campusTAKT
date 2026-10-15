@@ -1,5 +1,9 @@
 import "./rooms-toolbar";
+import "./dashboard";
 import "./exams-layout";
+import "./planning-selection";
+import "./learners-demo";
+import "./groups-demo";
 import { test, expect } from "@playwright/test";
 import { studyFlow } from "./study-flow";
 import { progressionFlow } from "./progression-flow";
@@ -214,6 +218,9 @@ test("Stundenplanung öffnet die aktuelle Woche und folgt der roten Zeitlinie", 
 }) => {
   await page.clock.install({ time: new Date("2026-10-14T13:15:00+02:00") });
   await page.goto("/");
+  await page
+    .getByRole("button", { name: "Gesamtübersicht öffnen", exact: true })
+    .click();
   await expect(page.locator(".calendar-event")).toHaveCount(10);
   await page.evaluate(() => {
     const key = "campustime-browser-demo-v1";
@@ -224,6 +231,9 @@ test("Stundenplanung öffnet die aktuelle Woche und folgt der roten Zeitlinie", 
     localStorage.setItem(key, JSON.stringify(state));
   });
   await page.reload();
+  await page
+    .getByRole("button", { name: "Gesamtübersicht öffnen", exact: true })
+    .click();
   await expect(page.locator(".week-nav")).toContainText(
     "12. Okt. – 16. Okt. 2026",
   );
@@ -350,6 +360,9 @@ test("Bestehende Browser-Demo wird ohne Verlust von Raumänderungen ergänzt", a
   page,
 }) => {
   await page.goto("/");
+  await page
+    .getByRole("button", { name: "Gesamtübersicht öffnen", exact: true })
+    .click();
   await expect(
     page.getByRole("button", { name: "Automatisch planen", exact: true }),
   ).toBeVisible();
@@ -366,6 +379,9 @@ test("Bestehende Browser-Demo wird ohne Verlust von Raumänderungen ergänzt", a
     localStorage.setItem(key, JSON.stringify(saved));
   });
   await page.reload();
+  await page
+    .getByRole("button", { name: "Gesamtübersicht öffnen", exact: true })
+    .click();
   await expect(
     page.getByRole("button", { name: "Automatisch planen", exact: true }),
   ).toBeVisible();
@@ -400,6 +416,9 @@ test("Bestehende Browser-Demo wird ohne Verlust von Raumänderungen ergänzt", a
     localStorage.setItem(key, JSON.stringify(saved));
   });
   await page.reload();
+  await page
+    .getByRole("button", { name: "Gesamtübersicht öffnen", exact: true })
+    .click();
   await expect(
     page.getByRole("button", { name: "Automatisch planen", exact: true }),
   ).toBeVisible();
@@ -433,6 +452,9 @@ test("Bestehende Browser-Demo wird ohne Verlust von Raumänderungen ergänzt", a
     localStorage.setItem(key, JSON.stringify(state));
   });
   await page.reload();
+  await page
+    .getByRole("button", { name: "Gesamtübersicht öffnen", exact: true })
+    .click();
   await expect(
     page.getByRole("button", { name: "Automatisch planen", exact: true }),
   ).toBeVisible();
@@ -470,6 +492,9 @@ test("Bestehende Browser-Demo wird ohne Verlust von Raumänderungen ergänzt", a
     localStorage.setItem(key, JSON.stringify(state));
   });
   await page.reload();
+  await page
+    .getByRole("button", { name: "Gesamtübersicht öffnen", exact: true })
+    .click();
   await expect(
     page.getByRole("button", { name: "Automatisch planen", exact: true }),
   ).toBeVisible();
@@ -502,6 +527,9 @@ test("Demo funktioniert ohne Backend, Raumänderungen bleiben im Browser", async
   });
   await page.route("**/api/**", (route) => route.abort());
   await page.goto("/");
+  await page
+    .getByRole("button", { name: "Gesamtübersicht öffnen", exact: true })
+    .click();
   await expect(
     page.getByText("Demo mit Beispieldaten", { exact: true }),
   ).toBeVisible();

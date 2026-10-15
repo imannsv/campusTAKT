@@ -3,7 +3,7 @@ Wähle unter **Prüfungen** zuerst den Semesterplan. Die Seite ist in drei Berei
 ![Prüfungen und Abgabefristen in der fiktiven Beispieleinrichtung](/api/wiki/assets/assessments.png)
 
 ## Anforderungen aus dem Lehrplan übernehmen
-1. Wähle unter **Prüfungen** den Semesterplan.
+1. Wähle unter **Prüfungen** zuerst Gruppe oder Jahrgang und danach einen zugeordneten Semesterplan. **Gruppe wechseln** öffnet die Auswahl erneut; **Gesamtübersicht öffnen** zeigt alle Pläne. Die konkrete Prüfungsliste berücksichtigt die Teilnehmer deiner Auswahl. Anforderungen und Abgaben bleiben Vorgaben des ganzen Semesterplans.
 2. Öffne **Anforderungen** und wähle **Lehrplan übernehmen**, wenn der Plan mit einer freigegebenen Lehrplanversion verbunden ist.
 3. Prüfe zeitgebundene Vorlagen unter **Anforderungen** und andere Leistungen unter **Abgaben & Fristen**. **Lehrplan übernehmen** ist auch dort verfügbar. Bestehende Vorlagen und eingetragene Fristen bleiben erhalten.
 4. Lege aus einer zeitgebundenen Vorlage die konkrete Prüfung an. Erfasse Zeitraum, Dauer, Teilnehmer, Aufsichten und Anforderungen an Räume.

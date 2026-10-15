@@ -4,6 +4,9 @@ async function openFreddy(page: Page) {
   await page.clock.install({ time: new Date("2026-10-07T08:00:00+02:00") });
   await page.goto("/");
   await page
+    .getByRole("button", { name: "Gesamtübersicht öffnen", exact: true })
+    .click();
+  await page
     .getByRole("button", { name: "Freddy öffnen", exact: true })
     .click();
   return page.getByRole("dialog", { name: "Freddy", exact: true });
@@ -35,6 +38,9 @@ test("Freddy prüft alle Demoräume und wiederkehrende Sperren im angefragten Ze
 }) => {
   await page.clock.install({ time: new Date("2026-10-07T08:00:00+02:00") });
   await page.goto("/");
+  await page
+    .getByRole("button", { name: "Gesamtübersicht öffnen", exact: true })
+    .click();
   await expect(page.locator(".calendar-event")).not.toHaveCount(0);
   await page.evaluate(() => {
     const key = "campustime-browser-demo-v1";
@@ -49,6 +55,9 @@ test("Freddy prüft alle Demoräume und wiederkehrende Sperren im angefragten Ze
     localStorage.setItem(key, JSON.stringify(state));
   });
   await page.reload();
+  await page
+    .getByRole("button", { name: "Gesamtübersicht öffnen", exact: true })
+    .click();
   await page
     .getByRole("button", { name: "Freddy öffnen", exact: true })
     .click();
@@ -73,6 +82,9 @@ test("Freddy prüft alle Demoräume und wiederkehrende Sperren im angefragten Ze
     localStorage.setItem(key, JSON.stringify(state));
   });
   await page.reload();
+  await page
+    .getByRole("button", { name: "Gesamtübersicht öffnen", exact: true })
+    .click();
   await page
     .getByRole("button", { name: "Freddy öffnen", exact: true })
     .click();
@@ -193,6 +205,9 @@ test("Freddy erklärt nur Konflikte der ausgewählten Wiederholung eines Termins
   });
   await page.reload();
   await page
+    .getByRole("button", { name: "Gesamtübersicht öffnen", exact: true })
+    .click();
+  await page
     .getByRole("button", { name: "Freddy öffnen", exact: true })
     .click();
   await page.getByRole("button", { name: /^Mathematik I ·/ }).click();
@@ -284,6 +299,9 @@ test("Freddy begrenzt lange Raumantworten ohne Räume aus der Prüfung zu verlie
     localStorage.setItem(key, JSON.stringify(state));
   });
   await page.reload();
+  await page
+    .getByRole("button", { name: "Gesamtübersicht öffnen", exact: true })
+    .click();
   await page
     .getByRole("button", { name: "Freddy öffnen", exact: true })
     .click();

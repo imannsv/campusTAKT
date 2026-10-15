@@ -28,7 +28,13 @@ def affected_session_ids(person, blocks):
 
 def cancel_for_teacher(person):
     ids = affected_session_ids(person, person.availability.get("exclusions", []))
-    return m.Session.objects.filter(institution_id=person.institution_id, id__in=ids).update(cancelled=True)
+    sessions = m.Session.objects.filter(institution_id=person.institution_id, id__in=ids)
+    cancelled = list(sessions)
+    count = sessions.update(cancelled=True)
+    if count:
+        from .cancellation_notices import notify_cancellations
+        notify_cancellations(person.institution, cancelled)
+    return count
 
 
 def cancellation_map(institution):

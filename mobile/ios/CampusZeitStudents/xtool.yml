@@ -1,0 +1,6 @@
+version: 1
+bundleID: de.campuszeit.students
+infoPath: Support/Info.plist
+iconPath: Support/Icon.png
+# Enable only with a push-capable Apple Developer provisioning profile (docs/STUDENT_PUSH.md).
+# entitlementsPath: Support/Push.entitlements

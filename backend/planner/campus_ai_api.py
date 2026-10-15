@@ -22,13 +22,17 @@ class Selection(serializers.Serializer):
     cohort = serializers.IntegerField(min_value=1, required=False, allow_null=True)
     page = serializers.ChoiceField(
         choices=[
+            "dashboard",
             "setup",
             "schedule",
             "teachers",
+            "learners",
+            "groups",
             "data",
             "exams",
             "map",
             "students",
+            "student-app",
             "displays",
             "settings",
         ],

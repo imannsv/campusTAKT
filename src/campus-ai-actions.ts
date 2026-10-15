@@ -70,13 +70,17 @@ export function pageContext(selection: Row) {
     "Semester planen",
   ];
   const names: Row = {
+    dashboard: "Dashboard",
     map: "Räume",
     schedule: "Stundenplanung",
     teachers: "Lehrendenübersicht",
+    learners: "Schüler & Studierende",
+    groups: "Gruppen & Jahrgänge",
     data: "Stammdaten",
     exams: "Prüfungen",
     displays: "Öffentliche Anzeigen",
     students: "Studierendenübersicht",
+    "student-app": "Studierenden-App",
     settings: "Einstellungen",
   };
   const labels: Row = {
@@ -87,12 +91,16 @@ export function pageContext(selection: Row) {
     rooms: "Räume",
   };
   const defaults: Row = {
+    dashboard: ["schedule", "setup"],
     map: ["add_room", "blocks"],
     schedule: ["courses", "semester"],
     teachers: ["teachers", "schedule"],
+    learners: ["learners"],
+    groups: ["group_admin", "cohorts"],
     exams: ["exams", "add_exam"],
     displays: ["displays", "schedule"],
     students: ["students", "displays"],
+    "student-app": ["student_app", "students"],
     settings: ["settings", "setup"],
     data: ["courses", "blocks"],
   };

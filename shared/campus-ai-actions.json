@@ -1,5 +1,36 @@
 [
   {
+    "id": "dashboard",
+    "label": "Dashboard öffnen",
+    "page": "dashboard",
+    "targets": ["dashboard", "startübersicht", "campusübersicht"],
+    "guides": ["dashboard"]
+  },
+  {
+    "id": "learners",
+    "label": "Schüler & Studierende öffnen",
+    "page": "learners",
+    "targets": [
+      "schüler und studierende",
+      "personenverwaltung",
+      "studierendenverwaltung",
+      "schülerverwaltung",
+      "studierendenliste"
+    ],
+    "guides": ["learners"]
+  },
+  {
+    "id": "group_admin",
+    "label": "Gruppen & Jahrgänge öffnen",
+    "page": "groups",
+    "targets": [
+      "gruppen und jahrgänge",
+      "gruppenverwaltung",
+      "klassenverwaltung"
+    ],
+    "guides": ["group-admin"]
+  },
+  {
     "id": "rooms",
     "label": "Räume öffnen",
     "page": "map",
@@ -196,6 +227,18 @@
     "resource": "periods",
     "targets": ["planungszeiträume", "zeiträume", "unterrichtskalender"],
     "guides": ["periods"]
+  },
+  {
+    "id": "student_app",
+    "label": "Studierenden-App öffnen",
+    "page": "student-app",
+    "targets": [
+      "studierenden app",
+      "studenten app",
+      "gruppenzugänge",
+      "app zugänge"
+    ],
+    "guides": ["student-app"]
   },
   {
     "id": "teacher_overview",

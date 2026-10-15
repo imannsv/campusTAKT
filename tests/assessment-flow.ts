@@ -7,6 +7,9 @@ export async function assessmentFlow(page: Page) {
     .getByRole("button", { name: "Prüfungen", exact: true })
     .click();
   await page
+    .getByRole("button", { name: "Gesamtübersicht öffnen", exact: true })
+    .click();
+  await page
     .getByRole("group", { name: "Prüfungsbereich wählen" })
     .getByRole("button", { name: "Anforderungen", exact: true })
     .click();
@@ -127,6 +130,9 @@ export async function assessmentFlow(page: Page) {
   await page
     .getByRole("navigation")
     .getByRole("button", { name: "Prüfungen", exact: true })
+    .click();
+  await page
+    .getByRole("button", { name: "Gesamtübersicht öffnen", exact: true })
     .click();
   await page
     .getByLabel("Semesterplan für Prüfungen", { exact: true })

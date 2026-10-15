@@ -14,3 +14,4 @@ staticfiles/
 test-results/
 playwright-report/
 .playwright/
+*.p8

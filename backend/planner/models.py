@@ -446,3 +446,81 @@ class ImportBatch(models.Model):
     revision = models.PositiveIntegerField()
     created = models.DateTimeField(default=timezone.now)
     committed = models.BooleanField(default=False)
+
+
+class StudentAccess(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    institution = models.ForeignKey(Institution, on_delete=models.CASCADE)
+    group = models.ForeignKey(Group, null=True, blank=True, on_delete=models.PROTECT)
+    cohort = models.ForeignKey(Cohort, null=True, blank=True, on_delete=models.PROTECT)
+    code = models.CharField(max_length=24, unique=True)
+    password_hash = models.CharField(max_length=256)
+    qr_hash = models.CharField(max_length=64)
+    server = models.URLField(max_length=500, blank=True, default="")
+    active = models.BooleanField(default=True)
+    created = models.DateTimeField(default=timezone.now)
+
+    @property
+    def is_authenticated(self):
+        return True
+
+    class Meta:
+        constraints = [
+            models.CheckConstraint(
+                condition=(
+                    models.Q(group__isnull=False, cohort__isnull=True)
+                    | models.Q(group__isnull=True, cohort__isnull=False)
+                ),
+                name="student_access_one_scope",
+            )
+        ]
+
+
+class StudentDeviceSession(models.Model):
+    access = models.ForeignKey(StudentAccess, on_delete=models.CASCADE)
+    token_hash = models.CharField(max_length=64, unique=True)
+    expires = models.DateTimeField()
+    push_token = models.CharField(max_length=512, null=True, blank=True, unique=True)
+    push_binding = models.UUIDField(default=uuid.uuid4, editable=False)
+
+
+class StudentNotice(models.Model):
+    institution = models.ForeignKey(Institution, on_delete=models.CASCADE)
+    group = models.ForeignKey(Group, null=True, blank=True, on_delete=models.PROTECT)
+    cohort = models.ForeignKey(Cohort, null=True, blank=True, on_delete=models.PROTECT)
+    cancellation_session = models.ForeignKey(
+        Session, null=True, blank=True, on_delete=models.SET_NULL
+    )
+    title = models.CharField(max_length=160)
+    body = models.TextField(max_length=5000)
+    active = models.BooleanField(default=True)
+    created = models.DateTimeField(default=timezone.now)
+
+    class Meta:
+        constraints = [
+            models.CheckConstraint(
+                condition=models.Q(group__isnull=True) | models.Q(cohort__isnull=True),
+                name="student_notice_at_most_one_scope",
+            ),
+            models.UniqueConstraint(
+                fields=["cancellation_session", "group"],
+                condition=models.Q(active=True, cancellation_session__isnull=False),
+                name="student_notice_active_cancellation_unique",
+            ),
+        ]
+
+
+class StudentPushDelivery(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    notice = models.ForeignKey(StudentNotice, on_delete=models.CASCADE)
+    device = models.ForeignKey(StudentDeviceSession, on_delete=models.CASCADE)
+    binding = models.UUIDField()
+    attempts = models.PositiveSmallIntegerField(default=0)
+    next_attempt = models.DateTimeField(default=timezone.now, db_index=True)
+    finished = models.DateTimeField(null=True, blank=True)
+    result = models.CharField(max_length=80, blank=True)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=["notice", "device"], name="student_push_once")
+        ]

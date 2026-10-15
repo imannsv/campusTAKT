@@ -100,3 +100,9 @@ MAP_STYLE_URL = os.getenv(
 )
 DATA_UPLOAD_MAX_MEMORY_SIZE = 10 * 1024 * 1024
 FILE_UPLOAD_MAX_MEMORY_SIZE = 10 * 1024 * 1024
+APNS_ENABLED = os.getenv("APNS_ENABLED", "0") == "1"
+APNS_TEAM_ID = os.getenv("APNS_TEAM_ID", "")
+APNS_KEY_ID = os.getenv("APNS_KEY_ID", "")
+APNS_KEY_PATH = os.getenv("APNS_KEY_PATH", "")
+APNS_TOPIC = os.getenv("APNS_TOPIC", "")
+APNS_ENVIRONMENT = os.getenv("APNS_ENVIRONMENT", "sandbox")

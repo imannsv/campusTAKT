@@ -22,6 +22,8 @@ export function demoAIContext(
   if (
     selection.page &&
     ![
+      "dashboard",
+      "groups",
       "setup",
       "schedule",
       "data",

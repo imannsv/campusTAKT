@@ -80,13 +80,17 @@ def reply_actions(question, guides, context):
 def proactive_context(context, selection):
     page, step = selection.get("page", "schedule"), selection.get("step", 0)
     names = {
+        "dashboard": "Dashboard",
         "map": "Räume",
         "schedule": "Stundenplanung",
         "teachers": "Lehrendenübersicht",
+        "learners": "Schüler & Studierende",
+        "groups": "Gruppen & Jahrgänge",
         "data": "Stammdaten",
         "exams": "Prüfungen",
         "displays": "Öffentliche Anzeigen",
         "students": "Studierendenübersicht",
+        "student-app": "Studierenden-App",
         "settings": "Einstellungen",
     }
     steps = [
@@ -98,12 +102,16 @@ def proactive_context(context, selection):
         "Semester planen",
     ]
     defaults = {
+        "dashboard": ["schedule", "setup"],
         "map": ["add_room", "blocks"],
         "schedule": ["courses", "semester"],
         "teachers": ["teachers", "schedule"],
+        "learners": ["learners"],
+        "groups": ["group_admin", "cohorts"],
         "exams": ["exams", "add_exam"],
         "displays": ["displays", "schedule"],
         "students": ["students", "displays"],
+        "student-app": ["student_app", "students"],
         "settings": ["settings", "setup"],
         "data": ["courses", "blocks"],
     }

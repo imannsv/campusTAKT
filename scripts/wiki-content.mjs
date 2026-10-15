@@ -9,6 +9,7 @@ const catalog = JSON.parse(
 const ids = new Set(catalog.map((item) => item.id));
 assert.equal(ids.size, catalog.length, "Duplicate Wiki article id");
 const guidePages = new Set([
+  "dashboard",
   "setup",
   "map",
   "schedule",
@@ -17,6 +18,9 @@ const guidePages = new Set([
   "displays",
   "overview",
   "students",
+  "learners",
+  "groups",
+  "student-app",
   "settings",
 ]);
 const images = new Set();

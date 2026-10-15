@@ -127,7 +127,8 @@ Die Zuordnung zu `imannsv/campusTIME`, `imanabi/campustime` und Supabase sowie d
 
 ## Grenzen der ersten Version
 
-- Konkrete Fremdsystemanbindungen, individuelle Lernendenzugänge mit persönlichen Belegungen, Handy-App, Regelbaukasten und automatische Online-Abrechnung sind wie vereinbart spätere Erweiterungen.
+- Die native Studierenden-App für iPhones und ihre Gruppenzugänge sind unter [Studierenden-App](docs/STUDENT_APP.md) beschrieben. Der iOS-Release-Build und die lokale Testsignierung bestehen; Installation und manuelles Öffnen auf dem iPhone wurden bestätigt; der vollständige Gerätetest steht noch aus. Android folgt anschließend.
+- Konkrete Fremdsystemanbindungen, individuelle Lernendenzugänge mit persönlichen Belegungen, Regelbaukasten und automatische Online-Abrechnung sind spätere Erweiterungen.
 - Die Automatik besitzt ein zehnminütiges Standardbudget und eine Begrenzung auf 500.000 mögliche Startpositionen. Größere Aufgaben müssen in Teilbereiche aufgeteilt werden. Die Oberfläche zeigt Arbeitsstatus statt eines erfundenen Fortschrittsprozentsatzes.
 - Fehlerberichte benennen Eingabefehler, Konflikte und offensichtlich fehlende Ressourcen. Bei komplexer Unlösbarkeit gibt es noch keine minimale mathematische Konfliktursache.
 - Die Raumverwaltung verwendet Bereiche → Stockwerke → Räume. Bestehende Gebäude-/Etagenzuordnungen bleiben erhalten; alte Geometriefelder sind nur noch zur Datenkompatibilität vorhanden.

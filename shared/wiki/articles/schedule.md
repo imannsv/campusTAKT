@@ -3,7 +3,9 @@ In Schritt 6 legst du einen Semesterplan mit Jahrgang, Fachsemester und Kalender
 ![Stundenplanung und Konflikte in der fiktiven Beispieleinrichtung](/api/wiki/assets/schedule.png)
 
 ## Vor der Berechnung
-Wähle unter **Stundenplanung** den gewünschten Plan. Prüfe Zeitraum, Veranstaltungen, Gruppen, Teilnehmer, Lehrende und deren Zeitfenster sowie Räume und Blockierungen. Leere oder widersprüchliche Vorgaben führen nicht durch die Berechnung automatisch zu einem sinnvollen Plan.
+Wähle unter **Stundenplanung** zuerst eine Gruppe oder **Ganzer Jahrgang**. Die Auswahl ist nach Aufnahmejahr und Studiengang geordnet; die Jahreszeilen lassen sich auf- und zuklappen. Über die Suche im Kopf findest du Gruppen direkt. Anschließend stehen die zugeordneten Semesterpläne zur Wahl. **Gruppe wechseln** führt zur Auswahl zurück. **Gesamtübersicht öffnen** zeigt alle Pläne, auch ohne Gruppenzuordnung.
+
+Prüfe Zeitraum, Veranstaltungen, Gruppen, Teilnehmer, Lehrende und deren Zeitfenster sowie Räume und Blockierungen. Leere oder widersprüchliche Vorgaben führen nicht durch die Berechnung automatisch zu einem sinnvollen Plan. Die automatische Planung betrifft weiterhin den gesamten gewählten Semesterplan.
 ## Automatisch planen
 1. Öffne **Automatisch planen**.
 2. Starte die Berechnung und warte auf das Ergebnis. Die Berechnung kann länger dauern als eine gewöhnliche Formularaktion.

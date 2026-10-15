@@ -27,3 +27,7 @@ Studienstrukturen bestimmen, was ein Jahrgang durchläuft. Semesterpläne bestim
 **Raumkapazität**: Bestätigte Anzahl nutzbarer Plätze. Eine noch unbekannte Kapazität bleibt leer. Solche Räume werden angezeigt, aber erst nach Erfassung der Kapazität automatisch zugeteilt; eine Veröffentlichung mit ungeprüfter Kapazität wird verhindert.
 
 **Planungsbereich**: Organisatorischer Bereich, dessen Termine gemeinsam geplant werden.
+
+**Gruppenzugang**: Gemeinsamer Lesezugang zur Studierenden-App für genau eine Gruppe oder einen Jahrgang. Die Verwaltung stellt ihn bereit und kann ihn sperren oder erneuern.
+
+**Mitteilung**: Von der Verwaltung veröffentlichte Information für die Einrichtung, eine Gruppe oder einen Jahrgang.

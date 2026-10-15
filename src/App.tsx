@@ -10,6 +10,7 @@ import {
 import { DateTime } from "luxon";
 import {
   CalendarDays,
+  LayoutDashboard,
   Layers,
   GraduationCap,
   Monitor,
@@ -43,6 +44,7 @@ import {
   SlidersHorizontal,
   X,
   ClipboardList,
+  Smartphone,
 } from "lucide-react";
 import { api, all, Row, Field, labels, fmt, DEMO_MODE } from "./api";
 import { Modal, RecordForm, ImportModal, Relation } from "./components";
@@ -51,7 +53,16 @@ import RoomOverview from "./RoomOverview";
 import ResourceOverview from "./ResourceOverview";
 import StudySetup from "./StudySetup";
 import StudentOverview from "./StudentOverview";
+import PlanningSelection, {
+  scopeGroups,
+  scopePlans,
+  type PlanningScope,
+} from "./PlanningSelection";
 import AssessmentBoard from "./AssessmentBoard";
+import StudentAppAdmin from "./StudentAppAdmin";
+import LearnerAdmin, { LearnerForm } from "./LearnerAdmin";
+import Dashboard from "./Dashboard";
+import GroupAdmin from "./GroupAdmin";
 import CampusAI from "./CampusAI";
 import { ThemePicker, ThemeSettings } from "./Theme";
 import { campusActions } from "./campus-ai-actions";
@@ -59,6 +70,12 @@ import { Brand, Login, SessionState, notifyAuthChange } from "./Auth";
 const Wiki = lazy(() => import("./Wiki"));
 
 const nav = [
+  {
+    id: "dashboard",
+    label: "Dashboard",
+    icon: LayoutDashboard,
+    group: "Überblick",
+  },
   {
     id: "schedule",
     label: "Stundenplanung",
@@ -73,6 +90,18 @@ const nav = [
     group: "Planung",
   },
   { id: "map", label: "Räume", icon: Building2, group: "Verwaltung" },
+  {
+    id: "groups",
+    label: "Gruppen & Jahrgänge",
+    icon: Layers,
+    group: "Verwaltung",
+  },
+  {
+    id: "learners",
+    label: "Schüler & Studierende",
+    icon: Users,
+    group: "Verwaltung",
+  },
   {
     id: "setup",
     label: "Einrichtung & Studienstruktur",
@@ -92,8 +121,14 @@ const nav = [
     icon: Users,
     group: "Veröffentlichung",
   },
+  {
+    id: "student-app",
+    label: "Studierenden-App",
+    icon: Smartphone,
+    group: "Veröffentlichung",
+  },
 ];
-const navGroups = ["Planung", "Verwaltung", "Veröffentlichung"];
+const navGroups = ["Überblick", "Planung", "Verwaltung", "Veröffentlichung"];
 const descriptions: Record<string, string> = {
   areas: "Getrennt planen, gemeinsame Ressourcen berücksichtigen.",
   programs: "Die Grundlage für Lehrpläne und Jahrgänge.",
@@ -112,6 +147,7 @@ const descriptions: Record<string, string> = {
   displays: "Freigegebene Pläne automatisch auf Bildschirmen anzeigen.",
 };
 const compactResources = [
+  "courses",
   "plans",
   "periods",
   "areas",
@@ -911,6 +947,9 @@ function Workspace() {
   >("exams");
   const [studyContext, setStudyContext] = useState<Row>({});
   const [roomContext, setRoomContext] = useState<Row>({});
+  const [planningScope, setPlanningScope] = useState<PlanningScope | null>(
+    null,
+  );
   const [areaId, setAreaId] = useState<number | null>(null);
   const [session, setSession] = useState<SessionState | null>(null),
     [boot, setBoot] = useState<Row | null>(null),
@@ -973,6 +1012,7 @@ function Workspace() {
       setBoot(null);
       setData({});
       setPlanId(null);
+      setPlanningScope(null);
     } catch (e) {
       setError((e as Error).message);
     } finally {
@@ -1011,6 +1051,38 @@ function Workspace() {
     period = data.periods?.find((p) => p.id === plan?.period);
   const selectedArea =
     data.buildings?.find((area) => area.id === areaId) || data.buildings?.[0];
+  const planningGroups = planningScope ? scopeGroups(data, planningScope) : [];
+  const planningPlans = planningScope ? scopePlans(data, planningScope) : [];
+  const selectedPlanningGroup = data.groups?.find(
+    (group) => group.id === planningScope?.group,
+  );
+  const selectedPlanningCohort = data.cohorts?.find(
+    (cohort) => cohort.id === planningScope?.cohort,
+  );
+  const selectPlanningScope = (scope: PlanningScope) => {
+    if (!canLeaveEditor()) return;
+    clearEditor();
+    setPlanningScope(scope);
+    setGroupFilter("");
+    setRoomFilter("");
+    setSearch("");
+    const candidates = scopePlans(data, scope);
+    const today = DateTime.now().setZone(zone).toISODate()!;
+    const current = candidates.filter((candidate) => {
+      const dates = data.periods?.find((item) => item.id === candidate.period);
+      return dates && dates.start <= today && dates.end >= today;
+    });
+    const selected =
+      (!scope.cohort &&
+        !scope.group &&
+        candidates.find((item) => item.id === planId)) ||
+      current.find((item) => item.id === planId) ||
+      current[0] ||
+      candidates.find((item) => item.id === planId) ||
+      candidates[0];
+    setPlanId(selected?.id ?? null);
+    if (!selected) setRows([]);
+  };
   useEffect(() => {
     setWeek(DateTime.now().setZone(zone).startOf("week").toISODate()!);
   }, [zone]);
@@ -1070,7 +1142,7 @@ function Workspace() {
         compactResources.forEach((name, i) => (d[name] = collections[i]));
         setData(d);
         if (initial && !d.plans.length) setPage("setup");
-        if (!planId && d.plans[0]) {
+        if (!planId && !planningScope && d.plans[0]) {
           setPlanId(d.plans[0].id);
         }
         setInitial(false);
@@ -1087,7 +1159,12 @@ function Workspace() {
     };
   }, [session?.authenticated, refresh]);
   useEffect(() => {
-    if (!planId) return;
+    if (!planId) {
+      setRows([]);
+      setConflicts([]);
+      setPublication(null);
+      return;
+    }
     let active = true;
     api(`plans/${planId}/check/`)
       .then((r) => {
@@ -1114,8 +1191,16 @@ function Workspace() {
         defaults,
         key: ++editorSequence.current,
       });
+    } else if (res === "people" && (row?.kind || defaults.kind) === "learner") {
+      setModal({ type: "learner", record: row, defaults });
     } else {
-      setModal({ type: "record", resource: res, record: row, defaults });
+      setModal({
+        type: "record",
+        resource: res,
+        record: row,
+        defaults,
+        simpleGroups: page === "groups" && ["cohorts", "groups"].includes(res),
+      });
     }
   };
   const go = (id: string) => {
@@ -1124,6 +1209,11 @@ function Workspace() {
     clearEditor();
     setDataFilters({});
     setPage(id);
+    if (id === "schedule" || id === "exams") {
+      setPlanningScope(null);
+      setGroupFilter("");
+      setRoomFilter("");
+    }
     if (id === "schedule") {
       setWeek(DateTime.now().setZone(zone).startOf("week").toISODate()!);
       setFollowNow(true);
@@ -1170,6 +1260,7 @@ function Workspace() {
     if (action.step !== undefined) setSetupStep(action.step);
     if (action.resource) setResource(action.resource);
     if (action.plan && selected) {
+      setPlanningScope(selected.cohort ? { cohort: selected.cohort } : {});
       setPlanId(selected.id);
       if (selected.id !== planId) {
         const period = data.periods?.find(
@@ -1246,14 +1337,25 @@ function Workspace() {
   }
   const visible = rows.filter(
     (r) =>
+      (!(planningScope?.group || planningScope?.cohort) ||
+        planningGroups.some(
+          (group) =>
+            r.group_ids?.includes(group.id) ||
+            r.group_names?.includes(group.name) ||
+            r.overview_scope?.groups?.some((item: Row) => item.id === group.id),
+        )) &&
       (!search ||
         `${r.name} ${r.group_names?.join(" ")} ${r.room_names?.join(" ")}`
           .toLowerCase()
           .includes(search.toLowerCase())) &&
-      (!groupFilter || r.group_names?.includes(groupFilter)) &&
+      (!groupFilter ||
+        r.group_names?.includes(groupFilter) ||
+        r.overview_scope?.groups?.some(
+          (item: Row) => item.name === groupFilter,
+        )) &&
       (!roomFilter || r.room_names?.includes(roomFilter)),
   );
-  const inWeek = rows.filter(
+  const inWeek = visible.filter(
     (r) =>
       DateTime.fromISO(r.start, { zone }).startOf("week").toISODate() === week,
   );
@@ -1541,6 +1643,22 @@ function Workspace() {
               <LoaderCircle className="spin" />
               Arbeitsbereich laden …
             </div>
+          ) : page === "dashboard" && boot ? (
+            <Dashboard
+              institution={session.institution}
+              boot={boot}
+              zone={zone}
+              revision={refresh}
+              query={search}
+              onNavigate={go}
+              onAction={(id) => {
+                try {
+                  assistantAction(id, { plan: planId });
+                } catch (e) {
+                  setError((e as Error).message);
+                }
+              }}
+            />
           ) : page === "setup" ? (
             <StudySetup
               step={setupStep}
@@ -1555,16 +1673,22 @@ function Workspace() {
               onOpenExams={(id) => {
                 setPlanId(id);
                 go("exams");
+                const selected = data.plans.find((item) => item.id === id);
+                setPlanningScope(
+                  selected?.cohort ? { cohort: selected.cohort } : {},
+                );
               }}
               onOpenStudents={(groupId) => {
-                go("data");
-                setResource("people");
+                go("learners");
                 setDataFilters({ groups: String(groupId), kind: "learner" });
               }}
               onOpenPlan={(id) => {
                 setPlanId(id);
                 go("schedule");
                 const selected = data.plans.find((item) => item.id === id);
+                setPlanningScope(
+                  selected?.cohort ? { cohort: selected.cohort } : {},
+                );
                 const p = data.periods.find(
                   (item) => item.id === selected?.period,
                 );
@@ -1576,8 +1700,45 @@ function Workspace() {
                   );
               }}
             />
+          ) : (page === "schedule" || page === "exams") && !planningScope ? (
+            <PlanningSelection
+              data={data}
+              page={page}
+              query={search}
+              onSelect={selectPlanningScope}
+            />
           ) : page === "schedule" ? (
             <>
+              <div className="planning-scope-bar">
+                <div>
+                  <Users size={16} aria-hidden="true" />
+                  <strong>
+                    {selectedPlanningGroup?.name ||
+                      selectedPlanningCohort?.name ||
+                      "Alle Gruppen"}
+                  </strong>
+                  {selectedPlanningCohort && (
+                    <span>
+                      {
+                        data.programs?.find(
+                          (item) => item.id === selectedPlanningCohort.program,
+                        )?.name
+                      }
+                    </span>
+                  )}
+                </div>
+                <button
+                  className="button secondary"
+                  onClick={() => {
+                    if (!canLeaveEditor()) return;
+                    clearEditor();
+                    setPlanningScope(null);
+                    setSearch("");
+                  }}
+                >
+                  Gruppe wechseln
+                </button>
+              </div>
               <div className="planning-heading">
                 <div>
                   <h1>Stundenplanung</h1>
@@ -1610,7 +1771,12 @@ function Workspace() {
                             setPlanId(Number(e.target.value));
                           }}
                         >
-                          {data.plans?.map((p) => (
+                          {!planningPlans.length && (
+                            <option value="">
+                              Kein zugeordneter Stundenplan
+                            </option>
+                          )}
+                          {planningPlans.map((p) => (
                             <option key={p.id} value={p.id}>
                               {p.name}
                             </option>
@@ -1770,16 +1936,24 @@ function Workspace() {
                       </div>
                       <div className="calendar-filters">
                         <SlidersHorizontal size={15} />
-                        <select
-                          aria-label="Gruppe filtern"
-                          value={groupFilter}
-                          onChange={(e) => setGroupFilter(e.target.value)}
-                        >
-                          <option value="">Alle Gruppen</option>
-                          {data.groups?.map((g) => (
-                            <option key={g.id}>{g.name}</option>
-                          ))}
-                        </select>
+                        {!planningScope?.group && (
+                          <select
+                            aria-label="Gruppe filtern"
+                            value={groupFilter}
+                            onChange={(e) => setGroupFilter(e.target.value)}
+                          >
+                            <option value="">
+                              {planningScope?.group
+                                ? selectedPlanningGroup?.name
+                                : planningScope?.cohort
+                                  ? "Alle Gruppen dieses Jahrgangs"
+                                  : "Alle Gruppen"}
+                            </option>
+                            {planningGroups.map((g) => (
+                              <option key={g.id}>{g.name}</option>
+                            ))}
+                          </select>
+                        )}
                         <select
                           aria-label="Raum filtern"
                           value={roomFilter}
@@ -1928,6 +2102,30 @@ function Workspace() {
               onEdit={edit}
               revision={refresh}
             />
+          ) : page === "groups" ? (
+            <GroupAdmin
+              data={data}
+              query={search}
+              currentYear={DateTime.now().setZone(zone).year}
+              onEdit={edit}
+              onOpenPeople={(group) => {
+                go("learners");
+                setDataFilters({ groups: String(group), kind: "learner" });
+              }}
+            />
+          ) : page === "learners" ? (
+            <LearnerAdmin
+              data={data}
+              revision={refresh}
+              query={search}
+              onQueryChange={setSearch}
+              initialGroup={dataFilters.groups}
+              onEdit={(record, defaults) =>
+                edit("people", record, { ...defaults, kind: "learner" })
+              }
+            />
+          ) : page === "student-app" ? (
+            <StudentAppAdmin data={data} />
           ) : page === "students" ? (
             <>
               <div className="page-actions">
@@ -2056,7 +2254,23 @@ function Workspace() {
                   aria-label="Prüfungen verwalten"
                 >
                   <div className="exams-page-heading">
-                    <h1>Prüfungen</h1>
+                    <div>
+                      <h1>Prüfungen</h1>
+                      <p>
+                        {selectedPlanningGroup?.name ||
+                          selectedPlanningCohort?.name ||
+                          "Alle Gruppen"}
+                      </p>
+                    </div>
+                    <button
+                      className="button secondary"
+                      onClick={() => {
+                        setPlanningScope(null);
+                        setSearch("");
+                      }}
+                    >
+                      Gruppe wechseln
+                    </button>
                   </div>
                   <div className="assessment-toolbar">
                     <label className="assessment-plan-select">
@@ -2068,10 +2282,10 @@ function Workspace() {
                           setPlanId(Number(event.target.value))
                         }
                       >
-                        {!data.plans?.length && (
+                        {!planningPlans.length && (
                           <option value="">Kein Semesterplan vorhanden</option>
                         )}
-                        {data.plans?.map((item) => (
+                        {planningPlans.map((item) => (
                           <option key={item.id} value={item.id}>
                             {item.name}
                           </option>
@@ -2276,7 +2490,15 @@ function Workspace() {
                   query={search}
                   filters={
                     page === "exams"
-                      ? { ...dataFilters, plan: String(planId || 0) }
+                      ? {
+                          ...dataFilters,
+                          plan: String(planId || 0),
+                          ...(planningScope?.group
+                            ? { groups: String(planningScope.group) }
+                            : planningScope?.cohort
+                              ? { cohort: String(planningScope.cohort) }
+                              : {}),
+                        }
                       : dataFilters
                   }
                   data={data}
@@ -2357,12 +2579,33 @@ function Workspace() {
         <RecordForm
           key={`${modal.resource}-${modal.record?.id}`}
           resource={modal.resource}
-          fields={boot.schema[modal.resource]}
+          title={
+            modal.simpleGroups
+              ? `${modal.resource === "cohorts" ? "Jahrgang" : "Gruppe"} ${modal.record ? "bearbeiten" : "hinzufügen"}`
+              : undefined
+          }
+          fields={
+            modal.simpleGroups
+              ? boot.schema[modal.resource].filter((field: Field) =>
+                  (modal.resource === "cohorts"
+                    ? ["name", "code", "program", "entry_year", "study_version"]
+                    : ["name", "code", "cohort", "size"]
+                  ).includes(field.name),
+                )
+              : boot.schema[modal.resource]
+          }
           record={modal.record}
           defaults={modal.defaults}
           zone={zone}
-          onClose={() => setModal(null)}
+          onStateChange={modal.simpleGroups ? updateEditorState : undefined}
+          onClose={() => {
+            if (modal.simpleGroups && !canLeaveEditor()) return;
+            if (modal.simpleGroups) clearEditor();
+            setModal(null);
+          }}
           onSaved={(saved) => {
+            if (modal.simpleGroups)
+              editorState.current = { dirty: false, busy: false };
             if (modal.resource === "buildings" && !modal.record && saved)
               setAreaId(saved.id);
             reload();
@@ -2488,6 +2731,18 @@ function Workspace() {
             </footer>
           </form>
         </Modal>
+      )}
+      {modal?.type === "learner" && (
+        <LearnerForm
+          record={modal.record}
+          defaults={modal.defaults}
+          data={data}
+          onClose={() => setModal(null)}
+          onSaved={() => {
+            setModal(null);
+            reload();
+          }}
+        />
       )}
     </div>
   );

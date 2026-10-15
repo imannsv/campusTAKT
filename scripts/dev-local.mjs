@@ -93,6 +93,12 @@ try {
     [vite, "--host", "127.0.0.1", "--port", "5173", "--strictPort"],
     "Oberfläche",
   );
+  if (process.env.APNS_ENABLED === "1")
+    start(
+      python,
+      ["backend/manage.py", "student_push", "--watch"],
+      "Push-Dienst",
+    );
   const ready = await Promise.all([
     waitUntilReady("http://127.0.0.1:8000/api/health/"),
     waitUntilReady("http://127.0.0.1:5173/"),
