@@ -1,5 +1,17 @@
 # Prüf- und Übergabestand
 
+## Abgleich mit der aktuellen Anwendung · 15.10.2026
+
+- Referenz: Produktanwendung auf `origin/main`, Commit `4f6ca3f888873690da58e667fbd7d2f4bbd4af99`, zusätzlich mit der laufenden Browser-Demo verglichen.
+- Gemeinsame Vorschaukomponente für Einstieg und Produktbereich: gruppierte Seitenleiste, hellblauer aktiver Eintrag, kompakte Kopfleiste, Einrichtungs- und Verwaltungsprofil. Seitenleiste auf Desktop einklappbar, auf kleinen Bildschirmen eigene Navigation.
+- Manrope für Überschriften und DM Sans für Fließtext und unveränderte Wortmarke. Bestehende Produktfarben bleiben erhalten; die Schriften werden lokal ausgeliefert.
+- Termindetails als modaler Dialog mit Escape, Fokus auf dem Schließen-Button und Rückkehr zum auslösenden Termin.
+- Räume zunächst als Belegungszeitleiste, mit separater Raumverwaltung. Zeitposition und Dauer der Beispielbelegung stimmen mit der Skala überein.
+- Prüfungen, Abgaben & Fristen sowie Anforderungen getrennt auswählbar. Alle Vorschauen bleiben ausdrücklich vereinfachte Beispiele mit fiktiven Daten; nicht angebotene Navigationseinträge sind statische Orientierung.
+- Vorschaugrafik an die neue Navigation und den Wochenplan ohne dauerhafte Detailspalte angepasst; Formatierungsleerraum wird vor dem Umwandeln in Schriftkonturen normalisiert.
+- Build, 6 Node-Tests und 12 Browsertests bestanden. Responsive Breiten 320, 390, 600, 768 und 1440 Pixel, JavaScript-freie Inhalte, Dialogbedienung sowie WCAG-A/AA-Prüfungen für Kalender, Räume, Prüfungen und Dialog geprüft. Desktop, Mobilansicht und Vorschaugrafik zusätzlich visuell geprüft.
+- Änderungen ausschließlich unter `apps/landingpage`, Branch `landingpage`. Kontakt- und Rechtsplatzhalter, Entwurfsfreigabe und Zugriffsschutz bleiben bestehen; keine neuen Tracker oder externen Einbettungen.
+
 ## Vermarktungsinhalte · 12.10.2026
 
 - Fiktives Praxisbeispiel: Raumblockierung, Änderung im Entwurf, Planprüfung und erneute Freigabe.

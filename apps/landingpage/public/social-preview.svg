@@ -38,7 +38,7 @@
     x="64"
     y="186"
     fill="#24374c"
-    font-family="DM Sans"
+    font-family="Manrope"
     font-size="48"
     font-weight="600"
   >
@@ -48,7 +48,7 @@
     x="64"
     y="246"
     fill="#24374c"
-    font-family="DM Sans"
+    font-family="Manrope"
     font-size="48"
     font-weight="600"
   >
@@ -63,121 +63,116 @@
     width="1072"
     height="244"
     rx="10"
-    fill="white"
+    fill="#f3f7fa"
     stroke="#d8e2ec"
   />
   <path
-    d="M74 345h1052a10 10 0 0 1 10 10v32H64v-32a10 10 0 0 1 10-10Z"
-    fill="#fff"
+    d="M74 345h162v244H74a10 10 0 0 1-10-10V355a10 10 0 0 1 10-10Z"
+    fill="white"
   />
-  <path d="M64 387h1072" stroke="#e5ebf1" />
+  <path d="M236 345h890a10 10 0 0 1 10 10v28H236Z" fill="white" />
+  <path d="M236 345v244m0-206h900" stroke="#e5ebf1" />
   <text
-    x="84"
-    y="374"
+    x="82"
+    y="375"
     fill="#214b76"
-    font-family="DM Sans"
-    font-size="16"
+    font-family="Manrope"
+    font-size="15"
     font-weight="600"
   >
     Campus Nord
   </text>
-  <text x="956" y="374" fill="#52677b" font-family="DM Sans" font-size="13">
-    Beispielansicht
+  <text x="82" y="404" fill="#52677b" font-family="DM Sans" font-size="11">
+    Planung
   </text>
-  <path d="M236 387v202" stroke="#e5ebf1" />
-  <rect x="80" y="407" width="140" height="32" rx="5" fill="#214b76" />
-  <text x="92" y="429" fill="white" font-family="DM Sans" font-size="14">
-    Stundenplan
-  </text>
-  <text x="92" y="470" fill="#52677b" font-family="DM Sans" font-size="14">
-    Räume
-  </text>
-  <text x="92" y="510" fill="#52677b" font-family="DM Sans" font-size="14">
-    Prüfungen
-  </text>
-  <rect
-    x="252"
-    y="404"
-    width="652"
-    height="168"
-    rx="5"
-    fill="#fff"
-    stroke="#e5ebf1"
-  />
+  <rect x="76" y="415" width="148" height="28" rx="5" fill="#e5eef7" />
+  <path d="M76 422v14" stroke="#214b76" stroke-width="2" />
   <text
-    x="268"
-    y="431"
-    fill="#24374c"
-    font-family="DM Sans"
-    font-size="16"
+    x="86"
+    y="434"
+    fill="#214b76"
+    font-family="Manrope"
+    font-size="12"
     font-weight="600"
   >
-    Wochenplanung
+    Stundenplanung
   </text>
-  <text x="754" y="431" fill="#315e4e" font-family="DM Sans" font-size="13">
-    Freigegeben
+  <text x="86" y="467" fill="#52677b" font-family="DM Sans" font-size="12">
+    Prüfungen
   </text>
-  <g stroke="#e5ebf1">
-    <path
-      d="M252 447h652M252 509h652M380 447v125M508 447v125M636 447v125M764 447v125"
-    />
-  </g>
-  <rect x="266" y="460" width="102" height="42" rx="4" fill="#e4f2ed" />
-  <rect
-    x="394"
-    y="521"
-    width="102"
-    height="38"
-    rx="4"
-    fill="#e7effa"
-    stroke="#214b76"
-    stroke-width="2"
-  />
-  <rect x="522" y="460" width="102" height="42" rx="4" fill="#efebf9" />
-  <rect x="650" y="521" width="102" height="38" rx="4" fill="#fbf1dc" />
-  <rect x="778" y="460" width="112" height="42" rx="4" fill="#e7effa" />
-  <text x="275" y="485" fill="#24374c" font-family="DM Sans" font-size="11">
-    Projektmanagement
+  <text x="82" y="505" fill="#52677b" font-family="DM Sans" font-size="11">
+    Verwaltung
   </text>
-  <text x="404" y="545" fill="#24374c" font-family="DM Sans" font-size="12">
-    Mathematik
+  <text x="86" y="535" fill="#52677b" font-family="DM Sans" font-size="12">
+    Räume
   </text>
-  <text x="532" y="485" fill="#24374c" font-family="DM Sans" font-size="12">
-    Datenbanken
+  <text x="86" y="568" fill="#52677b" font-family="DM Sans" font-size="12">
+    Studienstruktur
   </text>
-  <text x="660" y="545" fill="#24374c" font-family="DM Sans" font-size="12">
-    Wirtschaftsrecht
+  <text x="254" y="370" fill="#52677b" font-family="DM Sans" font-size="11">
+    Arbeitsbereich
   </text>
-  <text x="788" y="485" fill="#24374c" font-family="DM Sans" font-size="12">
-    Statistik
+  <path d="m346 359 4 4-4 4" fill="none" stroke="#64778b" />
+  <text x="365" y="370" fill="#24374c" font-family="DM Sans" font-size="11">
+    Stundenplanung
   </text>
-  <rect
-    x="920"
-    y="404"
-    width="200"
-    height="168"
-    rx="5"
-    fill="#fff"
-    stroke="#e5ebf1"
-  />
-  <text x="936" y="429" fill="#52677b" font-family="DM Sans" font-size="12">
-    Termindetails
+  <text x="996" y="370" fill="#52677b" font-family="DM Sans" font-size="11">
+    Beispielansicht
   </text>
   <text
-    x="936"
-    y="460"
+    x="254"
+    y="412"
     fill="#24374c"
-    font-family="DM Sans"
+    font-family="Manrope"
     font-size="18"
     font-weight="600"
   >
+    Stundenplanung
+  </text>
+  <rect
+    x="252"
+    y="426"
+    width="868"
+    height="148"
+    rx="6"
+    fill="white"
+    stroke="#e5ebf1"
+  />
+  <text
+    x="266"
+    y="446"
+    fill="#24374c"
+    font-family="Manrope"
+    font-size="12"
+    font-weight="600"
+  >
+    Wirtschaftsinformatik · WS 2026/27
+  </text>
+  <text x="1012" y="446" fill="#315e4e" font-family="DM Sans" font-size="11">
+    Freigegeben
+  </text>
+  <path
+    d="M252 458h868M252 514h868M426 458v116M600 458v116M774 458v116M948 458v116"
+    stroke="#e5ebf1"
+  />
+  <rect x="264" y="468" width="150" height="36" rx="4" fill="#e4f2ed" />
+  <rect x="438" y="524" width="150" height="36" rx="4" fill="#e7effa" />
+  <rect x="612" y="468" width="150" height="36" rx="4" fill="#efebf9" />
+  <rect x="786" y="524" width="150" height="36" rx="4" fill="#fbf1dc" />
+  <rect x="960" y="468" width="148" height="36" rx="4" fill="#e7effa" />
+  <text x="274" y="491" fill="#24374c" font-family="DM Sans" font-size="12">
+    Projektmanagement
+  </text>
+  <text x="448" y="547" fill="#24374c" font-family="DM Sans" font-size="12">
     Mathematik
   </text>
-  <text x="936" y="490" fill="#52677b" font-family="DM Sans" font-size="13">
-    10:15–11:45
+  <text x="622" y="491" fill="#24374c" font-family="DM Sans" font-size="12">
+    Datenbanken
   </text>
-  <text x="936" y="518" fill="#52677b" font-family="DM Sans" font-size="13">
-    B.101 · WI26
+  <text x="796" y="547" fill="#24374c" font-family="DM Sans" font-size="12">
+    Wirtschaftsrecht
   </text>
-  <rect x="936" y="536" width="168" height="22" rx="3" fill="#e4f2ed" />
+  <text x="970" y="491" fill="#24374c" font-family="DM Sans" font-size="12">
+    Statistik
+  </text>
 </svg>

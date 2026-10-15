@@ -1,4 +1,6 @@
 const paths = {
+  sidebar: "M3 4h18v16H3zM9 4v16m7-12-3 4 3 4",
+  layers: "m12 3 10 5-10 5L2 8l10-5Zm-10 9 10 5 10-5M2 16l10 5 10-5",
   arrow: "M4 12h16m-6-6 6 6-6 6",
   calendar: "M5 5h14v15H5zM8 3v4m8-4v4M5 10h14M8 14h2m4 0h2m-8 3h2",
   room: "M4 21h16M6 21V3h12v18M9 7h2m2 0h2m-6 4h2m2 0h2m-4 10v-6h2v6",

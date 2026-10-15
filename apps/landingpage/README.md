@@ -45,8 +45,18 @@ Das Datenformat:
 ```json
 {
   "approved": false,
-  "imprint": [{ "heading": "Abschnittsüberschrift", "paragraphs": ["Vom Anbieter freigegebener Inhalt."] }],
-  "privacy": [{ "heading": "Abschnittsüberschrift", "paragraphs": ["Vom Anbieter freigegebener Inhalt."] }]
+  "imprint": [
+    {
+      "heading": "Abschnittsüberschrift",
+      "paragraphs": ["Vom Anbieter freigegebener Inhalt."]
+    }
+  ],
+  "privacy": [
+    {
+      "heading": "Abschnittsüberschrift",
+      "paragraphs": ["Vom Anbieter freigegebener Inhalt."]
+    }
+  ]
 }
 ```
 
@@ -58,16 +68,16 @@ Keine Tracker, Kontakt-API, Cookie-Speicherung oder eingebetteten Fremddienste. 
 
 Das separate Projekt `campuszeit-landingpage` besteht im Team `jakob-fee8`. Der Benutzer hat manuelle CLI-Deployments gewählt; eine GitHub-Verbindung ist dafür nicht erforderlich. Die vorhandene Produktzuordnung **nicht** verwenden.
 
-| Einstellung | Wert |
-| --- | --- |
-| Repository | `imannsv/campusTIME` |
-| Root Directory | `apps/landingpage` |
-| Quellbranch für CLI-Uploads | `landingpage` |
-| Framework | Vite |
-| Install Command | `npm ci` |
-| Build Command | `npm run build` |
-| Output Directory | `dist` |
-| Ignored Build Step | `node scripts/ignore-build.mjs` |
+| Einstellung                 | Wert                            |
+| --------------------------- | ------------------------------- |
+| Repository                  | `imannsv/campusTIME`            |
+| Root Directory              | `apps/landingpage`              |
+| Quellbranch für CLI-Uploads | `landingpage`                   |
+| Framework                   | Vite                            |
+| Install Command             | `npm ci`                        |
+| Build Command               | `npm run build`                 |
+| Output Directory            | `dist`                          |
+| Ignored Build Step          | `node scripts/ignore-build.mjs` |
 
 Vercel-Systemvariablen aktivieren. Die lokale `vercel.json` enthält denselben Branchfilter. Vercel führt bei Exit-Code `1` den Build aus, bei `0` überspringt es ihn. Nur `landingpage` wird zugelassen; auch ein fehlender Branchwert führt zum Überspringen. Production Branch und Root Directory zusätzlich im Dashboard prüfen, da die Datei sie nicht festlegt.
 
@@ -92,7 +102,8 @@ Offizielle Referenzen: [Vercel-Projektkonfiguration](https://vercel.com/docs/pro
 ## Aufbau
 
 - `src/App.tsx`: Seiten, Navigation, Kontakt und Rechtsansichten.
-- `src/ProductPreview.tsx`: fiktive Stundenplan-, Raum- und Prüfungsvorschau.
+- `src/ProductPreview.tsx`: gemeinsame Anwendungsvorschau mit Stundenplan, Termindialog, Raumbelegung und getrennten Prüfungsbereichen.
+- `src/application-preview.css`: Gestaltung der Vorschau nach der aktuellen Anwendung, einschließlich Mobilansicht.
 - `src/content.ts`: fachlich überprüfte Produkttexte und FAQ.
 - `src/styles.css`: eigenständiges responsives Design.
 - `scripts/prerender.mjs`: HTML, Metadaten, Sitemap, robots und Vorschaugrafik.

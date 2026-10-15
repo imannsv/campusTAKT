@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Icon, Logo } from "./Icon";
-import { ProductPreview, Schedule } from "./ProductPreview";
+import { ProductPreview, ApplicationPreview } from "./ProductPreview";
 import {
   PracticeCase,
   PlanningComparison,
@@ -180,37 +180,7 @@ function Home({ config }: { config: SiteConfig }) {
           </p>
         </div>
         <div className="hero-product">
-          <div className="hero-window">
-            <div className="mini-window-bar">
-              <Logo />
-              <span className="mini-code">
-                Campus Nord · Hochschule & Akademie
-              </span>
-            </div>
-            <div className="hero-workspace">
-              <aside className="hero-sidebar" aria-label="Beispielnavigation">
-                <span>Planung</span>
-                <strong>
-                  <Icon name="calendar" /> Stundenplan
-                </strong>
-                <span>
-                  <Icon name="room" /> Räume
-                </span>
-                <span>
-                  <Icon name="exam" /> Prüfungen
-                </span>
-                <div>
-                  <Icon name="book" /> Studienstruktur
-                </div>
-                <p>
-                  Wintersemester
-                  <br />
-                  2026/27
-                </p>
-              </aside>
-              <Schedule compact />
-            </div>
-          </div>
+          <ApplicationPreview compact />
           <div className="hero-caption">
             <span className="caption-line" />
             Ihre Planung. Alle Zusammenhänge im Blick.

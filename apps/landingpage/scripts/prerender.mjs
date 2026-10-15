@@ -106,7 +106,7 @@ const fonts = {
   ),
   heading: createFont(
     await readFile(
-      "node_modules/@fontsource/dm-sans/files/dm-sans-latin-600-normal.woff2",
+      "node_modules/@fontsource/manrope/files/manrope-latin-600-normal.woff2",
     ),
   ),
   body: createFont(
@@ -132,7 +132,8 @@ const svg = svgSource.replace(
         : fonts.heading;
     const scale = Number(attr("font-size", "60")) / font.unitsPerEm;
     const tracking = Number(attr("letter-spacing", "0")) / scale;
-    const run = font.layout(text);
+    // SVG text collapses formatting whitespace; do the same before outlining glyphs.
+    const run = font.layout(text.replace(/\s+/g, " ").trim());
     let advance = 0;
     const paths = run.glyphs
       .map((glyph, index) => {
