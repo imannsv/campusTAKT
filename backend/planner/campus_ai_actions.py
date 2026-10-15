@@ -80,9 +80,11 @@ def reply_actions(question, guides, context):
 def proactive_context(context, selection):
     page, step = selection.get("page", "schedule"), selection.get("step", 0)
     names = {
+        "dashboard": "Dashboard",
         "map": "Räume",
         "schedule": "Stundenplanung",
         "teachers": "Lehrendenübersicht",
+        "learners": "Schüler & Studierende",
         "data": "Stammdaten",
         "exams": "Prüfungen",
         "displays": "Öffentliche Anzeigen",
@@ -99,9 +101,11 @@ def proactive_context(context, selection):
         "Semester planen",
     ]
     defaults = {
+        "dashboard": ["schedule", "setup"],
         "map": ["add_room", "blocks"],
         "schedule": ["courses", "semester"],
         "teachers": ["teachers", "schedule"],
+        "learners": ["learners"],
         "exams": ["exams", "add_exam"],
         "displays": ["displays", "schedule"],
         "students": ["students", "displays"],

@@ -1,5 +1,54 @@
 [
   {
+    "id": "dashboard",
+    "title": "Dashboard und Tagesüberblick",
+    "keywords": [
+      "dashboard",
+      "tagesüberblick",
+      "campusübersicht",
+      "heute",
+      "schnellzugriff",
+      "ausfälle"
+    ],
+    "page": "dashboard",
+    "section": "Erste Schritte",
+    "parentId": null,
+    "summary": "Das Dashboard steht zuerst in der Sidebar unter Überblick. Es zeigt die aktuelle Tagesplanung aller Pläne, laufende Termine und Ausfälle, echte Struktur- und Planungshinweise, den Prüfungsausblick für sieben Kalendertage, Kennzahlen der Einrichtung, Schnellzugriffe und letzte Änderungen. Personen umfasst Lernende und Lehrende. Tagesdaten und Hinweise aktualisieren sich alle 30 Sekunden; Fehler sind ausdrücklich gekennzeichnet. Entwurf und Freigabe bleiben unterscheidbar.",
+    "updatedAt": "2026-10-14",
+    "related": [
+      "schedule",
+      "assessments",
+      "setup",
+      "learners"
+    ],
+    "images": []
+  },
+  {
+    "id": "learners",
+    "title": "Schüler & Studierende verwalten",
+    "keywords": [
+      "schüler",
+      "studierende",
+      "studenten",
+      "personenverwaltung",
+      "studierendenliste",
+      "matrikelnummer",
+      "gruppenzuordnung",
+      "personen hinzufügen"
+    ],
+    "page": "learners",
+    "section": "Räume und Personen",
+    "parentId": null,
+    "summary": "Öffne Schüler & Studierende in der Verwaltung. Person hinzufügen erfasst Name und optional eine eindeutige Kennung; ohne Eingabe wird eine Kennung automatisch vergeben. Wähle einen Jahrgang, um die Gruppen-/Klassenauswahl einzugrenzen, und füge eine oder mehrere Gruppen hinzu. Bearbeiten ändert Name, Kennung und Zuordnungen; eine Gruppenmarke anklicken entfernt die Zuordnung. Suche, Jahrgang und Gruppe filtern die Personenübersicht, Ohne Zuordnung zeigt Personen ohne Gruppe. Der Jahrgang ergibt sich aus den zugeordneten Gruppen. Studierendenliste verwalten in der Einrichtung öffnet dieselbe Ansicht mit Gruppenfilter. Diese Personen sind Verwaltungsdatensätze; der App-Zugang bleibt der bestehende Gruppen-QR. Gruppengrößen und bereits veröffentlichte Pläne werden nicht automatisch überschrieben. Über Kacheln / Liste wechselst du zwischen der Jahrgangs-/Studiengangs-/Gruppenübersicht wie in der Stundenplanung und der bisherigen Personenliste. Gruppenkacheln öffnen die passend gefilterte Liste; Alle Personen und Ohne Zuordnung bleiben erreichbar. Die Darstellungswahl wird im Browser gemerkt.",
+    "updatedAt": "2026-10-14",
+    "related": [
+      "setup",
+      "student-app",
+      "imports"
+    ],
+    "images": []
+  },
+  {
     "id": "setup",
     "title": "Einrichtung Schritt für Schritt",
     "keywords": [
@@ -583,8 +632,8 @@
       "absage",
       "blockzeit"
     ],
-    "summary": "Öffne Studierenden-App. Erstelle einen Zugang für eine Gruppe oder einen Jahrgang und gib die erreichbare HTTPS-Serveradresse an. Speichere den einmalig angezeigten QR-Code oder kopiere die Zugangsdaten und teile sie ausschließlich mit dieser Zielgruppe. Die App zeigt freigegebene Stundenpläne, Prüfungen und veröffentlichte Mitteilungen. Sperren beendet alle verbundenen Gerätesitzungen. Der iPhone-Release-Build, die lokale Testsignierung und Installation bestehen; die Anmeldung wurde auf dem iPhone geöffnet. Der vollständige Gerätetest steht noch aus. Android folgt später. Die iPhone-App lädt und speichert beim Öffnen, während der Nutzung und bei von iOS erlaubten Hintergrundabrufen automatisch die aktuelle und nächsten 17 Wochen, Prüfungen und Mitteilungen für offline, auch nach Neustart. Ein Download-Button ist nicht nötig; Profil → Offline verfügbar zeigt den Speicherstand. Nicht gespeicherte Wochen werden gekennzeichnet. Abmelden entfernt den Stand; neue Änderungen erfordern Verbindung zum Server. Absagen bereits veröffentlichter Termine erzeugen automatisch Ausfallmitteilungen für die veröffentlichten Gruppen, auch durch Lehrenden-Blockzeiten. Die Nachricht enthält veröffentlichte Termindaten. Wiederholtes Speichern erzeugt keine Duplikate; eine aufgehobene Absage zieht die Nachricht zurück. Keine nachträglichen Meldungen alter Absagen und keine sofortige Push-Zustellung bei geschlossener App.",
-    "updatedAt": "2026-10-13",
+    "summary": "Öffne Studierenden-App. Erstelle einen Zugang für eine Gruppe oder einen Jahrgang und gib die erreichbare HTTPS-Serveradresse an. Der QR-Code ist über Zugang anzeigen später erneut abrufbar; bei älteren Zugängen muss einmal die erreichbare Serveradresse ergänzt werden. Das Passwort wird nur bei Erstellung angezeigt. Bereits verteilte QR-Codes und Gerätesitzungen bleiben erhalten. Teile Zugänge ausschließlich mit dieser Zielgruppe. Die App zeigt freigegebene Stundenpläne, Prüfungen und veröffentlichte Mitteilungen. Sperren beendet alle verbundenen Gerätesitzungen. Der iPhone-Release-Build, die lokale Testsignierung und Installation bestehen; die Anmeldung wurde auf dem iPhone geöffnet. Der vollständige Gerätetest steht noch aus. Android folgt später. Die iPhone-App lädt und speichert beim Öffnen, während der Nutzung und bei von iOS erlaubten Hintergrundabrufen automatisch die aktuelle und nächsten 17 Wochen, Prüfungen und Mitteilungen für offline, auch nach Neustart. Ein Download-Button ist nicht nötig; Profil → Offline verfügbar zeigt den Speicherstand. Nicht gespeicherte Wochen werden gekennzeichnet. Abmelden entfernt den Stand; neue Änderungen erfordern Verbindung zum Server. Absagen bereits veröffentlichter Termine erzeugen automatisch Ausfallmitteilungen für die veröffentlichten Gruppen, auch durch Lehrenden-Blockzeiten. Die Nachricht enthält veröffentlichte Termindaten. Wiederholtes Speichern erzeugt keine Duplikate; eine aufgehobene Absage zieht die Nachricht zurück. Keine nachträglichen Meldungen alter Absagen und keine sofortige Push-Zustellung bei geschlossener App.",
+    "updatedAt": "2026-10-14",
     "related": [
       "students",
       "publication",

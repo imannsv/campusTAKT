@@ -12,10 +12,12 @@ from zoneinfo import ZoneInfo
 import qrcode
 import qrcode.image.svg
 from django.contrib.auth.hashers import check_password, make_password
+from django.core import signing
 from django.db import transaction
 from django.db.models import Q
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
+from django.views.decorators.cache import never_cache
 from rest_framework import serializers
 from rest_framework.authentication import BaseAuthentication, get_authorization_header
 from rest_framework.decorators import (
@@ -38,6 +40,17 @@ from .views import bump, lock_tenant, tenant
 
 def digest(value):
     return hashlib.sha256(value.encode()).hexdigest()
+
+
+def valid_qr_key(access, key):
+    if secrets.compare_digest(access.qr_hash, digest(key)):
+        return True
+    try:
+        return signing.Signer(salt="planner.student-access.qr").unsign(key) == str(
+            access.id
+        )
+    except signing.BadSignature:
+        return False
 
 
 class DeviceAuthentication(BaseAuthentication):
@@ -128,7 +141,7 @@ def login(request):
             .first()
         )
         valid = (
-            secrets.compare_digest(access.qr_hash, digest(values["key"]))
+            valid_qr_key(access, values["key"])
             if access and "key" in values
             else check_password(
                 values.get("password", ""),
@@ -300,20 +313,19 @@ def access_row(access):
         "scope": scope.name,
         "active": access.active,
         "created": access.created,
+        "server": access.server,
+        "group": access.group_id,
+        "cohort": access.cohort_id,
     }
 
 
-def credentials(access, server):
-    password = secrets.token_urlsafe(12)
-    key = secrets.token_urlsafe(32)
-    access.password_hash = make_password(password)
-    access.qr_hash = digest(key)
-    access.save()
-    access.studentdevicesession_set.all().delete()
+def qr_credentials(access):
+    # A scoped signature makes the QR reproducible without storing its secret.
+    key = signing.Signer(salt="planner.student-access.qr").sign(str(access.id))
     qr = json.dumps(
         {
             "version": 1,
-            "server": server.rstrip("/"),
+            "server": access.server,
             "access": str(access.id),
             "key": key,
         },
@@ -325,12 +337,23 @@ def credentials(access, server):
     )
     return {
         **access_row(access),
-        "password": password,
         "qr_payload": qr,
         "qr_svg": output.getvalue().decode(),
     }
 
 
+def credentials(access, server):
+    password = secrets.token_urlsafe(12)
+    access.password_hash = make_password(password)
+    access.qr_hash = digest(
+        signing.Signer(salt="planner.student-access.qr").sign(str(access.id))
+    )
+    access.server = server.rstrip("/")
+    access.save()
+    return {**qr_credentials(access), "password": password}
+
+
+@never_cache
 @api_view(["GET", "POST"])
 def accesses(request):
     institution = tenant(request)
@@ -357,6 +380,38 @@ def accesses(request):
         result = credentials(access, values["server"])
         bump(request, institution, "Studierenden-App: Gruppenzugang angelegt")
         return Response(result, status=201)
+
+
+@never_cache
+@api_view(["GET", "POST"])
+def access_credentials(request, pk):
+    with transaction.atomic():
+        institution = (
+            lock_tenant(request) if request.method == "POST" else tenant(request)
+        )
+        access = get_object_or_404(
+            m.StudentAccess.objects.select_for_update(),
+            pk=pk,
+            institution=institution,
+            active=True,
+        )
+        if request.method == "POST":
+            payload = AccessInput(
+                data={
+                    "group": access.group_id,
+                    "cohort": access.cohort_id,
+                    "server": request.data.get("server"),
+                },
+                institution=institution,
+            )
+            payload.is_valid(raise_exception=True)
+            access.server = payload.validated_data["server"].rstrip("/")
+            access.save(update_fields=["server"])
+        if not access.server:
+            raise serializers.ValidationError(
+                "Bitte zuerst die erreichbare Serveradresse ergänzen."
+            )
+        return Response(qr_credentials(access))
 
 
 @api_view(["POST"])

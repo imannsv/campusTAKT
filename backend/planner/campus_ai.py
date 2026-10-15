@@ -111,10 +111,12 @@ def help_for(question, history=None, context=None):
     if not found and context:
         page = context.get("view", {}).get("page")
         guide = {
+            "dashboard": "dashboard",
             "map": "rooms",
             "exams": "assessments",
             "schedule": "schedule",
             "teachers": "teachers",
+            "learners": "learners",
             "students": "display",
             "student-app": "student-app",
             "displays": "display",

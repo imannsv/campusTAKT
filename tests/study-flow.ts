@@ -189,10 +189,10 @@ export async function studyFlow(page: Page) {
     .first()
     .click();
   await expect(
-    page.getByRole("cell", { name: "Fiktive Testperson", exact: true }),
+    page.locator(".learner-row").filter({ hasText: "Fiktive Testperson" }),
   ).toBeVisible();
   await expect(
-    page.getByRole("cell", { name: "Dr. Anna Berger", exact: true }),
+    page.locator(".learner-row").filter({ hasText: "Dr. Anna Berger" }),
   ).toHaveCount(0);
   await page
     .getByRole("navigation")

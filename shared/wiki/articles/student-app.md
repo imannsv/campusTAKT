@@ -7,8 +7,10 @@ Die Studierenden-App bietet ausschließlich Lesezugriff: Stundenplan, Prüfungen
 1. Öffne **Studierenden-App** unter **Veröffentlichung**.
 2. Klicke auf **Zugang erstellen** und wähle eine Gruppe oder einen Jahrgang. Ein Jahrgangszugang umfasst dessen Gruppen.
 3. Trage die vom iPhone erreichbare CampusZeit-Serveradresse ein, zum Beispiel die HTTPS-Adresse der eigenen Einrichtung. Die Adresse benötigt keinen zusätzlichen Pfad.
-4. Erstelle den Zugang. Speichere den angezeigten QR-Code oder kopiere die Zugangsdaten. Passwort und QR-Code werden ausschließlich jetzt angezeigt.
+4. Erstelle den Zugang. Speichere den angezeigten QR-Code oder kopiere die Zugangsdaten. Das Passwort wird ausschließlich bei der Erstellung angezeigt. Den QR-Code, die Serveradresse und den Zugangscode kannst du später in der Zugangsliste über **Zugang anzeigen** erneut öffnen und speichern – auch nach einem Neuladen.
 5. Teile diese Angaben mit der Zielgruppe. Verwende dafür kein Verwaltungskonto.
+
+Bei älteren Zugängen ergänze beim ersten erneuten Öffnen einmalig die erreichbare Serveradresse. Der neu angezeigte QR-Code funktioniert zusätzlich zu bereits verteilten Codes. Passwort und angemeldete Geräte bleiben erhalten. Ein vergessenes Passwort lässt sich aus seiner gespeicherten Prüfsumme nicht wiederherstellen; nutze dann den QR-Code. Gesperrte Zugänge können nicht erneut bereitgestellt werden.
 
 Für einen lokalen Test müssen Server und iPhone im selben Netzwerk sein. **localhost** und **127.0.0.1** bezeichnen auf dem iPhone das iPhone selbst. Der lokale Server muss unter seiner Netzwerkadresse erreichbar und dafür konfiguriert sein. Verwende im öffentlichen Betrieb HTTPS.
 

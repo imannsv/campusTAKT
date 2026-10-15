@@ -977,8 +977,25 @@ export async function demoApi(
       "semester",
       "status",
     ])
-      if (query.has(field) && !(resource === "exams" && field === "cohort"))
+      if (
+        query.has(field) &&
+        !(field === "cohort" && ["people", "exams"].includes(resource))
+      )
         rows = rows.filter((row) => String(row[field]) === query.get(field));
+    if (resource === "people") {
+      if (query.has("cohort")) {
+        const groups = new Set(
+          state.data.groups
+            .filter((group) => group.cohort === Number(query.get("cohort")))
+            .map((group) => group.id),
+        );
+        rows = rows.filter((row) =>
+          row.groups?.some((id: number) => groups.has(id)),
+        );
+      }
+      if (query.get("unassigned") === "1")
+        rows = rows.filter((row) => !row.groups?.length);
+    }
     if (resource === "exams" && (query.has("groups") || query.has("cohort"))) {
       const groups = state.data.groups.filter((group) =>
         query.has("groups")

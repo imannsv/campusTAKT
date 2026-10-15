@@ -10,6 +10,7 @@ import {
 import { DateTime } from "luxon";
 import {
   CalendarDays,
+  LayoutDashboard,
   Layers,
   GraduationCap,
   Monitor,
@@ -59,6 +60,8 @@ import PlanningSelection, {
 } from "./PlanningSelection";
 import AssessmentBoard from "./AssessmentBoard";
 import StudentAppAdmin from "./StudentAppAdmin";
+import LearnerAdmin, { LearnerForm } from "./LearnerAdmin";
+import Dashboard from "./Dashboard";
 import CampusAI from "./CampusAI";
 import { ThemePicker, ThemeSettings } from "./Theme";
 import { campusActions } from "./campus-ai-actions";
@@ -66,6 +69,12 @@ import { Brand, Login, SessionState, notifyAuthChange } from "./Auth";
 const Wiki = lazy(() => import("./Wiki"));
 
 const nav = [
+  {
+    id: "dashboard",
+    label: "Dashboard",
+    icon: LayoutDashboard,
+    group: "Überblick",
+  },
   {
     id: "schedule",
     label: "Stundenplanung",
@@ -80,6 +89,12 @@ const nav = [
     group: "Planung",
   },
   { id: "map", label: "Räume", icon: Building2, group: "Verwaltung" },
+  {
+    id: "learners",
+    label: "Schüler & Studierende",
+    icon: Users,
+    group: "Verwaltung",
+  },
   {
     id: "setup",
     label: "Einrichtung & Studienstruktur",
@@ -106,7 +121,7 @@ const nav = [
     group: "Veröffentlichung",
   },
 ];
-const navGroups = ["Planung", "Verwaltung", "Veröffentlichung"];
+const navGroups = ["Überblick", "Planung", "Verwaltung", "Veröffentlichung"];
 const descriptions: Record<string, string> = {
   areas: "Getrennt planen, gemeinsame Ressourcen berücksichtigen.",
   programs: "Die Grundlage für Lehrpläne und Jahrgänge.",
@@ -1169,6 +1184,8 @@ function Workspace() {
         defaults,
         key: ++editorSequence.current,
       });
+    } else if (res === "people" && (row?.kind || defaults.kind) === "learner") {
+      setModal({ type: "learner", record: row, defaults });
     } else {
       setModal({ type: "record", resource: res, record: row, defaults });
     }
@@ -1613,6 +1630,22 @@ function Workspace() {
               <LoaderCircle className="spin" />
               Arbeitsbereich laden …
             </div>
+          ) : page === "dashboard" && boot ? (
+            <Dashboard
+              institution={session.institution}
+              boot={boot}
+              zone={zone}
+              revision={refresh}
+              query={search}
+              onNavigate={go}
+              onAction={(id) => {
+                try {
+                  assistantAction(id, { plan: planId });
+                } catch (e) {
+                  setError((e as Error).message);
+                }
+              }}
+            />
           ) : page === "setup" ? (
             <StudySetup
               step={setupStep}
@@ -1633,8 +1666,7 @@ function Workspace() {
                 );
               }}
               onOpenStudents={(groupId) => {
-                go("data");
-                setResource("people");
+                go("learners");
                 setDataFilters({ groups: String(groupId), kind: "learner" });
               }}
               onOpenPlan={(id) => {
@@ -2056,6 +2088,17 @@ function Workspace() {
               query={search}
               onEdit={edit}
               revision={refresh}
+            />
+          ) : page === "learners" ? (
+            <LearnerAdmin
+              data={data}
+              revision={refresh}
+              query={search}
+              onQueryChange={setSearch}
+              initialGroup={dataFilters.groups}
+              onEdit={(record, defaults) =>
+                edit("people", record, { ...defaults, kind: "learner" })
+              }
             />
           ) : page === "student-app" ? (
             <StudentAppAdmin data={data} />
@@ -2643,6 +2686,18 @@ function Workspace() {
             </footer>
           </form>
         </Modal>
+      )}
+      {modal?.type === "learner" && (
+        <LearnerForm
+          record={modal.record}
+          defaults={modal.defaults}
+          data={data}
+          onClose={() => setModal(null)}
+          onSaved={() => {
+            setModal(null);
+            reload();
+          }}
+        />
       )}
     </div>
   );

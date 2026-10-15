@@ -77,6 +77,96 @@ class StudentAppTests(TestCase):
         self.sign_in(qr=True)
         self.assertEqual(m.StudentDeviceSession.objects.count(), 2)
 
+    def test_manager_can_reopen_qr_without_changing_credentials_or_device_sessions(
+        self,
+    ):
+        self.sign_in()
+        url = f"/api/student-app/accesses/{self.credentials['id']}/credentials/"
+        response = self.manager.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data["qr_payload"], self.credentials["qr_payload"])
+        self.assertEqual(response.data["server"], "https://campus.example.org")
+        self.assertNotIn("password", response.data)
+        self.assertIn("no-store", response["Cache-Control"])
+        self.assertEqual(m.StudentDeviceSession.objects.count(), 1)
+        self.assertEqual(self.feed().status_code, 200)
+        self.sign_in(qr=True)
+        listing = str(self.manager.get("/api/student-app/accesses/").data)
+        self.assertNotIn("qr_payload", listing)
+        self.assertNotIn("qr_svg", listing)
+        self.assertNotIn(self.credentials["password"], listing)
+
+    def test_legacy_access_can_show_qr_while_preserving_old_qr_and_password(self):
+        from .student_app import digest
+
+        access = m.StudentAccess.objects.get(pk=self.credentials["id"])
+        old_key = "legacy-qr-key-that-stays-valid-for-existing-copies"
+        access.qr_hash = digest(old_key)
+        access.server = ""
+        access.save()
+        old_password_hash = access.password_hash
+        self.sign_in()
+        url = f"/api/student-app/accesses/{access.id}/credentials/"
+        self.assertEqual(self.manager.get(url).status_code, 400)
+        self.assertEqual(
+            self.manager.post(url, {"server": "http://public.example.org"}).status_code,
+            400,
+        )
+        response = self.manager.post(url, {"server": "https://campus.example.org"})
+        self.assertEqual(response.status_code, 200)
+        access.refresh_from_db()
+        self.assertEqual(access.password_hash, old_password_hash)
+        self.assertEqual(access.qr_hash, digest(old_key))
+        self.assertEqual(m.StudentDeviceSession.objects.count(), 1)
+        self.assertEqual(self.feed().status_code, 200)
+        self.sign_in(response.data, qr=True)
+        self.sign_in(
+            {
+                **self.credentials,
+                "qr_payload": json.dumps({"access": str(access.id), "key": old_key}),
+            },
+            qr=True,
+        )
+        self.sign_in()
+        self.assertEqual(
+            self.manager.get(url).data["qr_payload"], response.data["qr_payload"]
+        )
+
+    def test_qr_retrieval_is_private_tenant_scoped_and_rejects_disabled_access(self):
+        from django.core import signing
+
+        url = f"/api/student-app/accesses/{self.credentials['id']}/credentials/"
+        self.assertEqual(self.client.get(url).status_code, 403)
+        self.sign_in()
+        self.assertEqual(self.client.get(url).status_code, 403)
+        other = self.create_access(group=self.other.id)
+        forged = self.client.post(
+            "/api/student-app/v1/login/",
+            {
+                "access": self.credentials["id"],
+                "key": signing.Signer(salt="planner.student-access.qr").sign(
+                    str(other["id"])
+                ),
+            },
+        )
+        self.assertEqual(forged.status_code, 401)
+        m.StudentAccess.objects.filter(pk=self.credentials["id"]).update(active=False)
+        self.assertEqual(self.manager.get(url).status_code, 404)
+        self.assertEqual(
+            self.manager.post(
+                url, {"server": "https://campus.example.org"}
+            ).status_code,
+            404,
+        )
+        foreign = m.Institution.objects.create(name="QR Other", slug="qr-other")
+        m.Membership.objects.filter(user=self.admin).update(institution=foreign)
+        self.assertEqual(
+            self.manager.get(
+                f"/api/student-app/accesses/{other['id']}/credentials/"
+            ).status_code,
+            404,
+        )
+
     def test_scope_cannot_be_changed_and_private_data_is_absent(self):
         self.sign_in()
         response = self.feed(group=self.other.id)

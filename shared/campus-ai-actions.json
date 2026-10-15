@@ -1,5 +1,25 @@
 [
   {
+    "id": "dashboard",
+    "label": "Dashboard öffnen",
+    "page": "dashboard",
+    "targets": ["dashboard", "startübersicht", "campusübersicht"],
+    "guides": ["dashboard"]
+  },
+  {
+    "id": "learners",
+    "label": "Schüler & Studierende öffnen",
+    "page": "learners",
+    "targets": [
+      "schüler und studierende",
+      "personenverwaltung",
+      "studierendenverwaltung",
+      "schülerverwaltung",
+      "studierendenliste"
+    ],
+    "guides": ["learners"]
+  },
+  {
     "id": "rooms",
     "label": "Räume öffnen",
     "page": "map",

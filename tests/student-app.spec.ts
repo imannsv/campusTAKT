@@ -42,6 +42,69 @@ test("administration provides QR access and notices without exposing stored secr
     await page.request.get("/api/student-app/accesses/")
   ).json();
   expect(JSON.stringify(listing)).not.toContain(result.password);
+  await page.reload();
+  await page
+    .getByRole("navigation", { name: "Arbeitsbereiche" })
+    .getByRole("button", { name: "Studierenden-App", exact: true })
+    .click();
+  const accessRow = page
+    .locator(".student-admin-row")
+    .filter({ hasText: result.code });
+  const reopening = page.waitForResponse(
+    (response) =>
+      response
+        .url()
+        .endsWith(`/api/student-app/accesses/${result.id}/credentials/`) &&
+      response.request().method() === "GET",
+  );
+  await accessRow
+    .getByRole("button", { name: "Zugang anzeigen", exact: true })
+    .click();
+  const reopened = await (await reopening).json();
+  expect(reopened.qr_payload === result.qr_payload).toBe(true);
+  expect(reopened.password).toBeUndefined();
+  await expect(
+    provided.getByRole("img", { name: /Anmelde-QR-Code/ }),
+  ).toBeVisible();
+  await expect(provided).toContainText("Wird nur bei der Erstellung angezeigt");
+  await expect(
+    provided.getByRole("link", { name: "QR-Code speichern", exact: true }),
+  ).toHaveAttribute("download", `campuszeit-${result.code}.svg`);
+  await provided.getByRole("button", { name: "Fertig", exact: true }).click();
+  // Exercise the address prompt for accesses created before addresses were stored.
+  await page.route("**/api/student-app/accesses/", async (route) => {
+    if (route.request().method() !== "GET") return route.continue();
+    const response = await route.fetch();
+    const rows = await response.json();
+    await route.fulfill({
+      response,
+      json: rows.map((row: any) =>
+        row.id === result.id ? { ...row, server: "" } : row,
+      ),
+    });
+  });
+  await page.reload();
+  await page
+    .getByRole("navigation", { name: "Arbeitsbereiche" })
+    .getByRole("button", { name: "Studierenden-App", exact: true })
+    .click();
+  await accessRow
+    .getByRole("button", { name: "Zugang anzeigen", exact: true })
+    .click();
+  const legacy = page.getByRole("dialog", {
+    name: "Zugang anzeigen",
+    exact: true,
+  });
+  await expect(legacy.getByLabel("Zielgruppe")).toBeDisabled();
+  await legacy.getByLabel("Serveradresse").fill("http://127.0.0.1:8123");
+  await legacy
+    .getByRole("button", { name: "QR-Code anzeigen", exact: true })
+    .click();
+  await expect(
+    provided.getByRole("img", { name: /Anmelde-QR-Code/ }),
+  ).toBeVisible();
+  await provided.getByRole("button", { name: "Fertig", exact: true }).click();
+  await page.unroute("**/api/student-app/accesses/");
   await page
     .getByRole("button", { name: "Mitteilung erstellen", exact: true })
     .click();
@@ -75,6 +138,9 @@ test("administration provides QR access and notices without exposing stored secr
   page.once("dialog", (dialog) => dialog.accept());
   await rows.getByRole("button", { name: "Sperren", exact: true }).click();
   await expect(rows).toContainText("Gesperrt");
+  await expect(
+    rows.getByRole("button", { name: "Zugang anzeigen", exact: true }),
+  ).toBeDisabled();
 });
 
 test("notice dialog keeps focus while typing and protects current unsaved changes", async ({

@@ -35,6 +35,12 @@
 .student-admin-row > button {
   flex-shrink: 0;
 }
+.student-admin-row-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  flex-shrink: 0;
+}
 .student-admin-row p {
   margin: 8px 0 0;
   overflow-wrap: anywhere;

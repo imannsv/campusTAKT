@@ -12,11 +12,32 @@ Anzeigezeitraum eine Wochenübersicht. Details: [Studierendenübersicht](STUDENT
 
 Alle Verwaltungsanfragen verwenden die Django-Sitzung. Schreibende Anfragen benötigen zusätzlich `X-CSRFToken` aus dem `csrftoken`-Cookie. Zuerst `GET /api/auth/me/` aufrufen. Der Server bestimmt die Einrichtung aus der Anmeldung; eine vom Client eingereichte Einrichtungs-ID wird nicht übernommen.
 
+Ein aktiver App-Gruppenzugang kann über
+`GET /api/student-app/accesses/<uuid>/credentials/` erneut als QR-Code
+bereitgestellt werden. Ausschließlich die eigene Verwaltungssitzung erhält
+diese nicht cachebare Antwort; Geräte-Bearer-Token sind dafür nicht gültig.
+`POST` mit `{server}` speichert nach Prüfung die erreichbare Serveradresse,
+auch für ältere Zugänge ohne gespeicherte Adresse. Passwort und vorhandene
+Gerätesitzungen bleiben erhalten. Die gewöhnliche Zugangsliste enthält keine
+QR-Schlüssel oder Passwörter. Details: [Studierenden-App](STUDENT_APP.md).
+
 Prüfungslisten unterstützen zusätzlich `groups=<Gruppen-ID>` oder
 `cohort=<Jahrgangs-ID>`. Explizite Prüfungsteilnehmer bestimmen die Zuordnung;
 nur ohne Teilnehmerliste wird die Gruppe des Kurses verwendet. Gruppenauswahl
 hat Vorrang vor Jahrgangsauswahl. Die interne Planprüfung liefert je Termin
 auch `overview_scope` mit den zugehörigen Gruppen für die Kalenderfilterung.
+
+Die Personenverwaltung verwendet weiterhin `/api/people/` und
+`/api/people/<id>/`. Lernende werden mit `kind=learner`, `name`, einer
+einrichtungsweit eindeutigen `code`-Kennung und `groups: [<id>, ...]` angelegt.
+Die neue Oberfläche vergibt bei leerer Kennung eine zufällig erzeugte Kennung;
+die API benötigt weiterhin `code`. Mehrere Gruppen sind erlaubt und werden
+gegen die eigene Einrichtung geprüft. Listen unterstützen `kind=learner`,
+`search`, `groups=<id>`, `cohort=<id>` (über die Gruppenzuordnung) und
+`unassigned=1` (ohne Gruppe), jeweils mit bestehender Paginierung.
+Jahrgangsfilter liefern Personen nur einmal, auch bei mehreren passenden
+Gruppen. Personen sind Verwaltungsdaten und erhalten keinen eigenen App-Login;
+Gruppen-QR-Zugänge, Gruppengrößen und Veröffentlichungen bleiben erhalten.
 
 | Schnittstelle | Verhalten |
 | --- | --- |

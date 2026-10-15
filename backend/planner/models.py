@@ -456,6 +456,7 @@ class StudentAccess(models.Model):
     code = models.CharField(max_length=24, unique=True)
     password_hash = models.CharField(max_length=256)
     qr_hash = models.CharField(max_length=64)
+    server = models.URLField(max_length=500, blank=True, default="")
     active = models.BooleanField(default=True)
     created = models.DateTimeField(default=timezone.now)
 

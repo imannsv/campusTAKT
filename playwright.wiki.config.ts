@@ -3,7 +3,12 @@ import { defineConfig } from "@playwright/test";
 const externalURL = process.env.WIKI_TEST_URL;
 export default defineConfig({
   testDir: "./tests",
-  testMatch: ["wiki.spec.ts", "student-app.spec.ts"],
+  testMatch: [
+    "wiki.spec.ts",
+    "student-app.spec.ts",
+    "learners.spec.ts",
+    "dashboard.spec.ts",
+  ],
   workers: 1,
   fullyParallel: false,
   webServer: externalURL

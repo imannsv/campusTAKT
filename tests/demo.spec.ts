@@ -1,6 +1,8 @@
 import "./rooms-toolbar";
+import "./dashboard";
 import "./exams-layout";
 import "./planning-selection";
+import "./learners-demo";
 import { test, expect } from "@playwright/test";
 import { studyFlow } from "./study-flow";
 import { progressionFlow } from "./progression-flow";

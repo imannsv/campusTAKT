@@ -42,12 +42,17 @@ export default function PlanningSelection({
   onSelect,
 }: {
   data: Record<string, Row[]>;
-  page: "schedule" | "exams";
+  page: "schedule" | "exams" | "learners";
   query: string;
   onSelect: (scope: PlanningScope) => void;
 }) {
   const [collapsed, setCollapsed] = useState<Set<string>>(new Set());
-  const title = page === "schedule" ? "Stundenplanung" : "Prüfungen";
+  const title =
+    page === "schedule"
+      ? "Stundenplanung"
+      : page === "exams"
+        ? "Prüfungen"
+        : "Schüler & Studierende";
   const Icon = page === "schedule" ? CalendarDays : GraduationCap;
   const search = query.trim().toLocaleLowerCase("de");
   const selectionRef = useRef<HTMLElement>(null);
@@ -129,18 +134,20 @@ export default function PlanningSelection({
       className="planning-selection"
       aria-label={`${title}: Gruppe auswählen`}
     >
-      <header className="selection-heading">
-        <div>
-          <span className="selection-eyebrow">
-            <Icon size={15} aria-hidden="true" /> Planung
-          </span>
-          <h1>{title}</h1>
-          <p>Wähle deinen Jahrgang und deine Gruppe.</p>
-        </div>
-        <button className="button secondary" onClick={() => onSelect({})}>
-          Gesamtübersicht öffnen <ArrowRight size={15} aria-hidden="true" />
-        </button>
-      </header>
+      {page !== "learners" && (
+        <header className="selection-heading">
+          <div>
+            <span className="selection-eyebrow">
+              <Icon size={15} aria-hidden="true" /> Planung
+            </span>
+            <h1>{title}</h1>
+            <p>Wähle deinen Jahrgang und deine Gruppe.</p>
+          </div>
+          <button className="button secondary" onClick={() => onSelect({})}>
+            Gesamtübersicht öffnen <ArrowRight size={15} aria-hidden="true" />
+          </button>
+        </header>
+      )}
       {years.length === 0 && (
         <div className="selection-empty" role="status">
           <Users size={28} aria-hidden="true" />
@@ -248,12 +255,14 @@ export default function PlanningSelection({
                                   <Users size={13} aria-hidden="true" />{" "}
                                   <span
                                     title={
-                                      group.size
+                                      page !== "learners" && group.size
                                         ? `${group.size} Personen`
                                         : undefined
                                     }
                                   >
-                                    {group.size || "Gruppe"}
+                                    {page === "learners"
+                                      ? "Personen öffnen"
+                                      : group.size || "Gruppe"}
                                   </span>{" "}
                                   <ArrowRight size={15} aria-hidden="true" />
                                 </span>

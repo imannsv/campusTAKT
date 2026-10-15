@@ -1,5 +1,5 @@
 import { FormEvent, useCallback, useEffect, useState } from "react";
-import { Plus, Smartphone, Download } from "lucide-react";
+import { Plus, Smartphone, Download, QrCode } from "lucide-react";
 import { api, DEMO_MODE, Row } from "./api";
 import { Modal } from "./components";
 import "./student-app.css";
@@ -17,6 +17,7 @@ export default function StudentAppAdmin({
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
   const [created, setCreated] = useState<Row | null>(null);
+  const [existing, setExisting] = useState<Row | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const reload = useCallback(async () => {
@@ -41,12 +42,28 @@ export default function StudentAppAdmin({
       setDialog(null);
   }, [busy, created, scope, title, body]);
   function open(next: "access" | "notice") {
+    setExisting(null);
     setScope("");
     setTitle("");
     setBody("");
     setCreated(null);
     setError("");
     setDialog(next);
+  }
+  async function showAccess(row: Row) {
+    open("access");
+    setExisting(row);
+    setScope(row.group ? `group:${row.group}` : `cohort:${row.cohort}`);
+    setServer(row.server || window.location.origin);
+    if (!row.server) return;
+    setBusy(true);
+    try {
+      setCreated(await api(`student-app/accesses/${row.id}/credentials/`));
+    } catch (e: any) {
+      setError(e.message);
+    } finally {
+      setBusy(false);
+    }
   }
   function selection() {
     if (!scope) return {};
@@ -60,10 +77,16 @@ export default function StudentAppAdmin({
     try {
       if (dialog === "access") {
         setCreated(
-          await api("student-app/accesses/", "POST", {
-            ...selection(),
-            server,
-          }),
+          await api(
+            existing
+              ? `student-app/accesses/${existing.id}/credentials/`
+              : "student-app/accesses/",
+            "POST",
+            {
+              ...(!existing ? selection() : {}),
+              server,
+            },
+          ),
         );
       } else {
         await api("student-app/notices/", "POST", {
@@ -167,18 +190,27 @@ export default function StudentAppAdmin({
                 {row.active ? "Aktiv" : "Gesperrt"}
               </p>
             </div>
-            <button
-              className="button secondary"
-              disabled={!row.active || busy}
-              onClick={() =>
-                revoke(
-                  `student-app/accesses/${row.id}/disable/`,
-                  "Zugang sperren und alle verbundenen Geräte abmelden?",
-                )
-              }
-            >
-              Sperren
-            </button>
+            <div className="student-admin-row-actions">
+              <button
+                className="button secondary"
+                disabled={!row.active || busy}
+                onClick={() => showAccess(row)}
+              >
+                <QrCode size={16} /> Zugang anzeigen
+              </button>
+              <button
+                className="button secondary"
+                disabled={!row.active || busy}
+                onClick={() =>
+                  revoke(
+                    `student-app/accesses/${row.id}/disable/`,
+                    "Zugang sperren und alle verbundenen Geräte abmelden?",
+                  )
+                }
+              >
+                Sperren
+              </button>
+            </div>
           </div>
         ))}
       </section>
@@ -226,9 +258,11 @@ export default function StudentAppAdmin({
           title={
             created
               ? "Zugang bereitstellen"
-              : dialog === "access"
-                ? "Gruppenzugang erstellen"
-                : "Mitteilung veröffentlichen"
+              : existing
+                ? "Zugang anzeigen"
+                : dialog === "access"
+                  ? "Gruppenzugang erstellen"
+                  : "Mitteilung veröffentlichen"
           }
           onClose={close}
           busy={busy}
@@ -236,8 +270,9 @@ export default function StudentAppAdmin({
           {created ? (
             <div className="student-app-form">
               <p>
-                Passwort und QR-Code werden nur jetzt angezeigt. Gib sie
-                ausschließlich an die zugehörige Gruppe weiter.
+                Diesen QR-Code kannst du später über „Zugang anzeigen“ erneut
+                öffnen und speichern. Gib ihn ausschließlich an die zugehörige
+                Gruppe weiter.
               </p>
               <img
                 className="student-access-qr"
@@ -248,14 +283,18 @@ export default function StudentAppAdmin({
                 <dt>Gruppe / Jahrgang</dt>
                 <dd>{created.scope}</dd>
                 <dt>Serveradresse</dt>
-                <dd>{server}</dd>
+                <dd>{created.server}</dd>
                 <dt>Zugangscode</dt>
                 <dd>
                   <code>{created.code}</code>
                 </dd>
                 <dt>Passwort</dt>
                 <dd>
-                  <code>{created.password}</code>
+                  {created.password ? (
+                    <code>{created.password}</code>
+                  ) : (
+                    "Wird nur bei der Erstellung angezeigt. Nutze zur Anmeldung den QR-Code."
+                  )}
                 </dd>
               </dl>
               <div className="student-app-actions">
@@ -272,7 +311,7 @@ export default function StudentAppAdmin({
                   onClick={() =>
                     navigator.clipboard
                       .writeText(
-                        `CampusZeit · ${created.scope}\nServer: ${server}\nZugangscode: ${created.code}\nPasswort: ${created.password}`,
+                        `CampusZeit · ${created.scope}\nServer: ${created.server}\nZugangscode: ${created.code}${created.password ? `\nPasswort: ${created.password}` : ""}`,
                       )
                       .catch(() =>
                         setError(
@@ -281,7 +320,9 @@ export default function StudentAppAdmin({
                       )
                   }
                 >
-                  Zugangsdaten kopieren
+                  {created.password
+                    ? "Zugangsdaten kopieren"
+                    : "Zugangscode kopieren"}
                 </button>
                 <button className="button primary" onClick={close}>
                   Fertig
@@ -293,6 +334,7 @@ export default function StudentAppAdmin({
               <label>
                 Zielgruppe
                 <select
+                  disabled={!!existing || busy}
                   required={dialog === "access"}
                   value={scope}
                   onChange={(e) => setScope(e.target.value)}
@@ -302,6 +344,13 @@ export default function StudentAppAdmin({
               </label>
               {dialog === "access" ? (
                 <>
+                  {existing && (
+                    <p>
+                      Ergänze einmalig die erreichbare Serveradresse für diesen
+                      bestehenden Zugang. Passwort und angemeldete Geräte
+                      bleiben erhalten.
+                    </p>
+                  )}
                   <label>
                     Serveradresse
                     <input
@@ -353,7 +402,9 @@ export default function StudentAppAdmin({
                   {busy
                     ? "Wird gespeichert …"
                     : dialog === "access"
-                      ? "Zugang erstellen"
+                      ? existing
+                        ? "QR-Code anzeigen"
+                        : "Zugang erstellen"
                       : "Veröffentlichen"}
                 </button>
               </div>

@@ -195,6 +195,12 @@ class ResourceViewSet(viewsets.ModelViewSet):
         ]:
             if query.get(field) and hasattr(model, field):
                 qs = qs.filter(**{field: query[field]})
+        if model is m.Person:
+            if query.get("cohort"):
+                cohort = serializers.IntegerField(min_value=1).run_validation(query["cohort"])
+                qs = qs.filter(groups__cohort_id=cohort).distinct()
+            if query.get("unassigned") == "1":
+                qs = qs.filter(groups__isnull=True)
         if model is m.Exam and (query.get("groups") or query.get("cohort")):
             field = "groups" if query.get("groups") else "cohort"
             value = serializers.IntegerField(min_value=1).run_validation(query[field])
