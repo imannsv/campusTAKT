@@ -12,6 +12,20 @@ public func scheduleSwipeStep(horizontal: Double, vertical: Double) -> Int {
   guard abs(horizontal) >= 60, abs(horizontal) > abs(vertical) * 1.5 else { return 0 }
   return horizontal < 0 ? 1 : -1
 }
+public enum StudentScheduleView: Int, CaseIterable, Sendable {
+  case day = 1
+  case twoDays = 2
+  case threeDays = 3
+  case week = 7
+  public var title: String {
+    switch self {
+    case .day: return "Tag"
+    case .twoDays: return "2 Tage"
+    case .threeDays: return "3 Tage"
+    case .week: return "Woche"
+    }
+  }
+}
 public struct ScheduleWeek {
   public let days: [Date]
   public let placements: [[ScheduledEvent]]
@@ -21,11 +35,17 @@ public struct ScheduleWeek {
     [startMinute] + Array(stride(from: (startMinute / 60 + 1) * 60, to: endMinute, by: 60))
   }
 
-  public init(events: [StudentEvent], date: Date, calendar: Calendar) {
-    let monday = calendar.dateInterval(of: .weekOfYear, for: date)!.start
-    var weekDays = (0..<6).map { calendar.date(byAdding: .day, value: $0, to: monday)! }
+  public init(
+    events: [StudentEvent], date: Date, calendar: Calendar,
+    view: StudentScheduleView = .week
+  ) {
+    let first =
+      view == .week
+      ? calendar.dateInterval(of: .weekOfYear, for: date)!.start : calendar.startOfDay(for: date)
+    let count = view == .week ? 6 : view.rawValue
+    var weekDays = (0..<count).map { calendar.date(byAdding: .day, value: $0, to: first)! }
     var weekPlacements = weekDays.map { schedulePlacements(events, day: $0, calendar: calendar) }
-    if weekPlacements[5].isEmpty {
+    if view == .week && weekPlacements[5].isEmpty {
       weekDays.removeLast()
       weekPlacements.removeLast()
     }

@@ -3,18 +3,19 @@
   import UIKit
   import StudentCore
 
-  private let campusBlue = Color(red: 33 / 255, green: 75 / 255, blue: 118 / 255)
-  private let campusCanvas = Color(red: 242 / 255, green: 243 / 255, blue: 246 / 255)
-  private let campusInk = Color(red: 31 / 255, green: 47 / 255, blue: 61 / 255)
-
   struct ContentView: View {
     @ObservedObject var store: StudentStore
     @ObservedObject var permissions: StudentPermissions
     @Environment(\.scenePhase) private var scenePhase
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @AppStorage("campuszeit.appearance") private var appearance = CampusAppearance.system.rawValue
+    @AppStorage("campuszeit.news.dismissed") private var dismissedRelease = ""
+    @AppStorage("campuszeit.schedule.view") private var scheduleViewValue = StudentScheduleView.week
+      .rawValue
     @State private var tab = 0
     @State private var noticeSearch = ""
     @State private var appeared = false
+    @State private var motto = studentMotto()
     @State private var selectedEvent: StudentEvent?
     @State private var daySummary: ScheduleDaySummary?
     @State private var calendarOpen = false
@@ -38,14 +39,19 @@
       .opacity(appeared ? 1 : 0)
       .offset(y: appeared || reduceMotion ? 0 : 10)
       .onAppear {
+        store.scheduleView = scheduleView
         if reduceMotion {
           appeared = true
         } else {
           withAnimation(.easeOut(duration: 0.35)) { appeared = true }
         }
       }
+      .onChange(of: scheduleViewValue) { _, _ in
+        store.scheduleView = scheduleView
+        Task { await store.refresh() }
+      }
       .tint(campusBlue)
-      .preferredColorScheme(.light)
+      .preferredColorScheme((CampusAppearance(rawValue: appearance) ?? .system).colorScheme)
       .environment(\.locale, Locale(identifier: "de_DE"))
       .environment(\.calendar, store.calendar)
       .environment(\.timeZone, store.calendar.timeZone)
@@ -76,7 +82,7 @@
         NavigationStack {
           List {
             if summary.events.isEmpty {
-              Text("Keine Veranstaltungen an diesem Tag").foregroundStyle(.secondary)
+              Text("Keine Veranstaltungen an diesem Tag").foregroundStyle(campusMuted)
             }
             ForEach(summary.events) { event in
               NavigationLink {
@@ -125,14 +131,19 @@
       }
       .onChange(of: store.selectedDate) { previous, next in
         store.selectSavedWeek()
+        let missingDays = ScheduleWeek(
+          events: scheduleRows, date: next, calendar: store.calendar, view: scheduleView
+        ).days.contains { store.archive?.feed(for: $0) == nil }
         if store.calendar.dateInterval(of: .weekOfYear, for: previous)?.start
           != store.calendar.dateInterval(of: .weekOfYear, for: next)?.start
+          || missingDays
         {
           Task { await store.refresh() }
         }
       }
       .onChange(of: scenePhase) { _, next in
         if next == .active {
+          motto = studentMotto(after: motto)
           Task {
             store.restoreCredentialIfNeeded()
             await permissions.refreshStatus()
@@ -145,7 +156,8 @@
     }
     @ViewBuilder private var status: some View {
       if let error = store.error {
-        Label(error, systemImage: "exclamationmark.circle").foregroundStyle(.red).font(.callout)
+        Label(error, systemImage: "exclamationmark.circle").foregroundStyle(campusRed).font(
+          .callout)
       }
     }
     @ViewBuilder private var header: some View {
@@ -157,10 +169,9 @@
           "\(store.connectionUnavailable ? "Offline" : "Geladener Stand") · "
             + displayDate(savedAt, template: "dd.MM., HH:mm", zone: store.calendar.timeZone),
           systemImage: store.connectionUnavailable ? "wifi.slash" : "arrow.down.circle"
-        ).font(.footnote).foregroundStyle(campusBlue)
-          .frame(maxWidth: .infinity, alignment: .leading).padding(.horizontal, 20).padding(
-            .vertical, 8
-          )
+        ).font(.footnote.weight(.medium)).foregroundStyle(campusMuted)
+          .frame(maxWidth: .infinity, alignment: .leading).padding(12)
+          .campusCard(radius: 16).padding(.horizontal, 20).padding(.vertical, 8)
           .accessibilityHint(
             "Letzter geladener Stand. Neue Änderungen werden erst mit Verbindung sichtbar.")
       }
@@ -173,7 +184,8 @@
         tab = 4
       } label: {
         VStack(spacing: 2) {
-          Text(store.credential?.login.institution ?? "").font(.caption).foregroundStyle(.secondary)
+          Text(store.credential?.login.institution ?? "").font(.caption).foregroundStyle(
+            campusMuted)
           HStack(spacing: 6) {
             Text(store.credential?.login.scope ?? "").font(.subheadline.weight(.semibold))
               .foregroundStyle(campusInk)
@@ -186,35 +198,69 @@
       if let url = Bundle.module.url(forResource: "Mark", withExtension: "png"),
         let mark = UIImage(contentsOfFile: url.path)
       {
-        Image(uiImage: mark).resizable().scaledToFit().frame(width: 52, height: 52)
+        // The source is RGB with a white backing; mask only the near-white background.
+        let transparent = mark.cgImage?.copy(maskingColorComponents: [250, 255, 250, 255, 250, 255])
+          .map { UIImage(cgImage: $0, scale: mark.scale, orientation: mark.imageOrientation) }
+        Image(uiImage: transparent ?? mark).resizable().scaledToFit().frame(width: 42, height: 42)
           .frame(width: 44, height: 44).clipped().accessibilityLabel("CampusZeit")
       }
     }
     private var dateCaption: String {
       let calendar = store.calendar
       let week = ScheduleWeek(
-        events: store.feed?.rows ?? [], date: store.selectedDate,
-        calendar: calendar)
+        events: scheduleRows, date: store.selectedDate,
+        calendar: calendar, view: scheduleView)
       let monday = week.days.first!
       let lastDay = week.days.last!
+      if week.days.count == 1 {
+        return displayDate(monday, template: "dd. MMM", zone: calendar.timeZone)
+      }
       let sameMonth = calendar.isDate(monday, equalTo: lastDay, toGranularity: .month)
       return displayDate(monday, template: sameMonth ? "dd." : "dd. MMM", zone: calendar.timeZone)
         + "–" + displayDate(lastDay, template: "dd. MMM", zone: calendar.timeZone)
     }
     private func moveWeek(_ step: Int) {
       store.selectedDate = store.calendar.date(
-        byAdding: .day, value: step * 7, to: store.selectedDate)!
+        byAdding: .day, value: step * scheduleView.rawValue, to: store.selectedDate)!
+    }
+    private var scheduleView: StudentScheduleView {
+      StudentScheduleView(rawValue: scheduleViewValue) ?? .week
+    }
+    private var scheduleRows: [StudentEvent] {
+      store.archive?.events(
+        from: store.calendar.dateInterval(of: .weekOfYear, for: store.selectedDate)!.start)
+        ?? store.feed?.rows ?? []
     }
     private var weekMenu: some View {
       Menu {
         Section(dateCaption) {
-          Button("Vorherige Woche", systemImage: "chevron.left") { moveWeek(-1) }
-          Button("Nächste Woche", systemImage: "chevron.right") { moveWeek(1) }
-          Button("Diese Woche", systemImage: "calendar") {
+          Button(scheduleView == .week ? "Vorherige Woche" : "Zurück", systemImage: "chevron.left")
+          { moveWeek(-1) }
+          Button(scheduleView == .week ? "Nächste Woche" : "Weiter", systemImage: "chevron.right") {
+            moveWeek(1)
+          }
+          Button(scheduleView == .week ? "Diese Woche" : "Heute", systemImage: "calendar") {
             store.selectedDate = Date()
             Task { await store.refresh() }
           }
           Button("Datum auswählen", systemImage: "calendar.badge.clock") { calendarOpen = true }
+        }
+        Picker("Ansicht", selection: $scheduleViewValue) {
+          ForEach(StudentScheduleView.allCases, id: \.rawValue) { view in
+            let symbol =
+              switch view {
+              case .day: "rectangle"
+              case .twoDays: "rectangle.split.2x1"
+              case .threeDays: "rectangle.split.3x1"
+              case .week: "tablecells"
+              }
+            Label(view.title, systemImage: symbol).tag(view.rawValue)
+          }
+        }
+        NavigationLink {
+          StudentHelpView()
+        } label: {
+          Label("Hilfe", systemImage: "questionmark.circle")
         }
         Button("Aktualisieren", systemImage: "arrow.clockwise") { Task { await store.refresh() } }
       } label: {
@@ -225,9 +271,17 @@
       NavigationStack {
         VStack(spacing: 0) {
           header
-          if let feed = store.feed {
+          if store.feed != nil {
+            let window = ScheduleWeek(
+              events: scheduleRows, date: store.selectedDate,
+              calendar: store.calendar, view: scheduleView)
+            if window.days.contains(where: { store.archive?.feed(for: $0) == nil }) {
+              Text("Einzelne Tage sind noch nicht gespeichert.")
+                .font(.footnote).foregroundStyle(campusMuted).padding(8)
+            }
             StudentWeekGrid(
-              events: feed.rows, date: store.selectedDate, calendar: store.calendar,
+              events: scheduleRows, date: store.selectedDate, calendar: store.calendar,
+              view: scheduleView,
               selectedEvent: $selectedEvent, openCalendar: { calendarOpen = true },
               openDay: { date, rows in
                 daySummary = ScheduleDaySummary(date: date, events: rows)
@@ -250,8 +304,8 @@
             ).padding(24)
             Spacer()
           }
-        }.background(campusCanvas).navigationTitle("").navigationBarTitleDisplayMode(.inline)
-          .toolbarBackground(.white, for: .navigationBar, .tabBar)
+        }.background { CampusBackdrop() }.navigationTitle("").navigationBarTitleDisplayMode(.inline)
+          .toolbarBackground(.ultraThinMaterial, for: .navigationBar, .tabBar)
           .toolbarBackground(.visible, for: .navigationBar, .tabBar)
           .toolbar {
             ToolbarItem(placement: .topBarLeading) { brandSymbol }
@@ -287,7 +341,7 @@
                     }.buttonStyle(.plain)
                   }
                   Text("Veröffentlichte Prüfungen im heruntergeladenen Zeitraum.")
-                    .font(.footnote).foregroundStyle(.secondary).padding(.top, 4)
+                    .font(.footnote).foregroundStyle(campusMuted).padding(.top, 4)
                 } else if !store.busy {
                   StudentEmptyState(
                     title: "Noch keine Prüfungen geladen", symbol: "graduationcap",
@@ -296,9 +350,9 @@
               }.padding(20).frame(maxWidth: .infinity, alignment: .leading)
             }.refreshable { await store.refresh() }
           }
-        }.background(campusCanvas)
+        }.background { CampusBackdrop() }
           .navigationTitle("").navigationBarTitleDisplayMode(.inline)
-          .toolbarBackground(.white, for: .navigationBar, .tabBar)
+          .toolbarBackground(.ultraThinMaterial, for: .navigationBar, .tabBar)
           .toolbarBackground(.visible, for: .navigationBar, .tabBar)
           .toolbar {
             ToolbarItem(placement: .topBarLeading) { brandSymbol }
@@ -312,7 +366,7 @@
         VStack(spacing: 0) {
           header
           HStack(spacing: 10) {
-            Image(systemName: "magnifyingglass").foregroundStyle(.secondary)
+            Image(systemName: "magnifyingglass").foregroundStyle(campusMuted)
             TextField("Mitteilungen suchen", text: $noticeSearch)
               .textInputAutocapitalization(.never).autocorrectionDisabled()
             if !noticeSearch.isEmpty {
@@ -323,7 +377,7 @@
               }
               .accessibilityLabel("Suche löschen")
             }
-          }.padding(12).background(.white, in: RoundedRectangle(cornerRadius: 10)).padding(16)
+          }.padding(14).campusCard(radius: 18).padding(16)
           List {
             if let feed = store.metadata {
               let matches = feed.notices.filter {
@@ -338,7 +392,7 @@
                     ? "Neue Hinweise deiner Verwaltung erscheinen hier."
                     : "Versuche einen anderen Suchbegriff."
                 )
-                .listRowBackground(Color.white)
+                .listRowBackground(campusSurface)
               }
               ForEach(matches) { notice in
                 NavigationLink {
@@ -349,12 +403,13 @@
                         displayDate(
                           notice.created, template: "dd. MMMM yyyy, HH:mm",
                           zone: store.calendar.timeZone)
-                      ).font(.subheadline).foregroundStyle(.secondary)
+                      ).font(.subheadline).foregroundStyle(campusMuted)
                       Divider()
                       Text(notice.body).font(.body).textSelection(.enabled)
                     }.frame(maxWidth: .infinity, alignment: .leading).padding(24)
-                  }.background(.white).navigationTitle("Mitteilung").navigationBarTitleDisplayMode(
-                    .inline)
+                  }.background(campusSurface).navigationTitle("Mitteilung")
+                    .navigationBarTitleDisplayMode(
+                      .inline)
                 } label: {
                   HStack(alignment: .top, spacing: 12) {
                     Image(systemName: "envelope").foregroundStyle(campusBlue)
@@ -368,27 +423,28 @@
                           displayDate(
                             notice.created, template: "dd. MMM", zone: store.calendar.timeZone)
                         )
-                        .font(.caption).foregroundStyle(.secondary)
+                        .font(.caption).foregroundStyle(campusMuted)
                       }
-                      Text(notice.body).font(.subheadline).foregroundStyle(.secondary).lineLimit(2)
+                      Text(notice.body).font(.subheadline).foregroundStyle(campusMuted).lineLimit(2)
                     }
                   }.foregroundStyle(campusInk).padding(.vertical, 10)
-                }.listRowBackground(Color.white)
+                }.listRowBackground(campusSurface)
               }
             } else if !store.busy {
               StudentEmptyState(
                 title: "Noch keine Mitteilungen geladen", symbol: "envelope",
                 detail: "Ziehe die Ansicht nach unten zum Aktualisieren."
-              ).listRowBackground(Color.white)
+              ).listRowBackground(campusSurface)
             }
           }.listStyle(.plain).scrollContentBackground(.hidden)
             .refreshable { await store.refresh() }
-        }.background(campusCanvas).navigationTitle("Mitteilungen").navigationBarTitleDisplayMode(
-          .inline
-        )
-        .toolbarBackground(.white, for: .navigationBar, .tabBar)
-        .toolbarBackground(.visible, for: .navigationBar, .tabBar)
-        .toolbar { ToolbarItem(placement: .topBarLeading) { brandSymbol } }
+        }.background { CampusBackdrop() }.navigationTitle("Mitteilungen")
+          .navigationBarTitleDisplayMode(
+            .inline
+          )
+          .toolbarBackground(.ultraThinMaterial, for: .navigationBar, .tabBar)
+          .toolbarBackground(.visible, for: .navigationBar, .tabBar)
+          .toolbar { ToolbarItem(placement: .topBarLeading) { brandSymbol } }
       }
     }
     private var home: some View {
@@ -402,17 +458,18 @@
             let next = rows.first { !$0.cancelled && $0.end > clock.date }
             ScrollView {
               VStack(alignment: .leading, spacing: 24) {
-                Text(store.credential?.login.institution ?? "CampusZeit")
-                  .font(.title.weight(.semibold)).foregroundStyle(campusInk)
+                homeGreeting(at: clock.date)
+                  .padding(.horizontal, -20).padding(.top, -20)
                 Button {
                   daySummary = ScheduleDaySummary(date: today, events: rows)
                 } label: {
-                  HStack(alignment: .top, spacing: 20) {
+                  HStack(alignment: .center, spacing: 16) {
                     VStack(alignment: .leading, spacing: 6) {
                       Text(displayDate(today, template: "EEEE", zone: store.calendar.timeZone))
                         .font(.subheadline)
                       Text(displayDate(today, template: "dd", zone: store.calendar.timeZone))
-                        .font(.largeTitle.weight(.semibold).monospacedDigit()).foregroundStyle(
+                        .font(.system(size: 48, weight: .bold, design: .rounded).monospacedDigit())
+                        .foregroundStyle(
                           campusBlue)
                       Text(displayDate(today, template: "MMMM", zone: store.calendar.timeZone))
                         .font(.subheadline)
@@ -444,34 +501,113 @@
                             ? "Ziehe die Ansicht zum Aktualisieren nach unten."
                             : "\(rows.count) veröffentlichte Termine heute"
                         ).font(.subheadline)
-                          .foregroundStyle(.secondary)
+                          .foregroundStyle(campusMuted)
                       }
                     }.frame(maxWidth: .infinity, alignment: .leading).padding(16)
-                      .background(campusBlue.opacity(0.07), in: RoundedRectangle(cornerRadius: 10))
+                      .background(campusIce.opacity(0.65), in: RoundedRectangle(cornerRadius: 16))
                   }.padding(20).foregroundStyle(campusInk)
-                    .background(.white, in: RoundedRectangle(cornerRadius: 18))
-                    .shadow(color: .black.opacity(0.04), radius: 8, y: 4)
+                    .campusCard(radius: 26)
                 }.buttonStyle(.plain).disabled(!store.todaySaved).accessibilityHint(
                   "Alle heutigen Termine öffnen")
-                VStack(spacing: 0) {
+                if dismissedRelease != StudentRelease.id {
+                  HStack(alignment: .top, spacing: 12) {
+                    Image(systemName: "info.circle").foregroundStyle(campusBlue)
+                      .font(.title3).accessibilityHidden(true)
+                    NavigationLink {
+                      StudentNewsView()
+                    } label: {
+                      VStack(alignment: .leading, spacing: 6) {
+                        Text("Was gibt es Neues").font(.headline).foregroundStyle(campusInk)
+                        Text(StudentRelease.summary).font(.subheadline).foregroundStyle(campusMuted)
+                      }.frame(maxWidth: .infinity, alignment: .leading)
+                    }.buttonStyle(.plain)
+                    Button {
+                      dismissedRelease = StudentRelease.id
+                    } label: {
+                      Image(systemName: "xmark.circle.fill").foregroundStyle(campusMuted)
+                        .frame(width: 44, height: 44)
+                    }.buttonStyle(.plain).accessibilityLabel("Neuerungen ausblenden")
+                  }.padding(16).campusCard()
+                }
+                VStack(alignment: .leading, spacing: 12) {
+                  Text("Schnellzugriff").font(.title3.weight(.semibold))
+                    .foregroundStyle(campusInk).padding(.bottom, 2)
                   homeLink("Mein Stundenplan", symbol: "calendar", destination: 1)
-                  Divider().padding(.leading, 52)
                   homeLink("Meine Prüfungen", symbol: "graduationcap", destination: 2)
-                  Divider().padding(.leading, 52)
                   homeLink("Mitteilungen", symbol: "envelope", destination: 3)
-                }.background(.white, in: RoundedRectangle(cornerRadius: 14))
+                }
                 Text("\(store.credential?.login.scope ?? "") · Gruppenzugang")
-                  .font(.subheadline).foregroundStyle(.secondary)
+                  .font(.subheadline).foregroundStyle(campusMuted)
               }.padding(20).frame(maxWidth: .infinity, alignment: .leading)
             }.refreshable { await store.refresh() }
           }
-        }.background(campusCanvas).navigationTitle("").navigationBarTitleDisplayMode(.inline)
-          .toolbarBackground(.white, for: .navigationBar, .tabBar)
+        }.background { CampusBackdrop() }.navigationTitle("").navigationBarTitleDisplayMode(.inline)
+          .toolbarBackground(.ultraThinMaterial, for: .navigationBar, .tabBar)
           .toolbarBackground(.visible, for: .navigationBar, .tabBar)
           .toolbar {
             ToolbarItem(placement: .topBarLeading) { brandSymbol }
             ToolbarItem(placement: .principal) { groupIdentity }
+            ToolbarItem(placement: .topBarTrailing) { inboxButton }
           }
+      }
+    }
+    private var inboxButton: some View {
+      Button {
+        tab = 3
+      } label: {
+        Image(systemName: "bell").font(.title3).frame(width: 44, height: 44)
+      }.accessibilityLabel("Mitteilungen öffnen")
+    }
+    private func homeGreeting(at date: Date) -> some View {
+      VStack(alignment: .leading, spacing: 10) {
+        Text(store.credential?.login.institution ?? "CampusZeit")
+          .font(.caption.weight(.semibold)).tracking(1).foregroundStyle(campusMuted)
+        Text(greeting(at: date))
+          .font(.largeTitle.weight(.bold)).tracking(-0.8).foregroundStyle(campusInk)
+        Text(motto).font(.subheadline).foregroundStyle(campusInk)
+          .frame(maxWidth: 250, alignment: .leading)
+          .fixedSize(horizontal: false, vertical: true)
+      }.frame(maxWidth: 250, alignment: .leading)
+        .padding(.horizontal, 20)
+        .frame(maxWidth: .infinity, minHeight: 180, alignment: .leading)
+        .padding(.vertical, 16)
+        .background {
+          if store.credential?.login.institution == "Leibniz-FH",
+            let url = Bundle.module.url(forResource: "CampusLeibnizFH", withExtension: "jpg"),
+            let photo = UIImage(contentsOfFile: url.path)
+          {
+            GeometryReader { size in
+              Image(uiImage: photo).resizable().scaledToFill()
+                .frame(width: size.size.width, height: size.size.height)
+                .clipped()
+                .mask {
+                  LinearGradient(
+                    stops: [
+                      .init(color: .clear, location: 0),
+                      .init(color: .white.opacity(0.03), location: 0.35),
+                      .init(color: .white.opacity(0.14), location: 0.6),
+                      .init(color: .white.opacity(0.45), location: 0.82),
+                      .init(color: .white.opacity(0.85), location: 1),
+                    ], startPoint: .leading, endPoint: .trailing)
+                }
+                .mask {
+                  LinearGradient(
+                    stops: [
+                      .init(color: .clear, location: 0),
+                      .init(color: .white, location: 0.18),
+                      .init(color: .white, location: 0.55),
+                      .init(color: .clear, location: 1),
+                    ], startPoint: .top, endPoint: .bottom)
+                }
+            }.accessibilityHidden(true)
+          }
+        }
+    }
+    private func greeting(at date: Date) -> String {
+      switch store.calendar.component(.hour, from: date) {
+      case 5..<11: return "Guten Morgen"
+      case 11..<18: return "Guten Tag"
+      default: return "Guten Abend"
       }
     }
     private func homeLink(_ title: String, symbol: String, destination: Int) -> some View {
@@ -480,12 +616,24 @@
         tab = destination
       } label: {
         HStack(spacing: 16) {
-          Image(systemName: symbol).font(.title3).foregroundStyle(campusBlue).frame(width: 24)
-          Text(title).font(.body).foregroundStyle(campusInk)
+          let accent = destination == 2 ? campusViolet : destination == 3 ? campusMint : campusBlue
+          Image(systemName: symbol).font(.title2.weight(.medium)).foregroundStyle(accent)
+            .frame(width: 50, height: 50)
+            .background(accent.opacity(0.12), in: RoundedRectangle(cornerRadius: 16))
+          VStack(alignment: .leading, spacing: 5) {
+            Text(title).font(.body.weight(.semibold)).foregroundStyle(campusInk)
+            Text(
+              destination == 1
+                ? "Vorlesungen und Räume"
+                : destination == 2
+                  ? "Termine und Prüfungsdetails" : "Hinweise deiner Verwaltung"
+            )
+            .font(.caption).foregroundStyle(campusMuted)
+          }
           Spacer()
-          Image(systemName: "chevron.right").foregroundStyle(.secondary).font(.subheadline)
-        }.padding(18).frame(maxWidth: .infinity, minHeight: 52, alignment: .leading)
-          .contentShape(Rectangle())
+          Image(systemName: "chevron.right").foregroundStyle(campusMuted).font(.subheadline)
+        }.padding(16).frame(maxWidth: .infinity, minHeight: 76, alignment: .leading)
+          .contentShape(Rectangle()).campusCard(radius: 22)
       }.buttonStyle(.plain)
     }
     private var permissionSetup: some View {
@@ -500,7 +648,7 @@
             Text(
               "Du entscheidest, welche Freigaben du erteilst. Die Anmeldung mit Zugangsdaten funktioniert auch ohne Kamera."
             )
-            .font(.subheadline).foregroundStyle(.secondary)
+            .font(.subheadline).foregroundStyle(campusMuted)
           }
           Section {
             Label("Kamera", systemImage: "qrcode.viewfinder").font(.headline)
@@ -518,7 +666,7 @@
           }
           Section {
             if let error = permissions.error {
-              Text(error).foregroundStyle(.red).font(.subheadline)
+              Text(error).foregroundStyle(campusRed).font(.subheadline)
             }
             Button {
               Task { await permissions.request() }
@@ -534,7 +682,7 @@
             Button("Später einrichten") { permissions.finishSetup() }
               .frame(minHeight: 44).disabled(permissions.requesting)
           }
-        }.scrollContentBackground(.hidden).background(campusCanvas)
+        }.scrollContentBackground(.hidden).background { CampusBackdrop() }
           .navigationTitle("Ersteinrichtung").navigationBarTitleDisplayMode(.inline)
       }.interactiveDismissDisabled().tint(campusBlue)
     }
@@ -550,10 +698,19 @@
                 VStack(alignment: .leading, spacing: 6) {
                   Text(store.credential?.login.scope ?? "").font(.title3.weight(.semibold))
                   Text(store.credential?.login.institution ?? "").font(.subheadline)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(campusMuted)
                   Text("Gemeinsamer Gruppenzugang").font(.caption).foregroundStyle(campusBlue)
                 }
               }.padding(.vertical, 8)
+            }
+            Section("Darstellung") {
+              Picker("Erscheinungsbild", selection: $appearance) {
+                ForEach(CampusAppearance.allCases) { mode in
+                  Text(mode.title).tag(mode.rawValue)
+                }
+              }.pickerStyle(.segmented)
+              Text("System folgt der hellen oder dunklen Darstellung deines iPhones.")
+                .font(.footnote).foregroundStyle(campusMuted)
             }
             Section("Verbindung") {
               LabeledContent("Server", value: store.credential?.server.host ?? "")
@@ -592,7 +749,7 @@
                   Text(
                     "\(archive.weeks.count) gespeicherte Wochen. Bereits geladene frühere Wochen können ebenfalls enthalten sein; dazwischen sind Lücken möglich."
                   )
-                  .font(.footnote).foregroundStyle(.secondary)
+                  .font(.footnote).foregroundStyle(campusMuted)
                 }
               } else {
                 Text("Noch kein Offline-Stand vorhanden.")
@@ -605,9 +762,9 @@
               Text(
                 "Stundenplan, Prüfungen und Mitteilungen werden automatisch geladen und gespeichert – beim Öffnen, während der Nutzung und wenn iOS einen Hintergrundabruf erlaubt. Du musst nichts herunterladen. Gespeichert werden die aktuelle und die nächsten 17 Wochen. Neue Änderungen benötigen Verbindung zum Server."
               )
-              .font(.footnote).foregroundStyle(.secondary)
+              .font(.footnote).foregroundStyle(campusMuted)
               if let error = store.cacheError {
-                Text(error).font(.subheadline).foregroundStyle(.red)
+                Text(error).font(.subheadline).foregroundStyle(campusRed)
               }
             }
             Section("App-Freigaben") {
@@ -621,19 +778,22 @@
                 "iPhone-Einstellungen öffnen",
                 destination: URL(string: UIApplication.openSettingsURLString)!)
               if let error = permissions.error {
-                Text(error).font(.subheadline).foregroundStyle(.red)
+                Text(error).font(.subheadline).foregroundStyle(campusRed)
               }
               Text(
                 "Neue Mitteilungen werden automatisch abgerufen. Hintergrundabrufe sind von iOS abhängig; sofortige Push-Zustellung ist noch nicht verfügbar."
               )
-              .font(.footnote).foregroundStyle(.secondary)
+              .font(.footnote).foregroundStyle(campusMuted)
             }
             Section("Über CampusZeit") {
+              NavigationLink("Was gibt es Neues", destination: StudentNewsView())
+              NavigationLink("Hilfe", destination: StudentHelpView())
+              NavigationLink("Open-Source-Lizenzen", destination: StudentLicensesView())
               Text("Stundenplan, Prüfungen und Mitteilungen deiner Verwaltung.")
               Text(
                 "Dieser Zugang wird gemeinsam von der Gruppe genutzt. Persönliche Noten und Teilnehmerlisten werden nicht angezeigt."
               )
-              .font(.subheadline).foregroundStyle(.secondary)
+              .font(.subheadline).foregroundStyle(campusMuted)
             }
             Section {
               Button(
@@ -644,12 +804,13 @@
               }
             }
           }.scrollContentBackground(.hidden)
-        }.background(campusCanvas).navigationTitle("Mein Zugang").navigationBarTitleDisplayMode(
-          .large
-        )
-        .toolbarBackground(.white, for: .navigationBar, .tabBar)
-        .toolbarBackground(.visible, for: .navigationBar, .tabBar)
-        .toolbar { ToolbarItem(placement: .topBarLeading) { brandSymbol } }
+        }.background { CampusBackdrop() }.navigationTitle("Mein Zugang")
+          .navigationBarTitleDisplayMode(
+            .large
+          )
+          .toolbarBackground(.ultraThinMaterial, for: .navigationBar, .tabBar)
+          .toolbarBackground(.visible, for: .navigationBar, .tabBar)
+          .toolbar { ToolbarItem(placement: .topBarLeading) { brandSymbol } }
       }
     }
     private var accountButton: some View {
@@ -670,10 +831,9 @@
 
   private func eventTint(_ event: StudentEvent) -> Color {
     let colors = [
-      campusBlue, Color(red: 0.18, green: 0.43, blue: 0.33),
-      Color(red: 0.53, green: 0.36, blue: 0.12),
+      campusBlue, campusMint, campusViolet,
     ]
-    if event.cancelled { return Color(red: 0.7, green: 0.13, blue: 0.17) }
+    if event.cancelled { return campusRed }
     if event.kind == "exam" { return colors[2] }
     return colors[event.name.utf8.reduce(0) { ($0 + Int($1)) % colors.count }]
   }
@@ -682,6 +842,7 @@
     let events: [StudentEvent]
     let date: Date
     let calendar: Calendar
+    let view: StudentScheduleView
     @Binding var selectedEvent: StudentEvent?
     let openCalendar: () -> Void
     let openDay: (Date, [StudentEvent]) -> Void
@@ -691,7 +852,7 @@
 
     var body: some View {
       TimelineView(.periodic(from: .now, by: 60)) { clock in
-        let week = ScheduleWeek(events: events, date: date, calendar: calendar)
+        let week = ScheduleWeek(events: events, date: date, calendar: calendar, view: view)
         GeometryReader { viewport in
           let axis = min(axisWidth, 72)
           let column = max(1, (viewport.size.width - 16 - axis) / CGFloat(week.days.count))
@@ -713,7 +874,7 @@
                   Text(displayDate(week.days[0], template: "MMM", zone: calendar.timeZone))
                     .font(.subheadline.weight(.semibold))
                 }.frame(width: axis, height: headerHeight, alignment: .leading)
-                  .foregroundStyle(.secondary)
+                  .foregroundStyle(campusMuted)
               }.buttonStyle(.plain).accessibilityLabel("Kalender öffnen")
                 .accessibilityValue(
                   displayDate(week.days[0], template: "MMMM yyyy", zone: calendar.timeZone))
@@ -733,21 +894,21 @@
                     )
                     .background(
                       calendar.isDate(day, inSameDayAs: clock.date)
-                        ? campusBlue.opacity(0.08) : Color.white)
+                        ? campusBlue.opacity(0.08) : campusSurface)
                 }.buttonStyle(.plain)
                   .accessibilityLabel(
                     displayDate(day, template: "EEEE, dd. MMMM", zone: calendar.timeZone)
                   )
                   .accessibilityHint("Alle Termine dieses Tages anzeigen")
               }
-            }.frame(height: headerHeight).background(.white)
+            }.frame(height: headerHeight).background(campusSurface)
             HStack(spacing: 0) {
               ZStack(alignment: .topLeading) {
                 ForEach(week.timeTicks, id: \.self) { minute in
                   Text(String(format: "%02d:%02d", minute / 60, minute % 60)).font(
                     .caption.monospacedDigit()
                   )
-                  .foregroundStyle(.secondary).lineLimit(1)
+                  .foregroundStyle(campusMuted).lineLimit(1)
                   .opacity(
                     (minute != week.startMinute && CGFloat(minute - week.startMinute) * scale < 20)
                       || nowMinutes.map {
@@ -770,9 +931,9 @@
                   HStack(spacing: 0) {
                     Text(displayDate(clock.date, template: "HH:mm", zone: calendar.timeZone))
                       .font(.caption.weight(.semibold).monospacedDigit())
-                      .foregroundStyle(Color(red: 0.7, green: 0.13, blue: 0.17))
+                      .foregroundStyle(campusRed)
                       .frame(width: axis, alignment: .leading).background(campusCanvas)
-                    Rectangle().fill(.red).frame(height: 1)
+                    Rectangle().fill(campusRed).frame(height: 1)
                   }.frame(height: 20).offset(y: CGFloat(minutes) * scale - 10)
                     .allowsHitTesting(false)
                     .accessibilityLabel(
@@ -794,13 +955,13 @@
                   Text(
                     "Jetzt \(displayDate(clock.date, template: "HH:mm", zone: calendar.timeZone)) · \(minutes < 0 ? "vor Beginn" : "nach Ende")"
                   )
-                  .font(.caption).foregroundStyle(Color(red: 0.7, green: 0.13, blue: 0.17))
+                  .font(.caption).foregroundStyle(campusRed)
                 }
                 Label("Termine & Details", systemImage: "list.bullet").font(
                   .footnote.weight(.medium))
               }.frame(maxWidth: .infinity, minHeight: footerHeight)
             }
-          }.padding(.horizontal, 8).padding(.bottom, 8).background(campusCanvas)
+          }.padding(.horizontal, 8).padding(.bottom, 8).background { CampusBackdrop() }
         }
       }
     }
@@ -815,7 +976,7 @@
       return ZStack(alignment: .topLeading) {
         Rectangle().fill(campusBlue.opacity(calendar.isDate(day, inSameDayAs: now) ? 0.025 : 0))
         ForEach(week.timeTicks, id: \.self) { minute in
-          Rectangle().fill(campusBlue.opacity(0.10)).frame(width: width, height: 0.5)
+          Rectangle().fill(campusMuted.opacity(0.16)).frame(width: width, height: 0.5)
             .offset(y: CGFloat(minute - week.startMinute) * scale)
         }
         ForEach(rows) { item in
@@ -824,11 +985,15 @@
           let tint = eventTint(item.event)
           VStack(alignment: .leading, spacing: 3) {
             if blockHeight >= 20 {
-              Text(scheduleShortTitle(item.event.name)).font(.subheadline.weight(.semibold))
-                .strikethrough(item.event.cancelled).lineLimit(1)
+              Text(lane >= 140 ? item.event.name : scheduleShortTitle(item.event.name)).font(
+                .subheadline.weight(.semibold)
+              )
+              .strikethrough(item.event.cancelled).lineLimit(1)
               if blockHeight >= 48, let teacher = item.event.teacherNames?.first {
-                Text(scheduleShortTitle(teacher)).font(.caption).lineLimit(1)
-                  .strikethrough(item.event.cancelled)
+                Text(lane >= 140 ? teacher : scheduleShortTitle(teacher)).font(.caption).lineLimit(
+                  1
+                )
+                .strikethrough(item.event.cancelled)
               }
               if blockHeight >= 68, let room = item.event.roomNames?.first {
                 Text(room.replacingOccurrences(of: " ", with: "")).font(.caption).lineLimit(1)
@@ -844,7 +1009,7 @@
           }.padding(.leading, 6).padding(.trailing, 3).padding(.vertical, blockHeight >= 40 ? 6 : 1)
             .frame(width: max(1, lane - 4), height: max(1, blockHeight - 4), alignment: .topLeading)
             .foregroundStyle(item.event.cancelled ? tint : campusInk)
-            .background(item.event.cancelled ? tint.opacity(0.05) : Color.white)
+            .background(item.event.cancelled ? tint.opacity(0.10) : campusSurface)
             .overlay(alignment: .leading) { Rectangle().fill(tint.opacity(0.7)).frame(width: 3) }
             .clipShape(RoundedRectangle(cornerRadius: 4))
             .overlay(
@@ -852,14 +1017,14 @@
                 item.event.cancelled ? tint : campusInk.opacity(0.12),
                 lineWidth: item.event.cancelled ? 1.5 : 0.5)
             )
-            .shadow(color: .black.opacity(0.10), radius: 2, y: 1)
+            .shadow(color: campusInk.opacity(0.08), radius: 3, y: 2)
             .offset(
               x: CGFloat(item.lane) * lane + 1,
               y: CGFloat(item.start.timeIntervalSince(start) / 60) * scale + 1)
         }
       }.frame(width: width, height: height).clipped()
         .overlay(alignment: .trailing) {
-          Rectangle().fill(campusBlue.opacity(0.10)).frame(width: 0.5)
+          Rectangle().fill(campusMuted.opacity(0.16)).frame(width: 0.5)
         }
         .contentShape(Rectangle())
         .onTapGesture(count: 1, coordinateSpace: .local) { point in
@@ -890,8 +1055,8 @@
     @ScaledMetric(relativeTo: .body) private var badgeWidth: CGFloat = 52
     @ScaledMetric(relativeTo: .body) private var badgeHeight: CGFloat = 64
     var body: some View {
-      let ink = event.cancelled ? Color(red: 0.7, green: 0.13, blue: 0.17) : campusInk
-      let accent = event.cancelled ? Color(red: 0.7, green: 0.13, blue: 0.17) : campusBlue
+      let ink = event.cancelled ? campusRed : campusInk
+      let accent = event.cancelled ? campusRed : campusBlue
       return VStack(alignment: .leading, spacing: 16) {
         HStack {
           Text(prominent ? "Nächste Prüfung" : "Prüfungstermin")
@@ -904,7 +1069,7 @@
                 ? "Beendet"
                 : examCountdown(to: event.start, now: now, calendar: calendar)
           )
-          .font(.subheadline.weight(.semibold)).foregroundStyle(accent)
+          .font(.subheadline.weight(.semibold)).foregroundStyle(ink)
           .padding(.horizontal, 10).padding(.vertical, 5)
           .background(accent.opacity(0.08), in: Capsule())
         }
@@ -914,7 +1079,7 @@
               .font(.title2.weight(.semibold).monospacedDigit())
             Text(displayDate(event.start, template: "MMM", zone: calendar.timeZone).uppercased())
               .font(.caption.weight(.semibold))
-          }.frame(width: badgeWidth, height: badgeHeight).foregroundStyle(accent)
+          }.frame(width: badgeWidth, height: badgeHeight).foregroundStyle(ink)
             .background(
               accent.opacity(prominent ? 0.12 : 0.06),
               in: RoundedRectangle(cornerRadius: 10))
@@ -922,7 +1087,7 @@
             Text(event.name).font(prominent ? .title3.weight(.semibold) : .body.weight(.semibold))
               .strikethrough(event.cancelled).fixedSize(horizontal: false, vertical: true)
             Text(displayDate(event.start, template: "EEEE, yyyy", zone: calendar.timeZone))
-              .font(.subheadline).foregroundStyle(.secondary)
+              .font(.subheadline).foregroundStyle(campusMuted)
           }.frame(maxWidth: .infinity, alignment: .leading)
         }
         VStack(alignment: .leading, spacing: 8) {
@@ -934,13 +1099,12 @@
           }
         }.font(.subheadline).foregroundStyle(ink.opacity(0.85))
       }.padding(18).frame(maxWidth: .infinity, alignment: .leading)
-        .foregroundStyle(ink).background(.white, in: RoundedRectangle(cornerRadius: 14))
+        .foregroundStyle(ink).campusCard(radius: 24)
         .overlay(alignment: .leading) {
           if prominent {
             RoundedRectangle(cornerRadius: 2).fill(accent).frame(width: 3).padding(.vertical, 18)
           }
         }
-        .shadow(color: .black.opacity(0.04), radius: 6, y: 3)
         .accessibilityElement(children: .combine)
     }
   }
@@ -955,23 +1119,23 @@
           Text(displayDate(event.start, template: "HH:mm", zone: zone))
             .font(.subheadline.weight(.semibold).monospacedDigit())
           Text(displayDate(event.end, template: "HH:mm", zone: zone))
-            .font(.caption.monospacedDigit()).foregroundStyle(.secondary)
+            .font(.caption.monospacedDigit()).foregroundStyle(campusMuted)
         }.frame(width: timeWidth, alignment: .leading)
-          .foregroundStyle(event.cancelled ? Color(red: 0.7, green: 0.13, blue: 0.17) : campusBlue)
+          .foregroundStyle(event.cancelled ? campusRed : campusBlue)
         VStack(alignment: .leading, spacing: 8) {
           Text(event.name).font(.body.weight(.medium)).strikethrough(event.cancelled)
             .fixedSize(horizontal: false, vertical: true)
           if event.cancelled {
             Label("Abgesagt", systemImage: "xmark.circle").font(.subheadline.weight(.medium))
           } else if event.kind == "exam" {
-            Text("Prüfung").font(.caption.weight(.medium)).foregroundStyle(.secondary)
+            Text("Prüfung").font(.caption.weight(.medium)).foregroundStyle(campusMuted)
           }
           if let rooms = event.roomNames, !rooms.isEmpty {
             Label(rooms.joined(separator: ", "), systemImage: "door.left.hand.open")
-              .font(.footnote).foregroundStyle(.secondary)
+              .font(.footnote).foregroundStyle(campusMuted)
           }
         }
-      }.foregroundStyle(event.cancelled ? Color(red: 0.7, green: 0.13, blue: 0.17) : campusInk)
+      }.foregroundStyle(event.cancelled ? campusRed : campusInk)
         .padding(.vertical, 16)
     }
   }
@@ -985,7 +1149,7 @@
           .accessibilityHidden(true)
         VStack(alignment: .leading, spacing: 6) {
           Text(title).font(.body.weight(.medium)).foregroundStyle(campusInk)
-          Text(detail).font(.subheadline).foregroundStyle(.secondary)
+          Text(detail).font(.subheadline).foregroundStyle(campusMuted)
         }
       }.padding(.vertical, 24)
     }
@@ -1011,7 +1175,7 @@
             ForEach(groups, id: \.self) { Text($0) }
           }
         }
-      }.scrollContentBackground(.hidden).background(campusCanvas)
+      }.scrollContentBackground(.hidden).background { CampusBackdrop() }
         .navigationTitle("Termindetails").navigationBarTitleDisplayMode(.inline)
     }
   }

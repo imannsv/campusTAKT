@@ -12,7 +12,7 @@
     @State private var scanned: LoginQR?
     @State private var confirmQR = false
     @State private var manualLogin = false
-    private let blue = Color(red: 33 / 255, green: 75 / 255, blue: 118 / 255)
+    private let blue = campusBlue
     var body: some View {
       GeometryReader { viewport in
         ScrollView {
@@ -20,8 +20,11 @@
             if let url = Bundle.module.url(forResource: "Logo", withExtension: "png"),
               let logo = UIImage(contentsOfFile: url.path)
             {
-              // Load the copied PNG directly and bound its empty right margin.
-              Image(uiImage: logo).resizable().scaledToFit().frame(width: 720, height: 46)
+              // The original RGB logo has a pale blue backing; remove it only for display.
+              let transparent = logo.cgImage?.copy(
+                maskingColorComponents: [233, 235, 240, 242, 246, 248])
+                .map { UIImage(cgImage: $0, scale: logo.scale, orientation: logo.imageOrientation) }
+              Image(uiImage: transparent ?? logo).resizable().scaledToFit().frame(width: 720, height: 46)
                 .frame(width: 230, height: 46, alignment: .leading).clipped()
                 .accessibilityLabel("CampusZeit")
             } else {
@@ -31,7 +34,7 @@
               VStack(alignment: .leading, spacing: 12) {
                 Text("Anmelden").font(.title.weight(.semibold)).foregroundStyle(blue)
                 Text("Den QR-Code oder die Zugangsdaten erhältst du von deiner Verwaltung.")
-                  .font(.body).foregroundStyle(.secondary)
+                  .font(.body).foregroundStyle(campusMuted)
               }
               VStack(spacing: 12) {
                 Button {
@@ -42,7 +45,8 @@
                     Label(store.busy ? "Anmelden …" : "QR-Code scannen", systemImage: "qrcode")
                   }.font(.headline).frame(maxWidth: .infinity, minHeight: 52)
                     .foregroundStyle(.white).background(
-                      blue, in: RoundedRectangle(cornerRadius: 12))
+                      Color(red: 20 / 255, green: 104 / 255, blue: 243 / 255),
+                      in: RoundedRectangle(cornerRadius: 12))
                 }.buttonStyle(.plain).disabled(store.busy)
                 Button {
                   manualLogin = true
@@ -54,19 +58,17 @@
                 }.buttonStyle(.plain).disabled(store.busy)
               }
               errorMessage
-            }.padding(24).background(.white, in: RoundedRectangle(cornerRadius: 20))
-              .overlay(RoundedRectangle(cornerRadius: 20).stroke(blue.opacity(0.1)))
+            }.padding(24).campusCard(radius: 26)
           }.frame(maxWidth: 420).padding(24)
             .frame(maxWidth: .infinity, minHeight: viewport.size.height)
         }.scrollBounceBehavior(.basedOnSize)
-          .background(Color(red: 234 / 255, green: 241 / 255, blue: 247 / 255).ignoresSafeArea())
-          .preferredColorScheme(.light)
+          .background { CampusBackdrop() }
           .sheet(isPresented: $manualLogin) {
             NavigationStack {
               Form {
                 Section {
                   Text("Die Zugangsdaten erhältst du von deiner Verwaltung.")
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(campusMuted)
                 }
                 Section("Einrichtung") {
                   TextField("Serveradresse (https://…)", text: $server).keyboardType(.URL)
@@ -87,7 +89,9 @@
                       if store.credential != nil { manualLogin = false }
                     }
                   }.font(.headline).frame(maxWidth: .infinity, minHeight: 44)
-                    .foregroundStyle(.white).listRowBackground(blue)
+                    .foregroundStyle(.white).listRowBackground(
+                      Color(red: 20 / 255, green: 104 / 255, blue: 243 / 255)
+                    )
                     .disabled(store.busy || server.isEmpty || code.isEmpty || password.isEmpty)
                   if store.busy { ProgressView("Anmelden …") }
                   errorMessage
@@ -130,7 +134,7 @@
     @ViewBuilder private var errorMessage: some View {
       if let error = store.error {
         Label(error, systemImage: "exclamationmark.circle")
-          .font(.callout).foregroundStyle(.red).accessibilityAddTraits(.updatesFrequently)
+          .font(.callout).foregroundStyle(campusRed).accessibilityAddTraits(.updatesFrequently)
       }
     }
   }

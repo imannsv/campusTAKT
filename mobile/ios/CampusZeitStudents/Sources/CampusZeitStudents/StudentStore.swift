@@ -16,6 +16,7 @@
     @Published var busy = false
     @Published var error: String?
     @Published var selectedDate = Date()
+    var scheduleView = StudentScheduleView.week
     var examRows: [StudentEvent] { upcomingRows.filter { $0.kind == "exam" } }
     var metadata: StudentFeed? { archive?.metadata }
     var calendar: Calendar { institutionCalendar(credential?.login.timezone ?? "Europe/Berlin") }
@@ -144,17 +145,26 @@
         return false
       }
       let requestedDate = selectedDate
+      let requestedView = scheduleView
       busy = true
       defer {
         busy = false
-        if !background, !Task.isCancelled, selectedDate != requestedDate, credential != nil {
+        if !background, !Task.isCancelled,
+          selectedDate != requestedDate || scheduleView != requestedView, credential != nil
+        {
           Task { await refresh() }
         }
       }
       selectSavedWeek()
       do {
         let start = calendar.dateInterval(of: .weekOfYear, for: requestedDate)!.start
-        let end = calendar.date(byAdding: .day, value: 7, to: start)!
+        let selectedEnd = calendar.date(
+          byAdding: .day, value: requestedView.rawValue, to: calendar.startOfDay(for: requestedDate)
+        )!
+        let end =
+          requestedView == .week
+          ? calendar.date(byAdding: .day, value: 7, to: start)!
+          : calendar.dateInterval(of: .weekOfYear, for: selectedEnd.addingTimeInterval(-1))!.end
         let today = calendar.startOfDay(for: Date())
         let downloadStart = calendar.dateInterval(of: .weekOfYear, for: today)!.start
         let horizon = calendar.date(byAdding: .day, value: 126, to: downloadStart)!
@@ -202,7 +212,8 @@
           connectionUnavailable = true
           self.error =
             archive == nil
-            ? "Der Server ist momentan nicht erreichbar. Die App versucht es automatisch erneut." : nil
+            ? "Der Server ist momentan nicht erreichbar. Die App versucht es automatisch erneut."
+            : nil
         }
       }
       return false

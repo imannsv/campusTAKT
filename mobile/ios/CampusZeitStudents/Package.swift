@@ -17,7 +17,10 @@ let package = Package(
         .target(
             name: "CampusZeitStudents",
             dependencies: ["StudentCore"],
-            resources: [.copy("Resources/Logo.png"), .copy("Resources/Mark.png")],
+            resources: [
+                .copy("Resources/Logo.png"), .copy("Resources/Mark.png"),
+                .copy("Resources/CampusLeibnizFH.jpg"),
+            ],
             swiftSettings: [.swiftLanguageMode(.v5)]
         ),
         .target(name: "StudentCore"),
