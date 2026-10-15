@@ -49,6 +49,7 @@
           if saved.login.expires > Date() {
             try DeviceKeychain.save(saved)
             credential = saved
+            permissions.configurePush(saved)
           } else {
             try DeviceKeychain.clear()
           }
@@ -119,6 +120,9 @@
         connectionUnavailable = false
         selectedDate = Date()
         credential = saved
+        permissions.configurePush(saved)
+        await permissions.refreshStatus()
+        await permissions.syncPush()
       } catch is CancellationError {} catch { self.error = error.localizedDescription }
     }
 
@@ -186,6 +190,7 @@
         error = nil
         persist(snapshot)
         await permissions.receive(upcoming.notices, credential: saved)
+        await permissions.syncPush()
         try Task.checkCancellation()
         guard credential?.login.token == saved.login.token else { return false }
         if !background, start < downloadStart || end > horizon {

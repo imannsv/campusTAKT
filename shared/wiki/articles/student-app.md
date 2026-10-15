@@ -42,7 +42,7 @@ Hintergrundabrufe haben keine feste Uhrzeit und können durch iOS-Einstellungen 
 
 ## Mitteilung veröffentlichen oder zurückziehen
 
-Klicke in der Verwaltung auf **Mitteilung erstellen**. Wähle eine Zielgruppe oder **Alle Studierenden**, erfasse Titel und Text und klicke **Veröffentlichen**. Mit **Zurückziehen** entfernst du die Mitteilung aus der App. Neu abgerufene Mitteilungen können nach erteilter Freigabe lokale Banner auslösen, auch nach einem von iOS erlaubten Hintergrundabruf. Sofortige Push-Zustellung ist noch nicht eingerichtet.
+Klicke in der Verwaltung auf **Mitteilung erstellen**. Wähle eine Zielgruppe oder **Alle Studierenden**, erfasse Titel und Text und klicke **Veröffentlichen**. Mit **Zurückziehen** entfernst du die Mitteilung aus der App. Mit freigeschaltetem Apple-Push-Dienst können neue Mitteilungen auch bei geschlossener App eintreffen. Ohne diese zusätzliche Einrichtung erscheinen nach erteilter Freigabe lokale Banner beim automatischen Abruf. Im App-Profil steht der Push-Status.
 
 ## Automatische Ausfallmitteilungen
 
@@ -52,7 +52,7 @@ Die Nachricht enthält den veröffentlichten Titel, Datum, Uhrzeit und Raum. Unv
 
 Die Mitteilung erscheint auch in der Verwaltung unter **Studierenden-App** und kann dort zurückgezogen werden. Wird die Absage am Termin aufgehoben und erfolgreich gespeichert, zieht CampusZeit die zugehörige Ausfallmitteilung zurück. Eine spätere erneute Absage erzeugt eine neue Nachricht. Für unveröffentlichte Termine oder Termine ohne zugeordnete Gruppe wird keine Nachricht verschickt; alte Absagen werden beim Update nicht nachträglich gemeldet.
 
-Die App übernimmt die neue Mitteilung beim nächsten erfolgreichen automatischen Abruf. Ohne Verbindung bleibt ihr gespeicherter Stand erhalten. Ein sofortiger Push bei geschlossener App ist weiterhin nicht eingerichtet; Hintergrundabrufe werden von iOS bestimmt.
+Die App übernimmt den vollständigen Inhalt beim nächsten erfolgreichen automatischen Abruf. Ohne Verbindung bleibt ihr gespeicherter Stand erhalten. Ein eingerichteter Push-Dienst verschickt für neue Ausfälle automatisch einen allgemeinen Hinweis an die passende Gruppe. Ohne Apple-Freischaltung bleiben Hintergrundabrufe von iOS abhängig.
 
 ## Zugang sperren oder ersetzen
 

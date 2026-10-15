@@ -38,6 +38,12 @@ services:
       REDIS_URL: redis://redis:6379/0
       LOCAL_WORKER: "0"
       MAP_STYLE_URL: ${MAP_STYLE_URL:-https://tiles.openfreemap.org/styles/liberty}
+      APNS_ENABLED: ${APNS_ENABLED:-0}
+      APNS_TEAM_ID: ${APNS_TEAM_ID:-}
+      APNS_KEY_ID: ${APNS_KEY_ID:-}
+      APNS_KEY_PATH: /run/secrets/apns-key
+      APNS_TOPIC: ${APNS_TOPIC:-}
+      APNS_ENVIRONMENT: ${APNS_ENVIRONMENT:-sandbox}
     volumes:
       - media:/app/backend/media
     depends_on:
@@ -47,7 +53,8 @@ services:
         condition: service_healthy
   worker:
     build: .
-    command: ["celery", "-A", "config", "worker", "--loglevel=info", "--concurrency=2"]
+    command:
+      ["celery", "-A", "config", "worker", "--loglevel=info", "--concurrency=2"]
     environment: *environment
     volumes:
       - media:/app/backend/media
@@ -56,11 +63,28 @@ services:
         condition: service_healthy
       redis:
         condition: service_healthy
+  push:
+    profiles: ["push"]
+    build: .
+    command: ["python", "manage.py", "student_push", "--watch"]
+    environment: *environment
+    restart: unless-stopped
+    volumes:
+      - type: bind
+        source: ${APNS_KEY_PATH:-./.playwright/not-configured.p8}
+        target: /run/secrets/apns-key
+        read_only: true
+        bind:
+          create_host_path: false
+    depends_on:
+      db:
+        condition: service_healthy
   backup:
     image: postgres:17-alpine
     environment:
       PGPASSWORD: ${POSTGRES_PASSWORD}
-    command: ["sh", "-c", "while true; do sh /scripts/backup.sh; sleep 86400; done"]
+    command:
+      ["sh", "-c", "while true; do sh /scripts/backup.sh; sleep 86400; done"]
     volumes:
       - ./scripts:/scripts:ro
       - media:/media:ro

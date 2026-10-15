@@ -186,3 +186,7 @@ mit `service_note` gesetzt. Anmeldung, Mandantenzuordnung und beim POST
 CSRF sind erforderlich. Fremde Plan-/Jahrgangs-IDs ergeben 404; ungültige
 Eingaben 400, mehr als zwölf Chat-Anfragen pro Minute 429. Kein Modelldownload
 und keine Datenmutation durch diese Endpunkte. [Grenzen und Konfiguration](CAMPUS_AI.md).
+
+## Push-Mitteilungen der App
+
+`POST /api/student-app/v1/push/` benötigt die Bearer-Gerätesitzung und `{token, environment, topic}`. Es liefert die aktuelle Gerätebindung `{binding}`; Zielgruppe und Apple-Adresse werden serverseitig bestimmt. Bei deaktiviertem/unvollständigem Push-Dienst folgt 503, bei abweichender Signierungsumgebung/Bundle-ID 400. `DELETE` entfernt die eigene Push-Bindung. Kein Verwaltungszugriff; Antworten sind nicht cachebar. [Einrichtung und Zustellgrenzen](STUDENT_PUSH.md).

@@ -5,6 +5,7 @@ from collections import defaultdict
 from . import models as m
 from .overview import enrich_snapshot
 from .services import local
+from .student_push import queue_notice_push
 
 
 def notify_cancellations(institution, sessions):
@@ -43,7 +44,7 @@ def notify_cancellations(institution, sessions):
                 "Der Termin bleibt im Stundenplan als entfallen sichtbar."
             )
             for group in groups:
-                m.StudentNotice.objects.get_or_create(
+                notice, created = m.StudentNotice.objects.get_or_create(
                     institution=institution,
                     cancellation_session_id=row["id"],
                     group=group,
@@ -53,3 +54,5 @@ def notify_cancellations(institution, sessions):
                         "body": body,
                     },
                 )
+                if created:
+                    queue_notice_push(notice)

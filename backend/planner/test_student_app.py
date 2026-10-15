@@ -478,3 +478,20 @@ class StudentAppTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data["view"]["label"], "Studierenden-App")
         self.assertNotIn(self.credentials["password"], str(response.data))
+
+    @override_settings(APNS_ENABLED=True)
+    def test_manual_notices_and_cancellations_both_queue_remote_delivery(self):
+        self.sign_in()
+        m.StudentDeviceSession.objects.update(push_token="ab" * 32)
+        response = self.manager.post(
+            "/api/student-app/notices/",
+            {"group": self.group.id, "title": "Test", "body": "Test"},
+            format="json",
+        )
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(m.StudentPushDelivery.objects.count(), 1)
+        session = self.published_session()
+        self.assertEqual(self.cancel(session).status_code, 200)
+        self.assertEqual(m.StudentPushDelivery.objects.count(), 2)
+        self.assertEqual(self.cancel(session).status_code, 200)
+        self.assertEqual(m.StudentPushDelivery.objects.count(), 2)

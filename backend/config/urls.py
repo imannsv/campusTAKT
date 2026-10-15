@@ -21,6 +21,7 @@ urlpatterns = [
     path("api/student-app/v1/login/", student_app.login),
     path("api/student-app/v1/logout/", student_app.logout),
     path("api/student-app/v1/feed/", student_app.feed),
+    path("api/student-app/v1/push/", student_app.push_registration),
     path("api/student-app/accesses/", student_app.accesses),
     path("api/student-app/accesses/<uuid:pk>/credentials/", student_app.access_credentials),
     path("api/student-app/accesses/<uuid:pk>/disable/", student_app.disable_access),

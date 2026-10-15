@@ -480,6 +480,8 @@ class StudentDeviceSession(models.Model):
     access = models.ForeignKey(StudentAccess, on_delete=models.CASCADE)
     token_hash = models.CharField(max_length=64, unique=True)
     expires = models.DateTimeField()
+    push_token = models.CharField(max_length=512, null=True, blank=True, unique=True)
+    push_binding = models.UUIDField(default=uuid.uuid4, editable=False)
 
 
 class StudentNotice(models.Model):
@@ -505,4 +507,20 @@ class StudentNotice(models.Model):
                 condition=models.Q(active=True, cancellation_session__isnull=False),
                 name="student_notice_active_cancellation_unique",
             ),
+        ]
+
+
+class StudentPushDelivery(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    notice = models.ForeignKey(StudentNotice, on_delete=models.CASCADE)
+    device = models.ForeignKey(StudentDeviceSession, on_delete=models.CASCADE)
+    binding = models.UUIDField()
+    attempts = models.PositiveSmallIntegerField(default=0)
+    next_attempt = models.DateTimeField(default=timezone.now, db_index=True)
+    finished = models.DateTimeField(null=True, blank=True)
+    result = models.CharField(max_length=80, blank=True)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=["notice", "device"], name="student_push_once")
         ]

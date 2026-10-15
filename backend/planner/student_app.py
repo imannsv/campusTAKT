@@ -5,15 +5,17 @@ import io
 import ipaddress
 import json
 import secrets
+import uuid
 from datetime import date, datetime, time, timedelta
 from urllib.parse import urlsplit
 from zoneinfo import ZoneInfo
 
 import qrcode
 import qrcode.image.svg
+from django.conf import settings
 from django.contrib.auth.hashers import check_password, make_password
 from django.core import signing
-from django.db import transaction
+from django.db import IntegrityError, transaction
 from django.db.models import Q
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
@@ -34,6 +36,7 @@ from rest_framework.throttling import SimpleRateThrottle
 from . import models as m
 from .overview import enrich_snapshot, matches_scope
 from .services import dt, latest_publications, public_row
+from .student_push import push_configured, queue_notice_push
 from .teacher_availability import overlay_cancellations
 from .views import bump, lock_tenant, tenant
 
@@ -168,6 +171,58 @@ def login(request):
 def logout(request):
     request.auth.delete()
     return Response(status=204)
+
+
+class PushInput(serializers.Serializer):
+    token = serializers.RegexField(r"\A(?:[a-fA-F0-9]{2}){16,256}\Z", max_length=512)
+    environment = serializers.ChoiceField(choices=["sandbox", "production"])
+    topic = serializers.CharField(max_length=255)
+
+
+@never_cache
+@api_view(["POST", "DELETE"])
+@authentication_classes([DeviceAuthentication])
+def push_registration(request):
+    with transaction.atomic():
+        device = get_object_or_404(
+            m.StudentDeviceSession.objects.select_for_update(), pk=request.auth.pk
+        )
+        if request.method == "DELETE":
+            device.push_token = None
+            device.push_binding = uuid.uuid4()
+            device.save(update_fields=["push_token", "push_binding"])
+            return Response(status=204)
+        payload = PushInput(data=request.data)
+        payload.is_valid(raise_exception=True)
+        if not push_configured():
+            return Response(
+                {"detail": "Push ist auf diesem Server noch nicht eingerichtet."},
+                status=503,
+            )
+        values = payload.validated_data
+        if (
+            values["environment"] != settings.APNS_ENVIRONMENT
+            or values["topic"] != settings.APNS_TOPIC
+        ):
+            raise serializers.ValidationError(
+                "App-Signierung und Push-Server passen nicht zusammen."
+            )
+        token = values["token"].lower()
+        # A device belongs to its latest authenticated session, including across institutions.
+        m.StudentDeviceSession.objects.filter(push_token=token).exclude(
+            pk=device.pk
+        ).update(push_token=None, push_binding=uuid.uuid4())
+        if device.push_token != token:
+            device.push_token = token
+            device.push_binding = uuid.uuid4()
+            try:
+                with transaction.atomic():
+                    device.save(update_fields=["push_token", "push_binding"])
+            except IntegrityError:
+                raise serializers.ValidationError(
+                    "Die Geräteanmeldung wurde gleichzeitig geändert. Bitte erneut versuchen."
+                ) from None
+        return Response({"binding": str(device.push_binding)})
 
 
 @api_view(["GET"])
@@ -459,6 +514,7 @@ def notices(request):
         notice = m.StudentNotice.objects.create(
             institution=institution, **payload.validated_data
         )
+        queue_notice_push(notice)
         bump(request, institution, "Studierenden-App: Mitteilung veröffentlicht")
     return Response({"id": notice.id}, status=201)
 

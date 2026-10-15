@@ -58,6 +58,10 @@
       .task {
         if scenePhase == .active { store.restoreCredentialIfNeeded() }
         await permissions.prepare()
+        if permissions.openInbox {
+          tab = 3
+          permissions.openInbox = false
+        }
         scheduleBackgroundRefresh()
       }
       .sheet(isPresented: $permissions.setupOpen) { permissionSetup }
@@ -66,6 +70,7 @@
           tab = 3
           noticeSearch = ""
           permissions.openInbox = false
+          Task { await store.refresh() }
         }
       }
       .sheet(item: $selectedEvent) { event in
@@ -773,6 +778,7 @@
               LabeledContent(
                 "Benachrichtigungen",
                 value: permissions.notificationsGranted ? "Freigegeben" : "Nicht freigegeben")
+              LabeledContent("Push-Zustellung", value: permissions.pushStatus)
               Button("Freigaben einrichten") { permissions.setupOpen = true }
               Link(
                 "iPhone-Einstellungen öffnen",
@@ -781,7 +787,7 @@
                 Text(error).font(.subheadline).foregroundStyle(campusRed)
               }
               Text(
-                "Neue Mitteilungen werden automatisch abgerufen. Hintergrundabrufe sind von iOS abhängig; sofortige Push-Zustellung ist noch nicht verfügbar."
+                "Push-Mitteilungen benötigen die Freigabe auf diesem Gerät und einen eingerichteten Push-Dienst. Sie können auch bei geschlossener App eintreffen. Auf dem Sperrbildschirm steht nur ein allgemeiner Hinweis; den Inhalt findest du im Posteingang."
               )
               .font(.footnote).foregroundStyle(campusMuted)
             }

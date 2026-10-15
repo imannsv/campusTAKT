@@ -3,6 +3,7 @@
   import CryptoKit
   import SwiftUI
   import UserNotifications
+  import UIKit
   import StudentCore
 
   @MainActor
@@ -13,9 +14,86 @@
     @Published var notificationsGranted = false
     @Published var openInbox = false
     @Published var error: String?
+    @Published private(set) var pushStatus = "Wird eingerichtet"
     private let center = UNUserNotificationCenter.current()
     private var currentScope: String?
     private let setupKey = "campuszeit.permissions.configured"
+    private var pushCredential: DeviceCredential?
+    private var pushBinding: String?
+    private var pushToken: String?
+    private var pushRequested = false
+    private var syncingPush = false
+    private var nextPushAttempt = Date.distantPast
+
+    func configurePush(_ credential: DeviceCredential) {
+      let scope = noticeScope(credential)
+      guard currentScope != scope else { return }
+      currentScope = scope
+      pushCredential = credential
+      pushBinding = UserDefaults.standard.string(forKey: "campuszeit.push.binding." + scope)
+      nextPushAttempt = .distantPast
+      pushStatus = pushBinding == nil ? "Wird eingerichtet" : "Aktiv"
+    }
+
+    private func noticeScope(_ credential: DeviceCredential) -> String {
+      let session = SHA256.hash(data: Data(credential.login.token.utf8))
+        .map { String(format: "%02x", $0) }.joined()
+      return credential.server.absoluteString + "|" + session
+    }
+
+    func registeredForPush(_ token: Data) {
+      if pushToken != studentPushToken(token) { nextPushAttempt = .distantPast }
+      pushToken = studentPushToken(token)
+      Task { await syncPush() }
+    }
+
+    func pushRegistrationFailed() {
+      pushRequested = false
+      nextPushAttempt = Date(timeIntervalSinceNow: 300)
+      pushStatus = "App-Signierung oder Apple-Verbindung noch nicht bereit"
+    }
+
+    func syncPush() async {
+      guard let saved = pushCredential, saved.login.expires > Date(), !syncingPush,
+        Date() >= nextPushAttempt
+      else { return }
+      let scope = noticeScope(saved)
+      let api = StudentAPI(server: saved.server)
+      syncingPush = true
+      defer { syncingPush = false }
+      do {
+        if !notificationsGranted {
+          if pushBinding != nil { try await api.unregisterPush(token: saved.login.token) }
+          guard currentScope == scope else { return }
+          pushBinding = nil
+          UserDefaults.standard.removeObject(forKey: "campuszeit.push.binding." + scope)
+          pushStatus = "Benachrichtigungen nicht freigegeben"
+          return
+        }
+        guard let pushToken else { return }
+        let environment =
+          Bundle.main.object(forInfoDictionaryKey: "CampusZeitPushEnvironment") as? String
+          ?? "sandbox"
+        let result = try await api.registerPush(
+          token: saved.login.token, deviceToken: pushToken,
+          environment: environment, topic: Bundle.main.bundleIdentifier ?? "")
+        guard currentScope == scope, !Task.isCancelled else { return }
+        pushBinding = result.binding.uuidString
+        nextPushAttempt = Date(timeIntervalSinceNow: 300)
+        UserDefaults.standard.set(pushBinding, forKey: "campuszeit.push.binding." + scope)
+        pushStatus = "Aktiv"
+      } catch StudentError.pushUnavailable {
+        guard currentScope == scope else { return }
+        pushBinding = nil
+        UserDefaults.standard.removeObject(forKey: "campuszeit.push.binding." + scope)
+        nextPushAttempt = Date(timeIntervalSinceNow: 300)
+        pushStatus = "Server-Push noch nicht eingerichtet"
+      } catch {
+        guard currentScope == scope else { return }
+        nextPushAttempt = Date(timeIntervalSinceNow: 300)
+        pushStatus = "Push-Verbindung noch nicht bereit; automatischer Neuversuch"
+      }
+    }
 
     func installDelegate() { center.delegate = self }
 
@@ -30,6 +108,10 @@
       let settings = await center.notificationSettings()
       notificationsGranted = [.authorized, .provisional, .ephemeral].contains(
         settings.authorizationStatus)
+      if notificationsGranted, !pushRequested, Date() >= nextPushAttempt, pushCredential != nil {
+        pushRequested = true
+        UIApplication.shared.registerForRemoteNotifications()
+      }
     }
 
     func request() async {
@@ -45,6 +127,7 @@
           _ = try await center.requestAuthorization(options: [.alert, .sound])
         }
         await refreshStatus()
+        await syncPush()
         finishSetup()
       } catch {
         self.error =
@@ -58,6 +141,16 @@
     }
 
     func clearNotifications() {
+      if let currentScope {
+        UserDefaults.standard.removeObject(forKey: "campuszeit.push.binding." + currentScope)
+      }
+      UIApplication.shared.unregisterForRemoteNotifications()
+      pushRequested = false
+      pushCredential = nil
+      pushBinding = nil
+      pushToken = nil
+      pushStatus = "Nicht angemeldet"
+      nextPushAttempt = .distantPast
       currentScope = nil
       openInbox = false
       center.removeAllPendingNotificationRequests()
@@ -65,10 +158,8 @@
     }
 
     func receive(_ notices: [StudentNotice], credential: DeviceCredential) async {
-      let sessionKey = SHA256.hash(data: Data(credential.login.token.utf8))
-        .map { String(format: "%02x", $0) }.joined()
-      let scope = credential.server.absoluteString + "|" + sessionKey
-      currentScope = scope
+      configurePush(credential)
+      let scope = noticeScope(credential)
       let key = "campuszeit.notices.seen." + scope
       let saved = UserDefaults.standard.array(forKey: key) as? [Int]
       var known = Set(saved ?? [])
@@ -79,11 +170,11 @@
       }
       await refreshStatus()
       guard !Task.isCancelled, currentScope == scope else { return }
-      if !notificationsGranted {
+      if !notificationsGranted || pushBinding != nil {
         UserDefaults.standard.set(Array(known.union(notices.map(\.id))), forKey: key)
         return
       }
-      // shortcut: banners depend on a fetch; immediate remote delivery needs APNs.
+      // Keep fetch-based banners for builds/servers without APNs; registered devices use remote alerts.
       for notice in incoming {
         guard !Task.isCancelled, currentScope == scope else { return }
         let content = UNMutableNotificationContent()
@@ -113,15 +204,29 @@
       _ center: UNUserNotificationCenter, willPresent notification: UNNotification,
       withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void
     ) {
-      completionHandler([.banner, .list, .sound])
+      let payload = notification.request.content.userInfo
+      if notification.request.trigger is UNPushNotificationTrigger {
+        Task { @MainActor in
+          completionHandler(
+            matchesStudentPush(payload, binding: self.pushBinding) ? [.banner, .list, .sound] : [])
+        }
+      } else {
+        completionHandler([.banner, .list, .sound])
+      }
     }
 
     nonisolated func userNotificationCenter(
       _ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse,
       withCompletionHandler completionHandler: @escaping () -> Void
     ) {
-      Task { @MainActor in self.openInbox = true }
-      completionHandler()
+      let remote = response.notification.request.trigger is UNPushNotificationTrigger
+      let payload = response.notification.request.content.userInfo
+      Task { @MainActor in
+        if !remote || matchesStudentPush(payload, binding: self.pushBinding) {
+          self.openInbox = true
+        }
+        completionHandler()
+      }
     }
   }
 #endif

@@ -57,7 +57,7 @@
             "Die App speichert automatisch die aktuelle und die nächsten 17 Wochen. Ein Offline-Hinweis nennt den Stand. Wochen, die noch nie geladen wurden, sind ohne Verbindung nicht verfügbar."
           )
           Text(
-            "Mitteilungen kannst du durchsuchen und vollständig öffnen. Benachrichtigungen benötigen die iPhone-Freigabe und einen erfolgreichen Abruf. Sofortige Push-Zustellung bei geschlossener App ist noch nicht eingerichtet."
+            "Mitteilungen kannst du durchsuchen und vollständig öffnen. Mit Benachrichtigungsfreigabe und eingerichtetem Push-Dienst können Hinweise auch bei geschlossener App eintreffen. Im Profil siehst du den Push-Status. Ohne Push-Dienst bleiben Hinweise beim automatischen Abruf verfügbar."
           )
         }.listRowBackground(campusSurface)
         Section("Zugang und Freigaben") {

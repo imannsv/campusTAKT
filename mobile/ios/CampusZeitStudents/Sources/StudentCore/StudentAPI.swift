@@ -5,7 +5,7 @@ import Foundation
 #endif
 
 public enum StudentError: LocalizedError {
-  case invalidServer, invalidQR, expired
+  case invalidServer, invalidQR, expired, pushUnavailable
   case service(String)
   public var errorDescription: String? {
     switch self {
@@ -13,6 +13,7 @@ public enum StudentError: LocalizedError {
       "Bitte eine HTTPS-Serveradresse ohne Pfad eingeben. Für lokale Tests ist HTTP im privaten Netzwerk möglich."
     case .invalidQR: "Dieser QR-Code ist kein gültiger CampusZeit-Gruppenzugang."
     case .expired: "Dein Zugang ist abgelaufen oder gesperrt. Bitte erneut anmelden."
+    case .pushUnavailable: "Push ist auf diesem Server noch nicht eingerichtet."
     case .service(let message): message
     }
   }
@@ -180,6 +181,9 @@ public struct StudentAPI: Sendable {
       throw StudentError.service("Keine Antwort vom Server.")
     }
     if response.statusCode == 401, token != nil { throw StudentError.expired }
+    if path == "push/", method == "POST", response.statusCode == 503 {
+      throw StudentError.pushUnavailable
+    }
     guard (200...299).contains(response.statusCode) else {
       let detail = (try? JSONSerialization.jsonObject(with: data)) as? [String: String]
       throw StudentError.service(
@@ -203,6 +207,18 @@ public struct StudentAPI: Sendable {
   }
   public func logout(token: String) async throws {
     _ = try await request("logout/", method: "POST", token: token)
+  }
+  public func registerPush(token: String, deviceToken: String, environment: String, topic: String)
+    async throws -> StudentPushRegistration
+  {
+    try JSONDecoder().decode(
+      StudentPushRegistration.self,
+      from: await request(
+        "push/", method: "POST",
+        body: ["token": deviceToken, "environment": environment, "topic": topic], token: token))
+  }
+  public func unregisterPush(token: String) async throws {
+    _ = try await request("push/", method: "DELETE", token: token)
   }
   public func feed(token: String, start: Date, end: Date, zone: String) async throws -> StudentFeed
   {

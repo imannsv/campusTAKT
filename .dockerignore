@@ -10,3 +10,5 @@ backend/media
 .vercel
 test-results
 playwright-report
+**/*.p8
+.playwright

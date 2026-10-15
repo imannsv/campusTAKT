@@ -15,6 +15,7 @@
       didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil
     ) -> Bool {
       permissions.installDelegate()
+      _ = store
       let registered = BGTaskScheduler.shared.register(
         forTaskWithIdentifier: Self.refreshID, using: .main
       ) { [weak self] task in
@@ -33,6 +34,19 @@
       }
       if !registered { logger.error("Background refresh registration failed") }
       return true
+    }
+
+    func application(
+      _ application: UIApplication,
+      didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data
+    ) {
+      permissions.registeredForPush(deviceToken)
+    }
+
+    func application(
+      _ application: UIApplication, didFailToRegisterForRemoteNotificationsWithError error: Error
+    ) {
+      permissions.pushRegistrationFailed()
     }
 
     func scheduleRefresh() {
