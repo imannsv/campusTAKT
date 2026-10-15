@@ -25,9 +25,15 @@ public func serverURL(_ value: String) throws -> URL {
     url.user == nil, url.password == nil, url.query == nil, url.fragment == nil,
     url.path.isEmpty || url.path == "/"
   else { throw StudentError.invalidServer }
-  let octets = host.split(separator: ".").compactMap { Int($0) }
+  let labels = host.split(separator: ".", omittingEmptySubsequences: false)
+  let octets = labels.compactMap { label -> Int? in
+    guard let value = Int(label), (0...255).contains(value), String(value) == label else {
+      return nil
+    }
+    return value
+  }
   let privateIP =
-    octets.count == 4 && octets.allSatisfy { (0...255).contains($0) }
+    labels.count == 4 && octets.count == 4
     && (octets[0] == 10 || (octets[0] == 192 && octets[1] == 168)
       || (octets[0] == 172 && (16...31).contains(octets[1])) || octets[0] == 127)
   let local = host == "localhost" || host.hasSuffix(".local") || privateIP

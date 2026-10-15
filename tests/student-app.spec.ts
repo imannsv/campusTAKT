@@ -143,6 +143,84 @@ test("administration provides QR access and notices without exposing stored secr
   ).toBeDisabled();
 });
 
+test("access credentials can be copied or manually selected when clipboard access is unavailable", async ({
+  page,
+}) => {
+  const errors: string[] = [];
+  page.on("pageerror", (error) => errors.push(error.message));
+  await page.goto("/");
+  await page.getByLabel("Passwort", { exact: true }).fill("WikiBuildOnly2026!");
+  await page.getByRole("button", { name: "Anmelden", exact: true }).click();
+  await page
+    .getByRole("navigation", { name: "Arbeitsbereiche" })
+    .getByRole("button", { name: "Studierenden-App", exact: true })
+    .click();
+  await page
+    .getByRole("button", { name: "Zugang erstellen", exact: true })
+    .click();
+  const form = page.getByRole("dialog", { name: "Gruppenzugang erstellen" });
+  const group = await form
+    .locator('optgroup[label="Gruppen"] option')
+    .first()
+    .getAttribute("value");
+  await form.getByLabel("Zielgruppe").selectOption(group!);
+  await form.getByLabel("Serveradresse").fill("http://127.0.0.1:8123");
+  await form
+    .getByRole("button", { name: "Zugang erstellen", exact: true })
+    .click();
+  const provided = page.getByRole("dialog", { name: "Zugang bereitstellen" });
+  const copy = provided.getByRole("button", {
+    name: "Zugangsdaten kopieren",
+    exact: true,
+  });
+  await expect(copy).toBeVisible();
+  await page.evaluate(() =>
+    Object.defineProperty(navigator, "clipboard", {
+      configurable: true,
+      value: undefined,
+    }),
+  );
+  await copy.click();
+  const fallback = provided.getByRole("alert");
+  await expect(fallback).toHaveText(
+    "Kopieren fehlgeschlagen. Bitte die Angaben auswählen und kopieren.",
+  );
+  expect(errors).toEqual([]);
+  await page.evaluate(() =>
+    Object.defineProperty(navigator, "clipboard", {
+      configurable: true,
+      value: {
+        writeText: async () => {
+          throw new DOMException("Denied", "NotAllowedError");
+        },
+      },
+    }),
+  );
+  await copy.click();
+  await expect(fallback).toBeVisible();
+  expect(errors).toEqual([]);
+  await page.evaluate(() => {
+    let copied = "";
+    Object.defineProperty(navigator, "clipboard", {
+      configurable: true,
+      value: {
+        writeText: async (text: string) => {
+          copied = text;
+        },
+        readText: async () => copied,
+      },
+    });
+  });
+  await copy.click();
+  await expect(fallback).toHaveCount(0);
+  const details = provided.locator("dd");
+  const [scope, server, code, password] = await details.allTextContents();
+  expect(await page.evaluate(() => navigator.clipboard.readText())).toBe(
+    `CampusZeit · ${scope}\nServer: ${server}\nZugangscode: ${code}\nPasswort: ${password}`,
+  );
+  expect(errors).toEqual([]);
+});
+
 test("notice dialog keeps focus while typing and protects current unsaved changes", async ({
   page,
 }) => {

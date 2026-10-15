@@ -308,17 +308,18 @@ export default function StudentAppAdmin({
                 </a>
                 <button
                   className="button secondary"
-                  onClick={() =>
-                    navigator.clipboard
-                      .writeText(
+                  onClick={async () => {
+                    try {
+                      await navigator.clipboard.writeText(
                         `CampusZeit · ${created.scope}\nServer: ${created.server}\nZugangscode: ${created.code}${created.password ? `\nPasswort: ${created.password}` : ""}`,
-                      )
-                      .catch(() =>
-                        setError(
-                          "Kopieren fehlgeschlagen. Bitte die Angaben auswählen und kopieren.",
-                        ),
-                      )
-                  }
+                      );
+                      setError("");
+                    } catch {
+                      setError(
+                        "Kopieren fehlgeschlagen. Bitte die Angaben auswählen und kopieren.",
+                      );
+                    }
+                  }}
                 >
                   {created.password
                     ? "Zugangsdaten kopieren"

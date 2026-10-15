@@ -16,6 +16,29 @@ final class StudentCoreTests: XCTestCase {
     XCTAssertThrowsError(try serverURL("http://campus.example.org"))
     XCTAssertEqual(try serverURL("http://192.168.1.10:8000").port, 8000)
   }
+  func testHTTPServerRequiresAnActualLocalHost() throws {
+    for host in [
+      "127.0.0.1.attacker.example", "192.168.1.10.attacker.example",
+      "10.attacker.0.0.1", "192..168.1.10", "192.168.1.10.",
+      "192.168.1.256", "+10.0.0.1", "010.0.0.1", "127.1", "2130706433",
+      "0x7f000001", "8.8.8.8", "172.15.0.1", "172.32.0.1",
+    ] {
+      XCTAssertThrowsError(try serverURL("http://\(host):8000"), host)
+    }
+    for host in [
+      "localhost", "campus.local", "127.0.0.1", "10.0.0.1", "192.168.1.10",
+      "172.16.0.1", "172.31.255.255",
+    ] {
+      let url = try serverURL(" http://\(host):8000/ ")
+      XCTAssertEqual(url.host, host)
+      XCTAssertEqual(url.port, 8000)
+    }
+    XCTAssertNoThrow(try serverURL("https://127.0.0.1.attacker.example"))
+    let qr = """
+      {"version":1,"server":"http://127.0.0.1.attacker.example","access":"2f30647f-87ec-48b8-b5db-efb6b2d74af4","key":"\(String(repeating: "a", count: 43))"}
+      """
+    XCTAssertThrowsError(try LoginQR.parse(qr))
+  }
   func testPublishedFeedDatesAndCancelledEvent() throws {
     let json = """
       {"institution":"Testhochschule","scope":"WI26 A1","timezone":"Europe/Berlin","updated":"2026-10-25T12:00:00.123Z",
