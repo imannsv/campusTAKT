@@ -1,5 +1,15 @@
 # Prüf- und Übergabestand
 
+## Kontaktanfrage vorbereitet · 16.10.2026
+
+- Kontaktformular mit optionalem Namen und Hochschule / Einrichtung sowie erforderlicher Antwortadresse und Nachricht. Die Zieladresse bleibt in `CONTACT_EMAIL=` ausdrücklich leer.
+- Solange kein Empfänger konfiguriert ist, bleiben die Eingaben möglich und die Versandaktion deaktiviert. Ein sichtbarer Hinweis erklärt den Stand.
+- Mit bestätigter Empfängeradresse öffnet der Button eine vorausgefüllte E-Mail im E-Mail-Programm des Besuchers. Erst dort erfolgt der tatsächliche Versand. Das Formular behauptet keinen erfolgreichen Versand und behält die Eingaben nach dem Öffnen.
+- Leere und reine Leerzeichen-Nachrichten werden mit einer Feldmeldung abgewiesen; Empfänger, Betreff und Nachricht werden für die Übergabe korrekt kodiert. Ohne JavaScript ist das Formular deaktiviert, bei hinterlegter Adresse steht ein direkter E-Mail-Link bereit.
+- Keine Kontakt-API, Speicherung der Anfragen auf dem Server, neuen Cookies oder externen Versanddienste. Die bestehende Datenschutzerklärung beschreibt den tatsächlichen Ablauf, der rechtliche Entwurfsstatus bleibt bestehen.
+- Aktivierung: In Vercel `CONTACT_EMAIL` mit der bestätigten Zieladresse setzen und neu bereitstellen. Weitere Zugangsdaten werden für diesen E-Mail-Ablauf nicht benötigt.
+- Build, 9 Node-Tests und 14 Browsertests bestanden; darunter die Fälle ohne Empfänger und mit fiktiver Testadresse, Pflichtfeldprüfung, Erhalt der Angaben und responsive Barrierefreiheitsprüfungen.
+
 ## Abgleich mit der aktuellen Anwendung · 15.10.2026
 
 - Referenz: Produktanwendung auf `origin/main`, Commit `4f6ca3f888873690da58e667fbd7d2f4bbd4af99`, zusätzlich mit der laufenden Browser-Demo verglichen.

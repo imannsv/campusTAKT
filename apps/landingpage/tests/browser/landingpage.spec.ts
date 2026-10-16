@@ -160,11 +160,16 @@ test("legal drafts, contact fallback and unknown routes are honest and reachable
 }) => {
   await page.goto("/#kontakt");
   await expect(
-    page.getByText("Der persönliche Kontaktweg wird gerade eingerichtet.", {
-      exact: true,
-    }),
+    page.getByText(
+      "Der Versand wird gerade eingerichtet. Sie können Ihre Anfrage bereits vorbereiten.",
+      {
+        exact: true,
+      },
+    ),
   ).toBeVisible();
-  await expect(page.locator("form")).toHaveCount(0);
+  await expect(
+    page.getByRole("form", { name: "Kontaktanfrage" }),
+  ).toBeVisible();
   await page.getByRole("link", { name: "Impressum", exact: true }).click();
   await expect(page.getByRole("heading", { level: 1 })).toHaveText("Impressum");
   await expect(
@@ -348,4 +353,92 @@ test("room, exam and dialog previews remain accessible on mobile and desktop", a
       if (name === "Stundenplanung") await page.keyboard.press("Escape");
     }
   }
+});
+
+test("contact form is usable but cannot send without a configured recipient", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto("/#kontakt");
+  const form = page.getByRole("form", { name: "Kontaktanfrage" });
+  await form.getByLabel("Name (optional)", { exact: true }).fill("Testname");
+  await form
+    .getByLabel("Hochschule / Einrichtung (optional)", { exact: true })
+    .fill("Testhochschule");
+  await form
+    .getByLabel("Ihre E-Mail-Adresse", { exact: true })
+    .fill("plan@example.org");
+  await form
+    .getByLabel("Nachricht", { exact: true })
+    .fill("Wir möchten einen Pilotbetrieb besprechen.");
+  await expect(
+    form.getByRole("button", { name: "E-Mail vorbereiten" }),
+  ).toBeDisabled();
+  await expect(
+    form.getByRole("link", { name: "Datenschutzhinweise" }),
+  ).toHaveAttribute("href", "/datenschutz/");
+  await expect(form.getByLabel("Nachricht", { exact: true })).toHaveValue(
+    "Wir möchten einen Pilotbetrieb besprechen.",
+  );
+  expect(
+    await page.evaluate(
+      () => document.documentElement.scrollWidth <= innerWidth,
+    ),
+  ).toBe(true);
+});
+
+test("configured contact prepares a draft without claiming it was sent", async ({
+  page,
+}) => {
+  const { readFile } = await import("node:fs/promises");
+  const { renderPage } = await import("../../.prerender/entry-server.js");
+  const { createSiteConfig } = await import("../../scripts/site-config.mjs");
+  const config = createSiteConfig({ CONTACT_EMAIL: "kontakt@example.org" });
+  const html = await readFile(
+    new URL("../../dist/index.html", import.meta.url),
+    "utf8",
+  );
+  const configured = html
+    .replace(
+      /<div id="root">[\s\S]*?<\/div>\s*(<script id="site-data")/,
+      `<div id="root">${renderPage("/", config)}</div>$1`,
+    )
+    .replace(
+      /(<script id="site-data"[^>]*>)[\s\S]*?(<\/script>)/,
+      `$1${JSON.stringify({ path: "/", config })}$2`,
+    );
+  await page.route("http://127.0.0.1:4180/", (route) =>
+    route.fulfill({ contentType: "text/html", body: configured }),
+  );
+  const errors: string[] = [];
+  page.on("pageerror", (error) => errors.push(error.message));
+  await page.goto("/#kontakt");
+  const form = page.getByRole("form", { name: "Kontaktanfrage" });
+  await form
+    .getByLabel("Ihre E-Mail-Adresse", { exact: true })
+    .fill("plan@example.org");
+  const message = form.getByLabel("Nachricht", { exact: true });
+  await message.fill("   ");
+  await form.getByRole("button", { name: "E-Mail vorbereiten" }).click();
+  await expect(message).toBeFocused();
+  expect(
+    await message.evaluate(
+      (element: HTMLTextAreaElement) => element.validationMessage,
+    ),
+  ).toBe("Bitte geben Sie eine Nachricht ein.");
+  await message.fill("Pilot für Hochschule Nord & Süd");
+  await form.getByRole("button", { name: "E-Mail vorbereiten" }).click();
+  await expect(form.getByRole("status")).toContainText(
+    "Die Anfrage wurde noch nicht versendet.",
+  );
+  const href = await form
+    .getByRole("link", { name: "E-Mail erneut öffnen" })
+    .getAttribute("href");
+  const mail = new URL(href!);
+  expect(mail.protocol).toBe("mailto:");
+  expect(mail.pathname).toBe("kontakt@example.org");
+  expect(mail.searchParams.get("body")).toBe(
+    "Antwortadresse: plan@example.org\r\n\r\nPilot für Hochschule Nord & Süd",
+  );
+  expect(errors).toEqual([]);
 });

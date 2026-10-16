@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Icon, Logo } from "./Icon";
+import { ContactForm } from "./ContactForm";
 import { ProductPreview, ApplicationPreview } from "./ProductPreview";
 import {
   PracticeCase,
@@ -365,45 +366,10 @@ function Home({ config }: { config: SiteConfig }) {
               wir Daten, Planungsbedarf und Betriebsumgebung gemeinsam ab. Das
               Angebot richtet sich nach Ihrer Einrichtung.
             </p>
+            <DemoLink config={config} className="button contact-demo" />
           </div>
           <div className="contact-panel">
-            <h3>Die Planungszentrale kennenlernen</h3>
-            <p>
-              Die Demo zeigt Ihnen, wie sich die Arbeit mit CampusZeit anfühlt.
-            </p>
-            <DemoLink config={config} />
-            <div className="contact-divider" />
-            {config.contactEmail ? (
-              <>
-                <h3>Pilotbetrieb besprechen</h3>
-                <p>
-                  Erzählen Sie uns von Ihren Studiengängen und Ihrem
-                  Planungsbedarf.
-                </p>
-                <a
-                  className="text-link"
-                  href={`mailto:${config.contactEmail}?subject=${encodeURIComponent("CampusZeit – Pilotbetrieb für unsere Hochschule")}`}
-                >
-                  <Icon name="mail" />
-                  {config.contactEmail}
-                </a>
-                <p className="small-print">
-                  Öffnet Ihr E-Mail-Programm. Die Anfrage wird erst versendet,
-                  wenn Sie die E-Mail dort abschicken.
-                </p>
-              </>
-            ) : (
-              <>
-                <h3>Pilotbetrieb besprechen</h3>
-                <p className="pending-contact">
-                  Der persönliche Kontaktweg wird gerade eingerichtet.
-                </p>
-                <p className="small-print">
-                  Sobald die Kontaktadresse bestätigt ist, können Sie hier eine
-                  Demo oder ein individuelles Angebot anfragen.
-                </p>
-              </>
-            )}
+            <ContactForm recipient={config.contactEmail} />
             <p className="small-print demo-limit">
               Die Online-Demo ist auf Testdaten und Browser-Speicherung
               beschränkt. Automatische Planung benötigt das Backend.

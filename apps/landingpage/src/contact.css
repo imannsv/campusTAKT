@@ -1,0 +1,119 @@
+.contact-grid {
+  align-items: start;
+}
+.contact-grid .contact-demo {
+  background: white;
+  color: var(--navy);
+  border: 1px solid white;
+  margin-top: 28px;
+}
+.contact-form {
+  min-width: 0;
+}
+.contact-form-intro {
+  margin-top: 12px;
+  font-size: 14px;
+  color: var(--muted);
+}
+.contact-form fieldset {
+  margin: 24px 0 0;
+  padding: 0;
+  border: 0;
+  min-width: 0;
+}
+.contact-field {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  margin-top: 18px;
+}
+.contact-field:first-of-type {
+  margin-top: 0;
+}
+.contact-field label {
+  font-size: 13px;
+  font-weight: 600;
+}
+.contact-field label span {
+  font-weight: 400;
+  color: var(--muted);
+}
+.contact-field input,
+.contact-field textarea {
+  width: 100%;
+  min-width: 0;
+  min-height: 44px;
+  border: 1px solid #c4d0dc;
+  border-radius: 6px;
+  padding: 11px 12px;
+  font: inherit;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--ink);
+  background: #fff;
+}
+.contact-field textarea {
+  resize: vertical;
+  min-height: 134px;
+}
+.contact-field textarea::placeholder {
+  color: var(--muted);
+  opacity: 1;
+}
+.contact-field input:focus-visible,
+.contact-field textarea:focus-visible {
+  outline: 2px solid var(--navy);
+  outline-offset: 2px;
+  border-color: var(--navy);
+}
+.contact-field .small-print {
+  color: var(--muted);
+  line-height: 1.6;
+}
+.contact-delivery {
+  margin-top: 22px;
+  color: var(--muted);
+}
+.contact-privacy {
+  margin-top: 12px;
+  color: var(--muted);
+}
+.contact-privacy a,
+.contact-draft-status a {
+  color: var(--navy);
+  text-decoration-thickness: 1px;
+}
+.contact-form .pending-contact {
+  margin-top: 18px;
+  border: 1px solid #eadcba;
+  border-radius: 6px;
+  padding: 12px;
+  background: #faf4df;
+  color: #6b592c;
+  font-size: 12px;
+  line-height: 1.6;
+}
+.contact-form .button {
+  gap: 8px;
+  width: 100%;
+}
+.contact-form button:disabled {
+  cursor: not-allowed;
+  background: #e5ebf1;
+  border-color: #d5dfe8;
+  color: #52677b;
+}
+.contact-draft-status {
+  margin-top: 18px;
+  padding: 14px;
+  border: 1px solid #c1dbd0;
+  border-radius: 6px;
+  background: var(--mint);
+  color: #315e4e;
+  font-size: 13px;
+}
+@media (max-width: 767px) {
+  .contact-form .button {
+    padding-inline: 12px;
+  }
+}
