@@ -1,6 +1,6 @@
-# CampusZeit Landingpage
+# CampusTakt Landingpage
 
-Eigenständige deutsche Produktseite auf dem Branch `landingpage`. React, TypeScript und Vite mit statisch erzeugtem HTML. Die bestehende CampusZeit-Anwendung und ihre Vercel-Konfiguration bleiben unverändert.
+Eigenständige deutsche Produktseite auf dem Branch `landingpage`. React, TypeScript und Vite mit statisch erzeugtem HTML. Die bestehende CampusTakt-Anwendung und ihre Vercel-Konfiguration bleiben unverändert.
 
 ## Lokal starten
 

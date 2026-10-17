@@ -18,7 +18,7 @@ export function PracticeCase() {
         </div>
         <p>
           Der Seminarraum ist gesperrt, die Veranstaltung soll stattfinden. In
-          CampusZeit prüfen Sie Raum, Lehrende und Gruppen im Zusammenhang und
+          CampusTakt prüfen Sie Raum, Lehrende und Gruppen im Zusammenhang und
           geben die Änderung gezielt frei.
         </p>
       </div>
@@ -104,20 +104,20 @@ export function PlanningComparison() {
           </h2>
         </div>
         <p>
-          Tabellen helfen beim Erfassen. CampusZeit verbindet diese Grundlagen
+          Tabellen helfen beim Erfassen. CampusTakt verbindet diese Grundlagen
           mit Ihren Terminen und den Prüfungen vor der Freigabe.
         </p>
       </div>
       <div className="comparison-table">
         <table>
           <caption className="sr-only">
-            Planungsaufgaben in getrennten Listen und in CampusZeit
+            Planungsaufgaben in getrennten Listen und in CampusTakt
           </caption>
           <thead>
             <tr>
               <th scope="col">Ihre Aufgabe</th>
               <th scope="col">In getrennten Listen</th>
-              <th scope="col">Mit CampusZeit</th>
+              <th scope="col">Mit CampusTakt</th>
             </tr>
           </thead>
           <tbody>
@@ -132,7 +132,7 @@ export function PlanningComparison() {
                 </td>
                 <td>
                   <span className="comparison-mobile-label" aria-hidden="true">
-                    Mit CampusZeit
+                    Mit CampusTakt
                   </span>
                   {after}
                 </td>
@@ -143,7 +143,7 @@ export function PlanningComparison() {
       </div>
       <p className="marketing-caption">
         Der Vergleich beschreibt typische Arbeitsabläufe. Welche Aufgaben
-        CampusZeit in Ihrer Hochschule übernimmt, wird im Pilotbetrieb geprüft.
+        CampusTakt in Ihrer Hochschule übernimmt, wird im Pilotbetrieb geprüft.
       </p>
     </section>
   );

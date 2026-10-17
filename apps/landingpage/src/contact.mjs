@@ -17,5 +17,5 @@ export function createContactDraft(recipient, fields) {
     fields.message.trim().replace(/\r?\n/g, "\r\n"),
   ].filter((line) => line !== null);
   const address = recipient.trim().split("@").map(encodeURIComponent).join("@");
-  return `mailto:${address}?subject=${encodeURIComponent("Campuszeit – Kontaktanfrage")}&body=${encodeURIComponent(lines.join("\r\n"))}`;
+  return `mailto:${address}?subject=${encodeURIComponent("CampusTakt – Kontaktanfrage")}&body=${encodeURIComponent(lines.join("\r\n"))}`;
 }

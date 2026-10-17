@@ -1,5 +1,14 @@
 # Prüf- und Übergabestand
 
+## CampusTakt auf aktuellem Landingpage-Stand · 20.10.2026
+
+- Die vorbereitete Umbenennung wurde auf die gemergte Landingpage übertragen. Neue Dashboard- und Gruppenvorschauen, Kontaktformular und unabhängige Hell-/Dunkelmodi bleiben erhalten.
+- Sichtbare Wortmarke, Produkttexte, Seitentitel, soziale Vorschaugrafik, Rechtsentwürfe und Betreff der Kontaktanfrage verwenden CampusTakt.
+- Bestehende Hostingadressen, Projektkennungen und der lokale Schlüssel für Darstellungspräferenzen bleiben erhalten.
+- Öffentliche Freigabe benötigt weiterhin bestätigte Domain-, Kontakt- und Rechtsangaben; der Zugriffsschutz bleibt bestehen.
+- Neu geprüft: vollständiger Build, neun Node-Tests und alle 22 Chromium-Browserprüfungen bestanden, einschließlich Wortmarke und Seitentitel. Unabhängige Prüfung ohne wesentliche Befunde.
+- Live-Bereitstellung noch ausstehend: Die aktuelle Vercel-Anmeldung hat ausschließlich Zugriff auf Imans Team; das bisherige separate Landingpage-Projekt in Jakobs Team ist damit nicht erreichbar.
+
 ## Dark Mode für Website und Produktvorschau · 20.10.2026
 
 - Website-Schalter in der Kopfzeile, auf Mobilgeräten jederzeit erreichbar. Eigener Schalter in beiden eingebetteten Produktvorschauen; beide Vorschauen teilen eine Auswahl, unabhängig von der Website.
@@ -7,7 +16,6 @@
 - Auswahl bleibt nach Navigation und erneutem Besuch erhalten; ausschließlich ausdrücklich gewählte Darstellungspräferenzen werden lokal gespeichert. Datenschutzhinweis entsprechend ergänzt. Blockierter Browserspeicher verhindert die Bedienung nicht.
 - Kontaktadresse weiterhin leer; Entwurfsstatus, Zugriffsschutz und bestehende Funktionen bleiben bestehen.
 - Build, 9 Node-Tests und 22 Browsertests einschließlich getrennter Themen, Speicherung, blockiertem Speicher, Kontrastprüfung aller Demoansichten und schmaler mobiler Navigation geprüft.
-
 
 ## Designabgleich nach Git-Aktualisierung · 20.10.2026
 

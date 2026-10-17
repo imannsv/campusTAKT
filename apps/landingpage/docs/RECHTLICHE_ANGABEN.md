@@ -1,6 +1,6 @@
 # Rechtliche Angaben vervollständigen
 
-Stand: 7. Oktober 2026. Geltungsbereich: die CampusZeit-Landingpage, nicht die separate Demo oder der Produktbetrieb bei Schulen und Hochschulen.
+Stand: 7. Oktober 2026. Geltungsbereich: die CampusTakt-Landingpage, nicht die separate Demo oder der Produktbetrieb bei Schulen und Hochschulen.
 
 Die maßgeblichen Texte stehen in `content/legal.json`, als lesbare Kopie in `docs/RECHTSTEXTE.md` sowie auf `/impressum/` und `/datenschutz/`. Es sind recherchierte Entwürfe mit Platzhaltern, keine Bestätigung der Rechtmäßigkeit eines unbekannten Anbieters und Betriebs. Der Anbieter muss die endgültigen Angaben und die beschriebenen Prozesse prüfen; bei Zweifeln ist eine rechtliche Prüfung sinnvoll.
 

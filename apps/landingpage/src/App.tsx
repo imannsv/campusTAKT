@@ -53,7 +53,7 @@ function Header({ config, home }: { config: SiteConfig; home: boolean }) {
   return (
     <header className="site-header">
       <div className="header-inner">
-        <a className="logo-link" href="/" aria-label="CampusZeit Startseite">
+        <a className="logo-link" href="/" aria-label="CampusTakt Startseite">
           <Logo />
         </a>
         <ThemeToggle target="site" />
@@ -100,7 +100,7 @@ function Footer({ config }: { config: SiteConfig }) {
   return (
     <footer className="site-footer">
       <div className="container footer-top">
-        <a href="/" aria-label="CampusZeit Startseite">
+        <a href="/" aria-label="CampusTakt Startseite">
           <Logo />
         </a>
         <p>
@@ -114,7 +114,7 @@ function Footer({ config }: { config: SiteConfig }) {
         </a>
       </div>
       <div className="container footer-bottom">
-        <span>© {new Date().getUTCFullYear()} CampusZeit</span>
+        <span>© {new Date().getUTCFullYear()} CampusTakt</span>
         <div>
           <a href="/impressum/">Impressum</a>
           <a href="/datenschutz/">Datenschutz</a>
@@ -267,7 +267,7 @@ function Home({ config }: { config: SiteConfig }) {
               zum freigegebenen Plan.
             </h2>
             <p>
-              Die Verwaltung behält die Entscheidung. CampusZeit unterstützt
+              Die Verwaltung behält die Entscheidung. CampusTakt unterstützt
               beim Vorbereiten, Prüfen und Veröffentlichen.
             </p>
           </div>
@@ -326,7 +326,7 @@ function Home({ config }: { config: SiteConfig }) {
             <Freddy />
             <div>
               <strong>Hallo, ich bin Freddy.</strong>
-              <span>Ihr Assistent in CampusZeit</span>
+              <span>Ihr Assistent in CampusTakt</span>
             </div>
           </div>
           <div className="sample-question">
@@ -363,7 +363,7 @@ function Home({ config }: { config: SiteConfig }) {
               Ihrem nächsten Semester.
             </h2>
             <p>
-              Testen Sie die Oberfläche und prüfen Sie CampusZeit anschließend
+              Testen Sie die Oberfläche und prüfen Sie CampusTakt anschließend
               mit den Abläufen Ihrer Hochschule. Für einen Pilotbetrieb stimmen
               wir Daten, Planungsbedarf und Betriebsumgebung gemeinsam ab. Das
               Angebot richtet sich nach Ihrer Einrichtung.

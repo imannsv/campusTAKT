@@ -1,12 +1,12 @@
 # Rechtsseiten mit Platzhaltern
 
-Stand: 7. Oktober 2026. Entwurf für die CampusZeit-Landingpage. Angaben in eckigen Klammern ersetzen und nicht einschlägige Abschnitte nach Prüfung entfernen. Quelle: `content/legal.json`. Ausfüllhinweise und amtliche Quellen: [RECHTLICHE_ANGABEN.md](RECHTLICHE_ANGABEN.md).
+Stand: 7. Oktober 2026. Entwurf für die CampusTakt-Landingpage. Angaben in eckigen Klammern ersetzen und nicht einschlägige Abschnitte nach Prüfung entfernen. Quelle: `content/legal.json`. Ausfüllhinweise und amtliche Quellen: [RECHTLICHE_ANGABEN.md](RECHTLICHE_ANGABEN.md).
 
 # Impressum
 
 ## Angaben gemäß § 5 DDG
 
-campuszeit. ist ein Angebot von:
+campustakt. ist ein Angebot von:
 
 [Vollständiger Name oder Firmierung mit Rechtsform]
 
@@ -46,7 +46,7 @@ Wirtschafts-Identifikationsnummer gemäß § 139c AO: [Wirtschafts-Identifikati
 
 ## 1. Geltungsbereich
 
-Diese Datenschutzerklärung erläutert die Verarbeitung personenbezogener Daten beim Besuch der CampusZeit-Landingpage und bei einer Kontaktaufnahme mit deren Anbieter. Sie gilt nicht für den Betrieb der CampusZeit-Anwendung bei Schulen oder Hochschulen. Für solche Anwendungen müssen die jeweils Verantwortlichen gesondert über ihre Datenverarbeitung informieren.
+Diese Datenschutzerklärung erläutert die Verarbeitung personenbezogener Daten beim Besuch der CampusTakt-Landingpage und bei einer Kontaktaufnahme mit deren Anbieter. Sie gilt nicht für den Betrieb der CampusTakt-Anwendung bei Schulen oder Hochschulen. Für solche Anwendungen müssen die jeweils Verantwortlichen gesondert über ihre Datenverarbeitung informieren.
 
 Die auf dieser Landingpage dargestellten Stundenpläne, Räume, Prüfungen und Freddy-Antworten sind fiktive Beispiele. Die Freddy-Darstellung ist kein Live-Chat und übermittelt keine Nachrichten an ein KI-Modell.
 
@@ -90,7 +90,7 @@ Schriftarten und Grafiken werden über dieselbe Website ausgeliefert. Für die S
 
 Soweit die Hostinginfrastruktur Informationen auf Ihrem Endgerät speichert oder ausliest, die für einen von Ihnen ausdrücklich gewünschten Dienst unbedingt erforderlich sind, richtet sich dies nach § 25 Abs. 2 Nr. 2 TDDDG. Eine darüber hinausgehende, einwilligungsbedürftige Speicherung oder Auslesung darf erst nach Ihrer Einwilligung gemäß § 25 Abs. 1 TDDDG erfolgen. Die anschließende Verarbeitung personenbezogener Daten benötigt zusätzlich eine Rechtsgrundlage nach der DSGVO.
 
-Die derzeit geschützte Vorschau kann eine vorgeschaltete Anmeldung bei Vercel verlangen. Dabei verarbeitet Vercel Anmelde- und Sitzungsinformationen nach seinen eigenen Datenschutzhinweisen. Diese Anmeldung ist keine Benutzerregistrierung bei CampusZeit. [Aktive Hosting-, Zugriffsschutz- und Cookie-Funktionen vor Freigabe prüfen; diesen Vorschauhinweis entfernen, wenn der Anmeldeschutz entfällt]
+Die derzeit geschützte Vorschau kann eine vorgeschaltete Anmeldung bei Vercel verlangen. Dabei verarbeitet Vercel Anmelde- und Sitzungsinformationen nach seinen eigenen Datenschutzhinweisen. Diese Anmeldung ist keine Benutzerregistrierung bei CampusTakt. [Aktive Hosting-, Zugriffsschutz- und Cookie-Funktionen vor Freigabe prüfen; diesen Vorschauhinweis entfernen, wenn der Anmeldeschutz entfällt]
 
 ## 6. Kontaktaufnahme per E-Mail
 

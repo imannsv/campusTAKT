@@ -65,7 +65,7 @@ export function Logo() {
         </g>
       </svg>
       <span>
-        campuszeit<span className="brand-dot">.</span>
+        campustakt<span className="brand-dot">.</span>
       </span>
     </span>
   );

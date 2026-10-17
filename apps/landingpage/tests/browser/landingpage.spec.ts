@@ -9,6 +9,12 @@ async function openCohortOverview(preview: Locator) {
 
 test("product benefits and honest demo link are present", async ({ page }) => {
   await page.goto("/");
+  await expect(page).toHaveTitle(
+    "CampusTakt – Die Planungszentrale für Hochschulen",
+  );
+  await expect(
+    page.getByRole("link", { name: "CampusTakt Startseite" }).first(),
+  ).toContainText("campustakt.");
   await expect(page.getByRole("heading", { level: 1 })).toHaveText(
     "Die Planungszentrale für Ihren Hochschulalltag.",
   );
