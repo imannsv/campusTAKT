@@ -1,5 +1,19 @@
 # Verifikation der ersten Version
 
+## Abschluss persönlicher Zugänge und Wiki — 20.10.2026
+
+- Alle 209 Backendtests bestanden auf einer getrennten Testdatenbank.
+- Alle 48 Demo-Browserprüfungen sowie alle 21 authentifizierten Verwaltungs-/Wiki-Prüfungen bestanden.
+- Drei neue Wiki-Aufnahmetests wurden vor der Korrektur gezielt fehlschlagend und danach erfolgreich ausgeführt: verzögerte Inhalte, vollständig ausbleibende Inhalte und alte Tabellenzeilen nach einer fehlgeschlagenen Datenanfrage. Vorhandene Bilder bleiben im Fehlerfall erhalten.
+- Der vollständige Bilderlauf bestand mit der fiktiven Wiki-Einrichtung. Prüfaufnahmen wurden lokal aufbewahrt; die vorhandenen Artikelbilder wurden für diese Skriptkorrektur nicht ersetzt.
+- Der QR-Regressionstest hielt die nachgeladene Zugangsliste kontrolliert zurück. Vor der Korrektur blieb „Fertig“ anklickbar, obwohl Schließen währenddessen gesperrt war. Mit deaktiviertem Knopf bis zum Ladeabschluss bestanden der vollständige Zugangs-/Mitteilungsablauf und die übrigen Verwaltungsprüfungen.
+- Der Freddy-Hilfelink-Test wählt die Stundenplanung ausdrücklich aus, da die Anwendung inzwischen mit dem Dashboard startet. Der geschützte Artikellink wird weiterhin geprüft.
+- Swift: 30 Tests, davon 29 bestanden und ein optionaler Integrationstest ohne Testzugang übersprungen. Das vollständige arm64-iOS-Quellziel wurde erfolgreich gegen das Apple-SDK gebaut; keine neue Signierung oder Geräteinstallation.
+- Regulärer Web-Build, Demo-Build samt Wiki-Ausschluss, Wiki-/Freddy-Konsistenz, Ruff und Migrationsprüfung bestanden. Ein bereits vorhandener ungenutzter Import im Belegungstest wurde entfernt. Die bestehende Vite-Paketgrößenwarnung bleibt bestehen.
+- Unabhängige Prüfung der Bildroutine: Ein zusätzlicher Fehlerfall mit alten Tabellenzeilen wurde nach Hinweis reproduziert, behoben und durch den dritten Aufnahmetest abgesichert. Danach keine verbleibenden wesentlichen Befunde.
+
+Diese Prüfung ändert keine bestehenden Kundendaten und führt keine produktive Migration oder Bereitstellung aus. Physische Geräte, Schlüsselspeicher und tatsächliche Push-Zustellung bleiben vor der App-Freigabe zu prüfen. Freddy ist nicht produktiv freigegeben; die zukünftige paketabhängige Freischaltung je Einrichtung ist unter `CAMPUS_AI.md` als noch nicht umgesetzt dokumentiert.
+
 ## Lokale Vorschau und selbstständige Testläufe — 08.10.2026
 
 - `npm test` startet eine eigene gebaute Demo auf Port 5175 und beendet sie
@@ -21,18 +35,18 @@
 
 Geprüft am 03.10.2026 im lokalen Arbeitsbereich.
 
-| Prüfung | Ergebnis |
-| --- | --- |
-| Django-Systemprüfung und unveränderte Migrationen | Bestanden |
-| Ruff | Bestanden |
-| TypeScript und Vite-Produktionsbuild | Bestanden |
-| 22 Backendtests mit SQLite | Bestanden |
-| Dieselben 22 Tests mit PostgreSQL 17 und Redis | Bestanden |
-| 2 Playwright-Browsertests, Desktop und Mobilansicht | Bestanden |
-| Docker-Image für Linux | Erfolgreich gebaut |
-| Echter Redis/Celery-Planungsauftrag | 26 gültige Termine; Vorschlag nicht übernommen |
-| PostgreSQL-Backup und Wiederherstellung in separater Testdatenbank | Erfolgreich; 26 Termine wiederhergestellt |
-| Synthetischer Teilplan, 30.000 erfasste / 6.000 aktive Lernende | 100 Termine, keine Konflikte, etwa 15 Sekunden |
+| Prüfung                                                                                   | Ergebnis                                       |
+| ----------------------------------------------------------------------------------------- | ---------------------------------------------- |
+| Django-Systemprüfung und unveränderte Migrationen                                         | Bestanden                                      |
+| Ruff                                                                                      | Bestanden                                      |
+| TypeScript und Vite-Produktionsbuild                                                      | Bestanden                                      |
+| 22 Backendtests mit SQLite                                                                | Bestanden                                      |
+| Dieselben 22 Tests mit PostgreSQL 17 und Redis                                            | Bestanden                                      |
+| 2 Playwright-Browsertests, Desktop und Mobilansicht                                       | Bestanden                                      |
+| Docker-Image für Linux                                                                    | Erfolgreich gebaut                             |
+| Echter Redis/Celery-Planungsauftrag                                                       | 26 gültige Termine; Vorschlag nicht übernommen |
+| PostgreSQL-Backup und Wiederherstellung in separater Testdatenbank                        | Erfolgreich; 26 Termine wiederhergestellt      |
+| Synthetischer Teilplan, 30.000 erfasste / 6.000 aktive Lernende                           | 100 Termine, keine Konflikte, etwa 15 Sekunden |
 | Synthetischer Teilplan mit überlappenden Gruppen, 30.000 erfasste / 3.030 aktive Lernende | 100 Termine, keine Konflikte, etwa 20 Sekunden |
 
 Die Lasttests verwendeten 100 Veranstaltungen, 20 Räume und 16 Lehrende in einer Woche sowie ein 20-Sekunden-Budget. Beide lieferten eine geprüfte Startlösung; im Testlimit verbesserte CP-SAT diese Lösung nicht weiter. Daraus lässt sich keine Laufzeitgarantie für ganze Hochschulen oder realistische Semester mit komplexer Kurswahl ableiten.
