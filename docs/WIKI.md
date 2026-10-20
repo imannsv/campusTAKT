@@ -16,11 +16,11 @@ Die vollständigen Artikel werden vom Django-Backend gelesen. Nach einer Veröff
 
 ## Authentifizierung und Auslieferung
 
-| Endpunkt | Inhalt |
-|---|---|
-| `GET /api/wiki/` | Navigation, Metadaten und Volltext für die Suche |
-| `GET /api/wiki/articles/<id>/` | Ein Markdown-Artikel |
-| `GET /api/wiki/assets/<filename>` | Ein registriertes PNG |
+| Endpunkt                          | Inhalt                                           |
+| --------------------------------- | ------------------------------------------------ |
+| `GET /api/wiki/`                  | Navigation, Metadaten und Volltext für die Suche |
+| `GET /api/wiki/articles/<id>/`    | Ein Markdown-Artikel                             |
+| `GET /api/wiki/assets/<filename>` | Ein registriertes PNG                            |
 
 Alle drei Endpunkte erfordern eine aktive Sitzung und eine Einrichtungsmitgliedschaft. Die Antworten verwenden `Cache-Control: private, no-store`. Es gibt keine öffentlich eingebundenen Wiki-Dateien und keinen Schreibendpunkt. Eine abgelaufene Lizenz verhindert den lesenden Zugriff nicht. Abmeldung in einem anderen Anwendungstab leert die Wiki; zusätzlich wird die Sitzung beim Fokussieren und alle 30 Sekunden geprüft. Bereits betrachtete Informationen können vom Leser natürlich selbst gespeichert werden.
 
@@ -37,6 +37,13 @@ node scripts/wiki-test-vite.mjs
 ```
 
 Anschließend `npm run wiki:screenshots`. Danach die beiden Server beenden. Das Skript ist absichtlich auf den separaten Port 5186 festgelegt.
+
+Der Bilderlauf wählt die Stundenplanung ausdrücklich aus und wartet je Ansicht auf
+sichtbare, geladene Inhalte. Die App-Verwaltung wartet zusätzlich auf beide
+erfolgreichen Datenantworten und die gerenderten Einträge. Bei Ladefehlern oder
+ausbleibenden Inhalten bricht die Aufnahme vor dem Dateiersatz ab; vorhandene
+Bilder bleiben erhalten. Die drei Regressionen in `tests/wiki-capture.spec.ts`
+prüfen verzögerte Inhalte, Zeitablauf und alte Tabellenzeilen nach einem Fehler.
 
 Die zwei Belegungsübersichten werden mit `node scripts/resource-screenshots.mjs` auf derselben temporären Einrichtung aufgenommen. Das Skript speichert `teachers-timeline.png` und `rooms-timeline.png`, aktualisiert die drei Bilder der Raumverwaltung (`rooms.png`, `start-02.png`, `definitions.png`) und legt mobile Prüfbilder unter `.playwright/resource-previews/` ab. Es nutzt ausschließlich Port 5186. Die neuen Ansichten werden zusätzlich in `tests/resource-overviews.ts` und mit dem authentifizierten Backend in `tests/wiki.spec.ts` geprüft.
 

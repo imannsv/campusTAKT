@@ -72,10 +72,16 @@ test("administration provides QR access and notices without exposing stored secr
   ).toHaveAttribute("download", `campuszeit-${result.code}.svg`);
   await provided.getByRole("button", { name: "Fertig", exact: true }).click();
   // Exercise the address prompt for accesses created before addresses were stored.
+  let pauseReload = false;
+  let finishReload!: () => void;
+  const reloadGate = new Promise<void>((resolve) => {
+    finishReload = resolve;
+  });
   await page.route("**/api/student-app/accesses/", async (route) => {
     if (route.request().method() !== "GET") return route.continue();
     const response = await route.fetch();
     const rows = await response.json();
+    if (pauseReload) await reloadGate;
     await route.fulfill({
       response,
       json: rows.map((row: any) =>
@@ -97,13 +103,22 @@ test("administration provides QR access and notices without exposing stored secr
   });
   await expect(legacy.getByLabel("Zielgruppe")).toBeDisabled();
   await legacy.getByLabel("Serveradresse").fill("http://127.0.0.1:8123");
+  pauseReload = true;
   await legacy
     .getByRole("button", { name: "QR-Code anzeigen", exact: true })
     .click();
   await expect(
     provided.getByRole("img", { name: /Anmelde-QR-Code/ }),
   ).toBeVisible();
+  try {
+    await expect(
+      provided.getByRole("button", { name: "Fertig", exact: true }),
+    ).toBeDisabled();
+  } finally {
+    finishReload();
+  }
   await provided.getByRole("button", { name: "Fertig", exact: true }).click();
+  await expect(provided).toHaveCount(0);
   await page.unroute("**/api/student-app/accesses/");
   await page
     .getByRole("button", { name: "Mitteilung erstellen", exact: true })

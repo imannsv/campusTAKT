@@ -1,5 +1,20 @@
 # campusAI
 
+## Offene Produktfreigabe und Kundenpakete
+
+Freddy ist für einen tatsächlichen Produktivbetrieb bei Kunden noch nicht freigegeben.
+Der Merge persönlicher App-Zugänge und der Wiki stellt keine solche Freigabe dar.
+
+Als spätere Anforderung ist festgehalten: Freddy muss je Einrichtung passend zum
+gebuchten Servicepaket an- und ausschaltbar sein. Die Sperre muss auch serverseitig
+gelten; das bloße Ausblenden des Chat-Icons genügt nicht. Ohne gebuchtes Paket darf
+Freddy nicht nutzbar sein. Diese kundenbezogene Freischaltung ist noch nicht umgesetzt.
+
+Die vorhandenen Hilfen und lokalen Modellversuche ersetzen weder die Prüfung der
+Antwortqualität noch eine Abnahme der Kundenumgebung.
+
+## Vorhandener Entwicklungsstand
+
 **Freddy** ist der CampusAI-Assistent für die Verwaltung. Das Chat-Icon unten rechts
 öffnet ein kompaktes Fenster über der aktuellen Verwaltungsansicht mit der Begrüßung
 „Hi, ich bin Freddy, dein CampusAI-Assistent. Wie kann ich dir helfen?“.

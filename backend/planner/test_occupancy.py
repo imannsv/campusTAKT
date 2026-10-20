@@ -6,7 +6,6 @@ from django.test import TestCase
 from rest_framework.test import APIClient
 
 from . import models as m
-from .occupancy import overview
 
 
 class ResourceOccupancyTests(TestCase):
