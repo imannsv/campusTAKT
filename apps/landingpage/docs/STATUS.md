@@ -1,0 +1,131 @@
+# Prüf- und Übergabestand
+
+## Dark Mode für Website und Produktvorschau · 20.10.2026
+
+- Website-Schalter in der Kopfzeile, auf Mobilgeräten jederzeit erreichbar. Eigener Schalter in beiden eingebetteten Produktvorschauen; beide Vorschauen teilen eine Auswahl, unabhängig von der Website.
+- Getrennte Farbpaletten für Website und Demo, einschließlich Dashboard, Gruppenauswahl, Kalender, Räume, Prüfungen und Termindialog. Logo unverändert auf heller Fläche.
+- Auswahl bleibt nach Navigation und erneutem Besuch erhalten; ausschließlich ausdrücklich gewählte Darstellungspräferenzen werden lokal gespeichert. Datenschutzhinweis entsprechend ergänzt. Blockierter Browserspeicher verhindert die Bedienung nicht.
+- Kontaktadresse weiterhin leer; Entwurfsstatus, Zugriffsschutz und bestehende Funktionen bleiben bestehen.
+- Build, 9 Node-Tests und 22 Browsertests einschließlich getrennter Themen, Speicherung, blockiertem Speicher, Kontrastprüfung aller Demoansichten und schmaler mobiler Navigation geprüft.
+
+
+## Designabgleich nach Git-Aktualisierung · 20.10.2026
+
+- Alle Remote-Branches und Tags von GitHub aktualisiert; `landingpage` war bereits aktuell. Neue Referenz der Anwendung: `origin/main` mit Commit `594aefc` (33 Commits nach der bisherigen Designreferenz). Die laufende Produkt-Demo zeigt die neue Oberfläche ebenfalls.
+- Einstiegsvorschau auf das neue Dashboard umgestellt: Begrüßung, Datumsfeld, Kennzahlen der fiktiven Einrichtung, Tagesagenda, Planungshinweise, Prüfungsausblick und funktionierende Schnellzugriffe.
+- Stundenplanung und Prüfungen beginnen wie die Anwendung mit der Auswahl nach Aufnahmejahr, Studiengang, Jahrgang und Gruppe. Ein fiktiver Jahrgang mit zwei Gruppen zeigt den Ablauf; Gruppenauswahl filtert die Beispieltermine, Jahrgang und Gesamtübersicht bleiben erreichbar.
+- Seitennavigation um Überblick/Dashboard sowie die neuen Verwaltungs- und Veröffentlichungsbereiche ergänzt. Nicht ausgeführte Bereiche bleiben statische Orientierung innerhalb der ausdrücklich vereinfachten Vorschau.
+- Karten, Rundungen, Flächen und Vorschaugrafik an Dashboard und Gruppenauswahl angeglichen. Bestehende Produktfarben und Wortmarke bleiben erhalten.
+- Vorschauen verwenden einen festen fiktiven Beispieltag am 20.10.2026 und die Woche vom 19.–23.10.2026. Kennzahlen sind ausschließlich Beispieldaten, keine Kundenzahlen. Termindialog, Raumbelegung und Prüfungsbeispiele verwenden dazu passende Daten.
+- Tastaturfokus folgt dem gewählten Bereich beziehungsweise der Gruppenauswahl. Ohne JavaScript bleiben statische Vorschauen und erläuternde Hinweise verfügbar. Mobile Gesamtübersichten zeigen beide Gruppen vollständig.
+- Kontaktformular mit leerem `CONTACT_EMAIL`, Rechtsentwürfe und Freigabesicherung bleiben erhalten. Änderungen ausschließlich unter `apps/landingpage` im Branch `landingpage`, kein Merge nach `main`.
+- Build, 9 Node-Tests und 17 Browsertests bestanden. Gruppenauswahl A/B, Jahrgang/Gesamtübersicht, Fokuswechsel, mobile Vollständigkeit, Kontaktformular und WCAG-A/AA-Prüfungen verifiziert; Desktop, Mobilansicht und Vorschaugrafik zusätzlich visuell geprüft. Unabhängige Prüfung ohne verbleibende Befunde.
+
+## Kontaktanfrage vorbereitet · 16.10.2026
+
+- Kontaktformular mit optionalem Namen und Hochschule / Einrichtung sowie erforderlicher Antwortadresse und Nachricht. Die Zieladresse bleibt in `CONTACT_EMAIL=` ausdrücklich leer.
+- Solange kein Empfänger konfiguriert ist, bleiben die Eingaben möglich und die Versandaktion deaktiviert. Ein sichtbarer Hinweis erklärt den Stand.
+- Mit bestätigter Empfängeradresse öffnet der Button eine vorausgefüllte E-Mail im E-Mail-Programm des Besuchers. Erst dort erfolgt der tatsächliche Versand. Das Formular behauptet keinen erfolgreichen Versand und behält die Eingaben nach dem Öffnen.
+- Leere und reine Leerzeichen-Nachrichten werden mit einer Feldmeldung abgewiesen; Empfänger, Betreff und Nachricht werden für die Übergabe korrekt kodiert. Ohne JavaScript ist das Formular deaktiviert, bei hinterlegter Adresse steht ein direkter E-Mail-Link bereit.
+- Keine Kontakt-API, Speicherung der Anfragen auf dem Server, neuen Cookies oder externen Versanddienste. Die bestehende Datenschutzerklärung beschreibt den tatsächlichen Ablauf, der rechtliche Entwurfsstatus bleibt bestehen.
+- Aktivierung: In Vercel `CONTACT_EMAIL` mit der bestätigten Zieladresse setzen und neu bereitstellen. Weitere Zugangsdaten werden für diesen E-Mail-Ablauf nicht benötigt.
+- Build, 9 Node-Tests und 14 Browsertests bestanden; darunter die Fälle ohne Empfänger und mit fiktiver Testadresse, Pflichtfeldprüfung, Erhalt der Angaben und responsive Barrierefreiheitsprüfungen.
+
+## Abgleich mit der aktuellen Anwendung · 15.10.2026
+
+- Referenz: Produktanwendung auf `origin/main`, Commit `4f6ca3f888873690da58e667fbd7d2f4bbd4af99`, zusätzlich mit der laufenden Browser-Demo verglichen.
+- Gemeinsame Vorschaukomponente für Einstieg und Produktbereich: gruppierte Seitenleiste, hellblauer aktiver Eintrag, kompakte Kopfleiste, Einrichtungs- und Verwaltungsprofil. Seitenleiste auf Desktop einklappbar, auf kleinen Bildschirmen eigene Navigation.
+- Manrope für Überschriften und DM Sans für Fließtext und unveränderte Wortmarke. Bestehende Produktfarben bleiben erhalten; die Schriften werden lokal ausgeliefert.
+- Termindetails als modaler Dialog mit Escape, Fokus auf dem Schließen-Button und Rückkehr zum auslösenden Termin.
+- Räume zunächst als Belegungszeitleiste, mit separater Raumverwaltung. Zeitposition und Dauer der Beispielbelegung stimmen mit der Skala überein.
+- Prüfungen, Abgaben & Fristen sowie Anforderungen getrennt auswählbar. Alle Vorschauen bleiben ausdrücklich vereinfachte Beispiele mit fiktiven Daten; nicht angebotene Navigationseinträge sind statische Orientierung.
+- Vorschaugrafik an die neue Navigation und den Wochenplan ohne dauerhafte Detailspalte angepasst; Formatierungsleerraum wird vor dem Umwandeln in Schriftkonturen normalisiert.
+- Build, 6 Node-Tests und 12 Browsertests bestanden. Responsive Breiten 320, 390, 600, 768 und 1440 Pixel, JavaScript-freie Inhalte, Dialogbedienung sowie WCAG-A/AA-Prüfungen für Kalender, Räume, Prüfungen und Dialog geprüft. Desktop, Mobilansicht und Vorschaugrafik zusätzlich visuell geprüft.
+- Änderungen ausschließlich unter `apps/landingpage`, Branch `landingpage`. Kontakt- und Rechtsplatzhalter, Entwurfsfreigabe und Zugriffsschutz bleiben bestehen; keine neuen Tracker oder externen Einbettungen.
+
+## Vermarktungsinhalte · 12.10.2026
+
+- Fiktives Praxisbeispiel: Raumblockierung, Änderung im Entwurf, Planprüfung und erneute Freigabe.
+- Vergleich typischer Planungsaufgaben in getrennten Listen mit Campuszeit; responsiv und mit erhaltener Tabellenstruktur für Hilfstechnologien.
+- Individuell zu vereinbarender Pilotablauf mit Umfang, Datenbedarf, repräsentativen Aufgaben und möglichen Abnahmekriterien.
+- Angebotsorientierung über Nutzungsumfang, Einrichtung, Datenübernahme, Betrieb und Begleitung; keine erfundenen Preise oder Servicezusagen.
+- Zusätzliche FAQ für Verwaltung und IT zu Pilotstart, Betriebsumgebung, Datenübernahme, Zugängen, Einführung, Support und Kosten.
+- Build, 6 Node-Tests und 9 bestehende Browsertests bestanden. Neue statische Inhalte bei 320, 390, 768 und 1440 Pixeln sowie ohne JavaScript geprüft. Unabhängige Prüfung ohne wesentliche Befunde.
+- Kontakt- und Rechtsplatzhalter sowie Zugriffsschutz bleiben im bisherigen Entwurfsstand. Namen von Anbietern, Teammitgliedern oder Referenzkunden benötigen weiterhin bestätigte Angaben.
+
+## Überarbeitung für Hochschulen · 09.10.2026
+
+- Gestaltung an die Planungszentrale angepasst: bestehende Produktfarben, DM Sans, helle Arbeitsflächen, klare Navigation und unverändertes Logo.
+- Große Wochenplanvorschau mit auswählbaren Beispielterminen und passenden Termindetails; weitere Ansichten für Räume und Prüfungen.
+- Hochschultexte mit Schwerpunkt Studienstruktur, Raumkoordination, Prüfungsorganisation und kontrollierte Freigabe. Kontakt für Pilotbetrieb nur über eine bestätigte Adresse; bestehender Hinweis bleibt ohne Adresse erhalten.
+- Gemeinsame Gestaltung für Ablauf, Hochschulnutzen, Freddy, Kontakt, FAQ, Footer, Rechtsseiten und Open-Graph-Grafik.
+- Rechtsinhalte und öffentliche Freigabesicherung bleiben im bisherigen Entwurfsstand. Keine neuen Tracker oder externen Einbettungen.
+- Build, 6 Node-Tests und 9 Browsertests einschließlich Terminwahl, Tastatur, JavaScript-freier Ansicht, Logo bei allen Breiten und nicht abgeschnittener Prüfungszeilen/Termintexte geprüft. Desktop, Mobil, Räume, Prüfungen, Rechtsseiten und Vorschaugrafik zusätzlich visuell geprüft.
+- Unabhängige Codeprüfung: keine kritischen Probleme; mobile Prüfungszeilen, Tablet-Termintexte und statische Vorschau ohne JavaScript nach Hinweisen korrigiert und durch Regressionstests abgesichert.
+
+Der folgende Stand dokumentiert die ursprüngliche Einrichtung und Bereitstellung.
+
+Stand: 07.10.2026. Eigenständige Umsetzung unter `apps/landingpage`, Branch `landingpage`.
+
+## Umgesetzt
+
+- Deutsche Produktseite mit Navigation, fiktiven Produktansichten, Einrichtungsschritten, getrennten Schul-/Hochschulabläufen, Freddy, Angebotsbereich und FAQ.
+- React/TypeScript/Vite mit eigenem Paketmanifest und Lockfile; keine Änderungen an Produktfrontend, Backend oder Root-Vercel-Konfiguration.
+- Statische HTML-Ausgabe für Startseite, Impressum, Datenschutz und 404.
+- Lokale Schriften, Logo, Favicon und PNG-/SVG-Vorschaugrafik; keine Tracker oder Fremdeinbettungen.
+- Konfigurierbarer echter E-Mail-Kontaktweg. Aktuell klar gekennzeichneter Hinweis, da keine bestätigte Adresse vorliegt.
+- Rechtliche Entwurfsseiten und überprüfte Freigabesicherung. Öffentliche Freigabe benötigt Domain, Kontakt und freigegebene Inhalte.
+- Eigenständige Vercel-Konfiguration mit Buildfilter ausschließlich für `landingpage`.
+- Umsetzung auf GitHub im Branch `landingpage` gespeichert und mit dem lokalen Checkout abgeglichen; `main` bleibt unverändert.
+- Logo an die bestehende Produktmarke angeglichen: `campuszeit.`, DM Sans 800, vier gedrehte farbige Quadrate; durchgängig in Seite, Favicon und Vorschaugrafik. Build und alle zwölf Tests bestanden nach der Korrektur erneut; visuell und unabhängig geprüft.
+- Recherchierte Impressums- und Datenschutzentwürfe mit Platzhaltern für Anbieter, Kontakt und tatsächliche Betriebsangaben eingebaut. Lesbare Texte und Ausfüllhinweise mit Primärquellen stehen in `RECHTSTEXTE.md` und `RECHTLICHE_ANGABEN.md`.
+- Öffentliche Freigabe mit ungelösten Klammerplatzhaltern wird auch bei versehentlich gesetztem `approved: true` abgewiesen. Desktop- und Mobilansichten der längeren Rechtsseiten geprüft; alle 13 Tests bestehen.
+
+## Verifiziert
+
+| Prüfung                                                          | Ergebnis                                                     |
+| ---------------------------------------------------------------- | ------------------------------------------------------------ |
+| TypeScript und Client-/Serverbuild                               | Bestanden                                                    |
+| Statische Erzeugung von 4 Seiten                                 | Bestanden                                                    |
+| 6 Node-Tests                                                     | Bestanden                                                    |
+| 7 Playwright-Prüfungen                                           | Bestanden                                                    |
+| axe: Startseite bei 320, 390, 768 und 1440 Pixeln                | Keine Verstöße in geprüften WCAG-A-/AA-Regeln                |
+| Ohne JavaScript: Inhalte, FAQ und mobile Ankernavigation         | Bestanden                                                    |
+| Produktansichten, Menü/Escape/Fokus, Rechtsseiten und 404-Inhalt | Bestanden                                                    |
+| Desktop- und Mobil-Screenshots                                   | Visuell geprüft                                              |
+| Generierte Open-Graph-Grafik                                     | Visuell geprüft, Schriftzeichen als eingebettete Konturen    |
+| Browserkonsole                                                   | Keine Fehler im geprüften Browser                            |
+| Öffentliche Freigabe ohne Betreiberangaben                       | Erwartungsgemäß abgewiesen                                   |
+| Demo-Link                                                        | HTTP 200 am 06.10.2026                                       |
+| npm-Abhängigkeiten                                               | Audit meldet keine bekannten Schwachstellen bei Installation |
+
+Eine unabhängige Codeprüfung fand keine kritischen oder wesentlichen Probleme. Der Hinweis auf verdeckte Ankerüberschriften ohne JavaScript wurde mit einem zuerst fehlschlagenden Browsertest reproduziert und behoben. Alle sieben Browserprüfungen bestanden danach erneut. Das ist keine vollständige manuelle WCAG-Zertifizierung.
+
+Die lokalen Tests gegen Vite preview prüfen den dargestellten 404-Inhalt, nicht den HTTP-Status des Hostings. Im neuen Vercel-Projekt wurden die Rechtsseiten mit HTTP 200 und eine unbekannte Route mit HTTP 404 und eigener Fehlerseite anschließend geprüft. Der Benutzer hat manuelle CLI-Deployments gewählt; eine Git-Verbindung ist dafür nicht erforderlich.
+
+## Vercel-Vorschau
+
+- Team: `jakob-fee8`; Projekt: `campuszeit-landingpage` (`prj_zITmXtZRWcLAv5dOSaATMyIFsMVn`).
+- Vorschau: https://campuszeit-landingpage-gkvbucbz0-jakob-fee8.vercel.app
+- Deployment: `dpl_Cb5gdmKSoYXFA9UpZRT8GWgP4YXP`, Ziel **preview**, Status **READY**, Builddauer 17 Sekunden.
+- Quellstand: `36a9c6dee966dbb251965eae6cf56c513a55e520`, Branch `landingpage`. CLI-Upload eines isolierten Snapshots mit ausschließlich Landingpage-Dateien; kein Git-Deployment.
+- Root Directory `apps/landingpage`, Framework Vite, Node 24.x, `npm ci`, `npm run build`, Ausgabe `dist`, Systemvariablen und Ignored Build Step eingerichtet.
+- Entwurfsmodus (`PUBLIC_RELEASE=false`), keine Canonical-URL; Hauptseite, Impressum und Datenschutz mit `noindex, nofollow`; robots sperrt Crawling, Sitemap ohne öffentliche URLs.
+- Vercel Authentication für **alle** Deployments und Adressen (`ssoProtection.deploymentType=all`). Für die neue Vorschau Startseite und beide Rechtsseiten authentifiziert mit HTTP 200 und `noindex, nofollow` geprüft; Rechtsseiten zeigen den Entwurfshinweis. Unangemeldeter Impressumsaufruf liefert HTTP 302 zur Vercel-Anmeldung. robots/Sitemap/Favicon und unbekannte Route mit eigener HTTP-404-Seite wurden beim vorherigen Deployment geprüft.
+- Beim ersten CLI-Deployment ordnete Vercel trotz angefordertem Preview das initiale Deployment dem Ziel production zu. Die automatisch angelegte Adresse `campuszeit-landingpage.vercel.app` war kurz öffentlich erreichbar, bis der Schutz auf `all` erweitert wurde. Sie ist jetzt ebenfalls geschützt. Es wurden keine echten Kontakt-/Betreiber- oder Personendaten veröffentlicht. Danach wurde ein separates Preview-Deployment erstellt und verifiziert.
+- Authentifizierte Browserprüfung der neuen Vorschau durchgeführt: Impressum am Desktop und Datenschutz auf Mobilgerät mit sichtbaren Abschnitten und Platzhaltern; bei 390 Pixeln kein horizontaler Überlauf. Lokale Rechtsseiten ebenfalls visuell geprüft. Nachweise im ignorierten `artifacts/`.
+- Beim vorherigen Logo-Deployment stimmten ausgelieferte JavaScript-/CSS-Dateien und PNG-Vorschaugrafik per SHA-256 mit dem lokal getesteten Build überein. Der neue Textbuild wurde anhand seiner Quellcommit-Metadaten, HTTP-Antworten und gerenderten Inhalte geprüft.
+- Git-Verbindung zu `imannsv/campusTIME` wurde von Vercel abgewiesen. Der Benutzer möchte beim manuellen Deployment bleiben. Root-Verzeichnis und Branchfilter sind eingerichtet; der Ignored Build Step wurde bei den CLI-Deployments nicht ausgeführt.
+
+Die lokale Vercel-Verknüpfung und heruntergeladene Entwicklungsvariablen liegen ausschließlich in ignorierten Dateien. Keine Tokens, Bypass-Schlüssel oder Umgebungsdateien gehören ins Repository.
+
+## Offen für die öffentliche Übergabe
+
+1. Platzhalter durch bestätigte Kontakt-, Betreiber- und Betriebsangaben ersetzen, nicht einschlägige Abschnitte entfernen und Inhalte freigeben.
+2. Hostingvertrag, Rollenverteilung, Drittlandgarantien und Tarifnutzung klären: Das Projekt nutzt Hobby; das veröffentlichte Vercel-DPA nennt Pro/Enterprise. Ein wirksamer AVV ist nicht nachgewiesen. E-Mail-Dienstleister und tatsächliche Löschfristen bestätigen.
+3. Zieladresse in `SITE_URL` eintragen und freigegebene Umgebung bauen; Live-Routen, Canonical, Sitemap und Kontakt prüfen.
+4. Falls weiterhin gewünscht: Projektzugriff für Iman mit bestätigter Empfängeridentität einrichten. Es wurde keine Einladung versendet.
+
+Bis dahin bleibt die Seite ein geschützter, lokal und auf Vercel prüfbarer Entwurf. Ein bestehendes Produktprojekt wurde weder umgestellt noch verändert. Es wurden keine Domains oder kostenpflichtigen Dienste gebucht.
+
+Lokale Screenshots liegen im ignorierten Verzeichnis `artifacts/`; Buildausgabe in `dist/`. Konzept und ausführliche Start-/Deployment-Anweisungen stehen in DESIGN.md und der Projekt-README.

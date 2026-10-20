@@ -1,0 +1,5 @@
+.prerender/
+.env*
+!.env.example
+artifacts/
+.vercel/
