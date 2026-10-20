@@ -325,7 +325,11 @@ export default function StudentAppAdmin({
                     ? "Zugangsdaten kopieren"
                     : "Zugangscode kopieren"}
                 </button>
-                <button className="button primary" onClick={close}>
+                <button
+                  className="button primary"
+                  onClick={close}
+                  disabled={busy}
+                >
                   Fertig
                 </button>
               </div>
