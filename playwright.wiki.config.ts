@@ -5,6 +5,7 @@ export default defineConfig({
   testDir: "./tests",
   testMatch: [
     "wiki.spec.ts",
+    "wiki-capture.spec.ts",
     "student-app.spec.ts",
     "learners.spec.ts",
     "dashboard.spec.ts",

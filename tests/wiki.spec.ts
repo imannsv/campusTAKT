@@ -289,7 +289,14 @@ test("Freddy links to the same protected guide in a new tab", async ({
   await page.goto("/");
   await page.getByLabel("Passwort", { exact: true }).fill("WikiBuildOnly2026!");
   await page.getByRole("button", { name: "Anmelden", exact: true }).click();
-  // Wait for the initial plan selection before typing into its chat draft.
+  await page
+    .getByRole("navigation", { name: "Arbeitsbereiche" })
+    .getByRole("button", { name: "Stundenplanung", exact: true })
+    .click();
+  await page
+    .getByRole("button", { name: "Gesamtübersicht öffnen", exact: true })
+    .click();
+  // Select the plan explicitly before typing into its chat draft.
   await expect(
     page.getByRole("button", { name: "Termin", exact: true }),
   ).toBeVisible();
