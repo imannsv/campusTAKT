@@ -59,7 +59,7 @@ export const faq = [
       "Sie wählen einen abgegrenzten Planbereich und legen die zu prüfenden Abläufe sowie Abnahmekriterien fest. Laufzeit, Einrichtung, Datenübernahme, Kosten und Begleitung werden individuell vereinbart. Ein größeres Einsatzgebiet wird erst nach Bewertung der Pilot-Ergebnisse abgestimmt.",
   },
   {
-    question: "Wo läuft CampusZeit und wer betreibt es?",
+    question: "Wo läuft CampusTakt und wer betreibt es?",
     answer:
       "Die Betriebsumgebung und die zuständigen Ansprechpartner werden vor einem Pilotbetrieb gemeinsam mit Ihrer IT festgelegt. Dabei sind Hosting, Datenstandort, Backups, Updates und Zugriffe zu klären. Die Browser-Demo ist eine getrennte Umgebung mit fiktiven Daten und ersetzt keine eingerichtete Kundenumgebung.",
   },
@@ -84,9 +84,9 @@ export const faq = [
       "Die geführte Einrichtung beginnt mit Räumen und Lehrenden. Danach folgen Studien- oder Bildungsgänge, Lehrplanversionen, Jahrgänge und Semesterpläne. Stammdaten können im Backend auch nach vorheriger Prüfung per CSV oder XLSX importiert werden.",
   },
   {
-    question: "Plant CampusZeit automatisch?",
+    question: "Plant CampusTakt automatisch?",
     answer:
-      "Mit dem Backend berechnet CampusZeit Vorschläge für Unterricht und Prüfungen. Verfügbarkeiten, Kapazitäten, Ausstattung, fixierte Termine und weitere Planungsregeln werden berücksichtigt. Sie prüfen den Vorschlag und übernehmen ihn selbst. Eine gültige Lösung ist bei widersprüchlichen Vorgaben nicht garantiert.",
+      "Mit dem Backend berechnet CampusTakt Vorschläge für Unterricht und Prüfungen. Verfügbarkeiten, Kapazitäten, Ausstattung, fixierte Termine und weitere Planungsregeln werden berücksichtigt. Sie prüfen den Vorschlag und übernehmen ihn selbst. Eine gültige Lösung ist bei widersprüchlichen Vorgaben nicht garantiert.",
   },
   {
     question: "Was passiert, wenn sich der Plan ändert?",
@@ -96,7 +96,7 @@ export const faq = [
   {
     question: "Wie werden Räume und Verfügbarkeiten berücksichtigt?",
     answer:
-      "Die Verwaltung pflegt Kapazitäten, Ausstattung, Raumblockierungen und die Zeitfenster der Lehrenden. Vor Veröffentlichung prüft CampusZeit auch Überschneidungen mit anderen freigegebenen Planbereichen derselben Einrichtung. Noch unbekannte Raumkapazitäten müssen vor der Planung ergänzt werden.",
+      "Die Verwaltung pflegt Kapazitäten, Ausstattung, Raumblockierungen und die Zeitfenster der Lehrenden. Vor Veröffentlichung prüft CampusTakt auch Überschneidungen mit anderen freigegebenen Planbereichen derselben Einrichtung. Noch unbekannte Raumkapazitäten müssen vor der Planung ergänzt werden.",
   },
   {
     question: "Welche Prüfungen und Abgaben lassen sich verwalten?",

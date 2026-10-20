@@ -41,7 +41,7 @@ for (const [path, filename] of routes) {
     `<meta name="robots" content="${indexable ? "index, follow" : "noindex, nofollow"}">`,
     '<meta property="og:type" content="website">',
     '<meta property="og:locale" content="de_DE">',
-    '<meta property="og:site_name" content="CampusZeit">',
+    '<meta property="og:site_name" content="CampusTakt">',
     `<meta property="og:title" content="${escapeHtml(title)}">`,
     `<meta property="og:description" content="${escapeHtml(description)}">`,
     '<meta name="twitter:card" content="summary_large_image">',
@@ -56,7 +56,7 @@ for (const [path, filename] of routes) {
           `<meta property="og:image" content="${escapeHtml(config.siteUrl)}/social-preview.png">`,
           '<meta property="og:image:width" content="1200">',
           '<meta property="og:image:height" content="630">',
-          '<meta property="og:image:alt" content="CampusZeit: Stundenpläne, Räume und Prüfungen gemeinsam planen">',
+          '<meta property="og:image:alt" content="CampusTakt: Stundenpläne, Räume und Prüfungen gemeinsam planen">',
         ]
       : []),
   ].join("\n    ");

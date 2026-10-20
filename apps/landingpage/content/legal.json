@@ -4,7 +4,7 @@
     {
       "heading": "Angaben gemäß § 5 DDG",
       "paragraphs": [
-        "campuszeit. ist ein Angebot von:",
+        "campustakt. ist ein Angebot von:",
         "[Vollständiger Name oder Firmierung mit Rechtsform]",
         "[Straße und Hausnummer]",
         "[Postleitzahl und Ort]",
@@ -49,7 +49,7 @@
     {
       "heading": "1. Geltungsbereich",
       "paragraphs": [
-        "Diese Datenschutzerklärung erläutert die Verarbeitung personenbezogener Daten beim Besuch der CampusZeit-Landingpage und bei einer Kontaktaufnahme mit deren Anbieter. Sie gilt nicht für den Betrieb der CampusZeit-Anwendung bei Schulen oder Hochschulen. Für solche Anwendungen müssen die jeweils Verantwortlichen gesondert über ihre Datenverarbeitung informieren.",
+        "Diese Datenschutzerklärung erläutert die Verarbeitung personenbezogener Daten beim Besuch der CampusTakt-Landingpage und bei einer Kontaktaufnahme mit deren Anbieter. Sie gilt nicht für den Betrieb der CampusTakt-Anwendung bei Schulen oder Hochschulen. Für solche Anwendungen müssen die jeweils Verantwortlichen gesondert über ihre Datenverarbeitung informieren.",
         "Die auf dieser Landingpage dargestellten Stundenpläne, Räume, Prüfungen und Freddy-Antworten sind fiktive Beispiele. Die Freddy-Darstellung ist kein Live-Chat und übermittelt keine Nachrichten an ein KI-Modell."
       ]
     },
@@ -87,7 +87,7 @@
         "Die Landingpage selbst setzt keine Analyse- oder Marketing-Cookies ein und speichert keine Besucherdaten zu Analyse- oder Marketingzwecken im lokalen Speicher des Browsers. Unter dem Schlüssel campuszeit-appearance speichern wir ausschließlich Ihre Auswahl für den hellen oder dunklen Modus der Website und der Produktvorschau auf Ihrem Gerät. Die Auswahl wird bei späteren Besuchen wiederverwendet und kann über die Schalter geändert oder durch Löschen der Website-Daten im Browser entfernt werden. Wir verwenden hier keine eingebetteten Analysewerkzeuge, Werbenetzwerke, Videos oder Social-Media-Plugins.",
         "Schriftarten und Grafiken werden über dieselbe Website ausgeliefert. Für die Schriftarten erfolgt keine Verbindung zu Google Fonts oder einem anderen externen Schriftanbieter.",
         "Soweit die Hostinginfrastruktur Informationen auf Ihrem Endgerät speichert oder ausliest, die für einen von Ihnen ausdrücklich gewünschten Dienst unbedingt erforderlich sind, richtet sich dies nach § 25 Abs. 2 Nr. 2 TDDDG. Eine darüber hinausgehende, einwilligungsbedürftige Speicherung oder Auslesung darf erst nach Ihrer Einwilligung gemäß § 25 Abs. 1 TDDDG erfolgen. Die anschließende Verarbeitung personenbezogener Daten benötigt zusätzlich eine Rechtsgrundlage nach der DSGVO.",
-        "Die derzeit geschützte Vorschau kann eine vorgeschaltete Anmeldung bei Vercel verlangen. Dabei verarbeitet Vercel Anmelde- und Sitzungsinformationen nach seinen eigenen Datenschutzhinweisen. Diese Anmeldung ist keine Benutzerregistrierung bei CampusZeit. [Aktive Hosting-, Zugriffsschutz- und Cookie-Funktionen vor Freigabe prüfen; diesen Vorschauhinweis entfernen, wenn der Anmeldeschutz entfällt]"
+        "Die derzeit geschützte Vorschau kann eine vorgeschaltete Anmeldung bei Vercel verlangen. Dabei verarbeitet Vercel Anmelde- und Sitzungsinformationen nach seinen eigenen Datenschutzhinweisen. Diese Anmeldung ist keine Benutzerregistrierung bei CampusTakt. [Aktive Hosting-, Zugriffsschutz- und Cookie-Funktionen vor Freigabe prüfen; diesen Vorschauhinweis entfernen, wenn der Anmeldeschutz entfällt]"
       ]
     },
     {

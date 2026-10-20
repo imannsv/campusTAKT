@@ -39,7 +39,7 @@ export function ContactForm({ recipient }: { recipient: string }) {
       <h3 id={`${id}-title`}>Kontaktanfrage</h3>
       <p className="contact-form-intro">
         Erzählen Sie uns von Ihrer Hochschule und dem Vorhaben, das Sie mit
-        Campuszeit besprechen möchten.
+        CampusTakt besprechen möchten.
       </p>
       <fieldset disabled={!enhanced}>
         <legend className="sr-only">Ihre Kontaktangaben</legend>

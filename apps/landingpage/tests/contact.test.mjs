@@ -25,7 +25,7 @@ test("contact draft keeps entered details in an encoded mail body", () => {
   const url = new URL(draft);
   assert.equal(url.protocol, "mailto:");
   assert.equal(url.pathname, "kontakt@example.org");
-  assert.equal(url.searchParams.get("subject"), "Campuszeit – Kontaktanfrage");
+  assert.equal(url.searchParams.get("subject"), "CampusTakt – Kontaktanfrage");
   assert.equal(
     url.searchParams.get("body"),
     "Name: Dr. Müller\r\nHochschule / Einrichtung: Hochschule Nord & Süd\r\nAntwortadresse: planung+pilot@example.org\r\n\r\nWir möchten einen Pilotbetrieb besprechen.\r\n2 Studiengänge & Räume #1?",
