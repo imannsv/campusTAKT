@@ -1,5 +1,11 @@
 import { useEffect, useId, useRef, useState } from "react";
 import { Icon, Logo, type IconName } from "./Icon";
+import {
+  PreviewDashboard,
+  PreviewGroupSelection,
+  type PreviewView,
+  type PreviewScope,
+} from "./PreviewOverview";
 
 const days = ["Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag"];
 const events = [
@@ -139,7 +145,7 @@ function TermDialog({
         <span className={`term-color ${event.tone}`} />
         <h3>{event.title}</h3>
         <p>
-          {days[event.day]}, {event.day + 12}. Oktober 2026
+          {days[event.day]}, {event.day + 19}. Oktober 2026
         </p>
         <dl>
           <div>
@@ -188,7 +194,16 @@ function PreviewHeading({
   );
 }
 
-export function Schedule({ compact = false }: { compact?: boolean }) {
+export function Schedule({
+  compact = false,
+  scope = "all",
+}: {
+  compact?: boolean;
+  scope?: PreviewScope;
+}) {
+  const visibleEvents = events
+    .map((event, index) => ({ event, index }))
+    .filter(({ event }) => scope === "all" || event.group.endsWith(scope));
   const [selected, setSelected] = useState<number | null>(null);
   const [enhanced, setEnhanced] = useState(false);
   useEffect(() => setEnhanced(true), []);
@@ -207,7 +222,7 @@ export function Schedule({ compact = false }: { compact?: boolean }) {
       <PreviewHeading
         title="Stundenplanung"
         description="Termine im Wochenplan auswählen und ansehen."
-        count="6 Termine diese Woche"
+        count={`${visibleEvents.length} Termine diese Woche`}
       />
       <div className="planning-preview-calendar">
         <div className="schedule-toolbar">
@@ -221,8 +236,10 @@ export function Schedule({ compact = false }: { compact?: boolean }) {
           </span>
         </div>
         <div className="week-bar">
-          <strong>12. Okt. – 16. Okt. 2026</strong>
-          <span className="week-selection">Alle Gruppen · Alle Räume</span>
+          <strong>19. Okt. – 23. Okt. 2026</strong>
+          <span className="week-selection">
+            {scope === "all" ? "Alle Gruppen" : `Gruppe ${scope}`} · Alle Räume
+          </span>
         </div>
         <div className="week-calendar">
           <div className="calendar-corner">Zeit</div>
@@ -233,7 +250,7 @@ export function Schedule({ compact = false }: { compact?: boolean }) {
               style={{ gridColumn: index + 2 }}
             >
               <span>{compact ? day.slice(0, 2) : day}</span>
-              <strong>{index + 12}</strong>
+              <strong>{index + 19}</strong>
             </div>
           ))}
           {["08:30", "10:15", "12:15", "14:00"].map((hour, index) => (
@@ -254,7 +271,7 @@ export function Schedule({ compact = false }: { compact?: boolean }) {
               />
             )),
           )}
-          {events.map((event, index) => (
+          {visibleEvents.map(({ event, index }) => (
             <div
               className="event-position"
               key={index}
@@ -265,11 +282,11 @@ export function Schedule({ compact = false }: { compact?: boolean }) {
           ))}
         </div>
         <div className="mobile-calendar">
-          {events.map((event, index) => (
+          {visibleEvents.map(({ event, index }) => (
             <div className="mobile-day" key={index}>
               <span>
                 {days[event.day]}
-                <strong>{event.day + 12}. Oktober</strong>
+                <strong>{event.day + 19}. Oktober</strong>
               </span>
               {renderEvent(event, index)}
             </div>
@@ -360,7 +377,7 @@ function Rooms() {
       {view === "occupancy" ? (
         <div className="cz-panel">
           <div className="schedule-toolbar">
-            <strong>15. Okt. 2026</strong>
+            <strong>22. Okt. 2026</strong>
             <span>Bereich A · 2. Stockwerk</span>
           </div>
           <div className="cz-occupancy-legend">
@@ -378,13 +395,13 @@ function Rooms() {
           >
             <table
               className="cz-occupancy"
-              aria-label="Raumbelegung am 15. Oktober"
+              aria-label="Raumbelegung am 22. Oktober"
             >
               <thead>
                 <tr>
                   <th>Räume</th>
                   <th colSpan={4}>
-                    Do, 15. Okt.
+                    Do, 22. Okt.
                     <div className="cz-time-axis">
                       <span>08:00</span>
                       <span>10:00</span>
@@ -481,7 +498,7 @@ function Exams() {
         {view === "planned" ? (
           <div className="exam-row">
             <div className="exam-date">
-              <strong>19</strong>
+              <strong>26</strong>
               <span>Oktober</span>
             </div>
             <div>
@@ -494,8 +511,8 @@ function Exams() {
         ) : view === "deadlines" ? (
           <div className="exam-row">
             <div className="exam-date">
-              <strong>26</strong>
-              <span>Oktober</span>
+              <strong>2</strong>
+              <span>November</span>
             </div>
             <div>
               <h4>Projektmanagement · Hausarbeit</h4>
@@ -524,14 +541,36 @@ function Exams() {
   );
 }
 
-type View = "schedule" | "rooms" | "exams";
+type View = PreviewView;
 const views = {
+  dashboard: "Dashboard",
   schedule: "Stundenplanung",
   rooms: "Räume",
   exams: "Prüfungen",
 };
 export function ApplicationPreview({ compact = false }: { compact?: boolean }) {
-  const [view, setView] = useState<View>("schedule");
+  const [view, setView] = useState<View>(compact ? "dashboard" : "schedule");
+  const [scope, setScope] = useState<PreviewScope | null>(null);
+  const contentRef = useRef<HTMLDivElement>(null);
+  const pendingFocus = useRef(false);
+  const selectScope = (next: PreviewScope | null) => {
+    pendingFocus.current = true;
+    setScope(next);
+  };
+  useEffect(() => {
+    if (!pendingFocus.current) return;
+    pendingFocus.current = false;
+    const heading = contentRef.current?.querySelector("h3");
+    if (heading) {
+      heading.tabIndex = -1;
+      heading.focus({ preventScroll: true });
+    }
+  }, [view, scope]);
+  const navigate = (next: View) => {
+    pendingFocus.current = true;
+    setView(next);
+    setScope(null);
+  };
   const [collapsed, setCollapsed] = useState(false);
   const sidebarId = useId();
   const [enhanced, setEnhanced] = useState(false);
@@ -545,7 +584,7 @@ export function ApplicationPreview({ compact = false }: { compact?: boolean }) {
       title={views[id]}
       aria-label={views[id]}
       aria-pressed={view === id}
-      onClick={() => setView(id)}
+      onClick={() => navigate(id)}
     >
       <Icon name={icon} />
       <span>{views[id]}</span>
@@ -577,6 +616,8 @@ export function ApplicationPreview({ compact = false }: { compact?: boolean }) {
           role="group"
           aria-label="Produktansicht auswählen"
         >
+          <span className="cz-nav-label">Überblick</span>
+          {navButton("dashboard", "dashboard")}
           <span className="cz-nav-label">Planung</span>
           {navButton("schedule", "calendar")}
           {navButton("exams", "exam")}
@@ -586,6 +627,14 @@ export function ApplicationPreview({ compact = false }: { compact?: boolean }) {
           </span>
           <span className="cz-nav-label">Verwaltung</span>
           {navButton("rooms", "room")}
+          <span className="cz-nav-item cz-static">
+            <Icon name="layers" />
+            <span>Gruppen & Jahrgänge</span>
+          </span>
+          <span className="cz-nav-item cz-static">
+            <Icon name="people" />
+            <span>Schüler & Studierende</span>
+          </span>
           <span className="cz-nav-item cz-static">
             <Icon name="book" />
             <span>Einrichtung & Studienstruktur</span>
@@ -598,6 +647,14 @@ export function ApplicationPreview({ compact = false }: { compact?: boolean }) {
           <span className="cz-nav-item cz-static">
             <Icon name="screen" />
             <span>Öffentliche Anzeige</span>
+          </span>
+          <span className="cz-nav-item cz-static">
+            <Icon name="people" />
+            <span>Studierendenübersicht</span>
+          </span>
+          <span className="cz-nav-item cz-static">
+            <Icon name="phone" />
+            <span>Studierenden-App</span>
           </span>
         </div>
         <div className="cz-profile">
@@ -638,22 +695,51 @@ export function ApplicationPreview({ compact = false }: { compact?: boolean }) {
           role="group"
           aria-label="Produktansicht auswählen"
         >
+          {navButton("dashboard", "dashboard")}
           {navButton("schedule", "calendar")}
           {navButton("exams", "exam")}
           {navButton("rooms", "room")}
         </div>
-        <div className="product-content">
+        <div className="product-content" ref={contentRef}>
           <div className="cz-demo-note">
             <strong>Produktvorschau</strong>
             <span>Fiktive Daten · Auswahl ohne Speicherung</span>
           </div>
-          {view === "schedule" ? (
-            <Schedule compact={compact} />
+          {view === "dashboard" ? (
+            <PreviewDashboard enhanced={enhanced} onNavigate={navigate} />
           ) : view === "rooms" ? (
             <Rooms />
+          ) : scope === null ? (
+            <PreviewGroupSelection
+              title={views[view]}
+              enhanced={enhanced}
+              onSelect={selectScope}
+            />
           ) : (
-            <Exams />
+            <>
+              <div className="cz-scope-bar">
+                <button type="button" onClick={() => selectScope(null)}>
+                  <Icon name="chevron" />
+                  Gruppe wechseln
+                </button>
+                <span>
+                  WI26
+                  {scope !== "all"
+                    ? ` · Gruppe ${scope}`
+                    : " · Ganzer Jahrgang"}
+                </span>
+              </div>
+              {view === "schedule" ? (
+                <Schedule key={scope} compact={compact} scope={scope} />
+              ) : (
+                <Exams />
+              )}
+            </>
           )}
+          <p className="cz-selection-note cz-static-preview-note">
+            Statische Vorschau. In der Browser-Demo können Sie die Oberfläche
+            ausprobieren.
+          </p>
         </div>
       </div>
     </div>

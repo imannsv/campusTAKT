@@ -1543,9 +1543,7 @@ details[open] .faq-plus::after {
   .schedule-event .event-time {
     font-size: 11px;
   }
-  .compact .mobile-day:nth-child(n + 4) {
-    display: none;
-  }
+
   .compact .calendar-preview-footer {
     display: none;
   }

@@ -175,8 +175,8 @@ function Home({ config }: { config: SiteConfig }) {
         <div className="hero-context">
           <p>Ein Semester hat viele Abhängigkeiten.</p>
           <p>
-            Bringen Sie Studienstruktur, Lehrende und Räume in einen gemeinsamen
-            Arbeitsbereich. Ihre Verwaltung entscheidet, welcher Plan
+            Starten Sie im Dashboard und wechseln Sie gezielt zu Jahrgängen,
+            Gruppen und Räumen. Ihre Verwaltung entscheidet, welcher Plan
             freigegeben wird.
           </p>
         </div>
@@ -230,9 +230,9 @@ function Home({ config }: { config: SiteConfig }) {
             </h2>
           </div>
           <p>
-            Wochenplan, Räume und Prüfungen in einem Arbeitsbereich: CampusZeit
-            verbindet die Aufgaben Ihrer Studienverwaltung in einer klaren
-            Oberfläche. Die Vorschau zeigt ein fiktives Hochschulsemester.
+            Dashboard, Stundenplanung, Räume und Prüfungen in einem
+            Arbeitsbereich. Wählen Sie einen Beispieljahrgang oder eine Gruppe
+            und lernen Sie die neue Oberfläche mit fiktiven Daten kennen.
           </p>
         </div>
         <ProductPreview />

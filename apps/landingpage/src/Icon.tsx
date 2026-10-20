@@ -1,4 +1,6 @@
 const paths = {
+  dashboard: "M3 3h7v7H3zM14 3h7v5h-7zM14 12h7v9h-7zM3 14h7v7H3z",
+  phone: "M7 2h10v20H7zM10 18h4",
   sidebar: "M3 4h18v16H3zM9 4v16m7-12-3 4 3 4",
   layers: "m12 3 10 5-10 5L2 8l10-5Zm-10 9 10 5 10-5M2 16l10 5 10-5",
   arrow: "M4 12h16m-6-6 6 6-6 6",

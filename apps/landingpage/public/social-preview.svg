@@ -83,7 +83,7 @@
     Campus Nord
   </text>
   <text x="82" y="404" fill="#52677b" font-family="DM Sans" font-size="11">
-    Planung
+    Überblick
   </text>
   <rect x="76" y="415" width="148" height="28" rx="5" fill="#e5eef7" />
   <path d="M76 422v14" stroke="#214b76" stroke-width="2" />
@@ -95,84 +95,158 @@
     font-size="12"
     font-weight="600"
   >
+    Dashboard
+  </text>
+  <text x="82" y="470" fill="#52677b" font-family="DM Sans" font-size="11">
+    Planung
+  </text>
+  <text x="86" y="499" fill="#52677b" font-family="DM Sans" font-size="12">
     Stundenplanung
   </text>
-  <text x="86" y="467" fill="#52677b" font-family="DM Sans" font-size="12">
+  <text x="86" y="533" fill="#52677b" font-family="DM Sans" font-size="12">
     Prüfungen
   </text>
-  <text x="82" y="505" fill="#52677b" font-family="DM Sans" font-size="11">
-    Verwaltung
-  </text>
-  <text x="86" y="535" fill="#52677b" font-family="DM Sans" font-size="12">
+  <text x="86" y="567" fill="#52677b" font-family="DM Sans" font-size="12">
     Räume
-  </text>
-  <text x="86" y="568" fill="#52677b" font-family="DM Sans" font-size="12">
-    Studienstruktur
   </text>
   <text x="254" y="370" fill="#52677b" font-family="DM Sans" font-size="11">
     Arbeitsbereich
   </text>
   <path d="m346 359 4 4-4 4" fill="none" stroke="#64778b" />
   <text x="365" y="370" fill="#24374c" font-family="DM Sans" font-size="11">
-    Stundenplanung
+    Dashboard
   </text>
   <text x="996" y="370" fill="#52677b" font-family="DM Sans" font-size="11">
     Beispielansicht
   </text>
+  <rect
+    x="252"
+    y="396"
+    width="868"
+    height="74"
+    rx="12"
+    fill="#e7effa"
+    stroke="#dce6f1"
+  />
   <text
-    x="254"
-    y="412"
-    fill="#24374c"
+    x="270"
+    y="419"
+    fill="#214b76"
     font-family="Manrope"
-    font-size="18"
+    font-size="10"
     font-weight="600"
   >
-    Stundenplanung
+    Campus Nord · Hochschule
+  </text>
+  <text
+    x="270"
+    y="447"
+    fill="#24374c"
+    font-family="Manrope"
+    font-size="22"
+    font-weight="600"
+  >
+    Guten Morgen
+  </text>
+  <text x="963" y="419" fill="#214b76" font-family="DM Sans" font-size="11">
+    Oktober 2026
+  </text>
+  <text
+    x="997"
+    y="451"
+    fill="#214b76"
+    font-family="Manrope"
+    font-size="30"
+    font-weight="600"
+  >
+    20
+  </text>
+  <text
+    x="270"
+    y="501"
+    fill="#24374c"
+    font-family="Manrope"
+    font-size="20"
+    font-weight="600"
+  >
+    1
+  </text>
+  <text x="295" y="500" fill="#52677b" font-family="DM Sans" font-size="11">
+    Stundenplan
+  </text>
+  <text
+    x="481"
+    y="501"
+    fill="#24374c"
+    font-family="Manrope"
+    font-size="20"
+    font-weight="600"
+  >
+    1
+  </text>
+  <text x="506" y="500" fill="#52677b" font-family="DM Sans" font-size="11">
+    Jahrgang
+  </text>
+  <text
+    x="692"
+    y="501"
+    fill="#24374c"
+    font-family="Manrope"
+    font-size="20"
+    font-weight="600"
+  >
+    54
+  </text>
+  <text x="727" y="500" fill="#52677b" font-family="DM Sans" font-size="11">
+    Erfasste Personen
+  </text>
+  <text
+    x="938"
+    y="501"
+    fill="#24374c"
+    font-family="Manrope"
+    font-size="20"
+    font-weight="600"
+  >
+    3
+  </text>
+  <text x="963" y="500" fill="#52677b" font-family="DM Sans" font-size="11">
+    Räume
   </text>
   <rect
     x="252"
-    y="426"
-    width="868"
-    height="148"
-    rx="6"
+    y="517"
+    width="520"
+    height="57"
+    rx="9"
     fill="white"
     stroke="#e5ebf1"
   />
   <text
-    x="266"
-    y="446"
+    x="269"
+    y="539"
     fill="#24374c"
     font-family="Manrope"
-    font-size="12"
+    font-size="13"
     font-weight="600"
   >
-    Wirtschaftsinformatik · WS 2026/27
+    Heute auf dem Campus
   </text>
-  <text x="1012" y="446" fill="#315e4e" font-family="DM Sans" font-size="11">
-    Freigegeben
+  <text x="269" y="560" fill="#52677b" font-family="DM Sans" font-size="11">
+    10:15–11:45 · Mathematik · WI26 A · B.101
   </text>
-  <path
-    d="M252 458h868M252 514h868M426 458v116M600 458v116M774 458v116M948 458v116"
-    stroke="#e5ebf1"
-  />
-  <rect x="264" y="468" width="150" height="36" rx="4" fill="#e4f2ed" />
-  <rect x="438" y="524" width="150" height="36" rx="4" fill="#e7effa" />
-  <rect x="612" y="468" width="150" height="36" rx="4" fill="#efebf9" />
-  <rect x="786" y="524" width="150" height="36" rx="4" fill="#fbf1dc" />
-  <rect x="960" y="468" width="148" height="36" rx="4" fill="#e7effa" />
-  <text x="274" y="491" fill="#24374c" font-family="DM Sans" font-size="12">
-    Projektmanagement
+  <rect x="790" y="517" width="330" height="57" rx="9" fill="#efebf9" />
+  <text x="807" y="539" fill="#655084" font-family="DM Sans" font-size="11">
+    Ausblick · nächste 7 Tage
   </text>
-  <text x="448" y="547" fill="#24374c" font-family="DM Sans" font-size="12">
-    Mathematik
-  </text>
-  <text x="622" y="491" fill="#24374c" font-family="DM Sans" font-size="12">
-    Datenbanken
-  </text>
-  <text x="796" y="547" fill="#24374c" font-family="DM Sans" font-size="12">
-    Wirtschaftsrecht
-  </text>
-  <text x="970" y="491" fill="#24374c" font-family="DM Sans" font-size="12">
-    Statistik
+  <text
+    x="807"
+    y="560"
+    fill="#24374c"
+    font-family="Manrope"
+    font-size="13"
+    font-weight="600"
+  >
+    Statistik · Klausur
   </text>
 </svg>

@@ -1,5 +1,17 @@
 # Prüf- und Übergabestand
 
+## Designabgleich nach Git-Aktualisierung · 20.10.2026
+
+- Alle Remote-Branches und Tags von GitHub aktualisiert; `landingpage` war bereits aktuell. Neue Referenz der Anwendung: `origin/main` mit Commit `594aefc` (33 Commits nach der bisherigen Designreferenz). Die laufende Produkt-Demo zeigt die neue Oberfläche ebenfalls.
+- Einstiegsvorschau auf das neue Dashboard umgestellt: Begrüßung, Datumsfeld, Kennzahlen der fiktiven Einrichtung, Tagesagenda, Planungshinweise, Prüfungsausblick und funktionierende Schnellzugriffe.
+- Stundenplanung und Prüfungen beginnen wie die Anwendung mit der Auswahl nach Aufnahmejahr, Studiengang, Jahrgang und Gruppe. Ein fiktiver Jahrgang mit zwei Gruppen zeigt den Ablauf; Gruppenauswahl filtert die Beispieltermine, Jahrgang und Gesamtübersicht bleiben erreichbar.
+- Seitennavigation um Überblick/Dashboard sowie die neuen Verwaltungs- und Veröffentlichungsbereiche ergänzt. Nicht ausgeführte Bereiche bleiben statische Orientierung innerhalb der ausdrücklich vereinfachten Vorschau.
+- Karten, Rundungen, Flächen und Vorschaugrafik an Dashboard und Gruppenauswahl angeglichen. Bestehende Produktfarben und Wortmarke bleiben erhalten.
+- Vorschauen verwenden einen festen fiktiven Beispieltag am 20.10.2026 und die Woche vom 19.–23.10.2026. Kennzahlen sind ausschließlich Beispieldaten, keine Kundenzahlen. Termindialog, Raumbelegung und Prüfungsbeispiele verwenden dazu passende Daten.
+- Tastaturfokus folgt dem gewählten Bereich beziehungsweise der Gruppenauswahl. Ohne JavaScript bleiben statische Vorschauen und erläuternde Hinweise verfügbar. Mobile Gesamtübersichten zeigen beide Gruppen vollständig.
+- Kontaktformular mit leerem `CONTACT_EMAIL`, Rechtsentwürfe und Freigabesicherung bleiben erhalten. Änderungen ausschließlich unter `apps/landingpage` im Branch `landingpage`, kein Merge nach `main`.
+- Build, 9 Node-Tests und 17 Browsertests bestanden. Gruppenauswahl A/B, Jahrgang/Gesamtübersicht, Fokuswechsel, mobile Vollständigkeit, Kontaktformular und WCAG-A/AA-Prüfungen verifiziert; Desktop, Mobilansicht und Vorschaugrafik zusätzlich visuell geprüft. Unabhängige Prüfung ohne verbleibende Befunde.
+
 ## Kontaktanfrage vorbereitet · 16.10.2026
 
 - Kontaktformular mit optionalem Namen und Hochschule / Einrichtung sowie erforderlicher Antwortadresse und Nachricht. Die Zieladresse bleibt in `CONTACT_EMAIL=` ausdrücklich leer.

@@ -1,5 +1,11 @@
-import { test, expect } from "@playwright/test";
+import { test, expect, type Locator } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
+
+async function openCohortOverview(preview: Locator) {
+  await preview
+    .getByRole("button", { name: "Gesamtübersicht öffnen", exact: true })
+    .click();
+}
 
 test("product benefits and honest demo link are present", async ({ page }) => {
   await page.goto("/");
@@ -38,11 +44,13 @@ test("product view selector exposes meaningful room and exam examples", async ({
     .getByRole("group", { name: "Produktansicht auswählen" })
     .getByRole("button", { name: "Prüfungen", exact: true })
     .click();
+  await openCohortOverview(preview);
   await expect(preview.getByText("Statistik · Klausur")).toBeVisible();
   await preview
     .getByRole("group", { name: "Produktansicht auswählen" })
     .getByRole("button", { name: "Stundenplanung", exact: true })
     .click();
+  await openCohortOverview(preview);
   await expect(preview.getByText("Wochenplanung")).toBeVisible();
 });
 
@@ -51,6 +59,7 @@ test("planning preview allows keyboard selection and shows the matching saved ex
 }) => {
   await page.goto("/#produkt");
   const preview = page.getByRole("region", { name: "Produktvorschau" });
+  await openCohortOverview(preview);
   const event = preview.getByRole("button", {
     name: "Montag: Projektmanagement, 08:30–10:00",
   });
@@ -92,6 +101,7 @@ test("mobile exam badges and tablet event text stay inside their panels", async 
       .getByRole("group", { name: "Produktansicht auswählen" })
       .getByRole("button", { name: "Prüfungen", exact: true })
       .click();
+    await openCohortOverview(preview);
     expect(
       await preview.locator(".exam-tag").evaluateAll((tags) =>
         tags.every((tag) => {
@@ -104,6 +114,12 @@ test("mobile exam badges and tablet event text stay inside their panels", async 
   }
   await page.setViewportSize({ width: 768, height: 1000 });
   await page.goto("/");
+  await openCohortOverview(
+    page.getByRole("region", { name: "Produktvorschau", exact: true }),
+  );
+  await expect(
+    page.locator(".week-calendar .schedule-event").first(),
+  ).toBeVisible();
   expect(
     await page.locator(".week-calendar .schedule-event").evaluateAll((events) =>
       events.every((event) => {
@@ -211,7 +227,7 @@ test("complete content and FAQ remain usable without JavaScript", async ({
   await expect(
     page
       .getByRole("region", { name: "Produktvorschau" })
-      .getByRole("button", { name: "Dienstag: Mathematik, 10:15–11:45" }),
+      .getByRole("button", { name: "Gruppe WI26 A öffnen", exact: true }),
   ).toBeDisabled();
   await expect(
     page
@@ -290,7 +306,7 @@ test("preview sidebar collapses without losing navigation", async ({
     .getByRole("button", { name: "Räume", exact: true })
     .click();
   await expect(
-    preview.getByRole("table", { name: "Raumbelegung am 15. Oktober" }),
+    preview.getByRole("table", { name: "Raumbelegung am 22. Oktober" }),
   ).toBeVisible();
   await preview
     .getByRole("button", { name: "Raumverwaltung", exact: true })
@@ -307,6 +323,7 @@ test("exam preview separates planned exams, deadlines and requirements", async (
     .getByRole("group", { name: "Produktansicht auswählen" })
     .getByRole("button", { name: "Prüfungen", exact: true })
     .click();
+  await openCohortOverview(preview);
   await expect(preview.getByText("Statistik · Klausur")).toBeVisible();
   await expect(
     preview.getByText("Projektmanagement · Hausarbeit"),
@@ -333,8 +350,10 @@ test("room, exam and dialog previews remain accessible on mobile and desktop", a
     const nav = preview.getByRole("group", {
       name: "Produktansicht auswählen",
     });
-    for (const name of ["Räume", "Prüfungen", "Stundenplanung"]) {
+    for (const name of ["Dashboard", "Räume", "Prüfungen", "Stundenplanung"]) {
       await nav.getByRole("button", { name, exact: true }).click();
+      if (name === "Stundenplanung" || name === "Prüfungen")
+        await openCohortOverview(preview);
       if (name === "Stundenplanung")
         await preview
           .getByRole("button", {
@@ -441,4 +460,95 @@ test("configured contact prepares a draft without claiming it was sent", async (
     "Antwortadresse: plan@example.org\r\n\r\nPilot für Hochschule Nord & Süd",
   );
   expect(errors).toEqual([]);
+});
+
+test("new dashboard leads into cohort planning and filters the selected group", async ({
+  page,
+}) => {
+  await page.goto("/");
+  const hero = page.locator(".hero-product");
+  await expect(
+    hero.getByRole("heading", { name: "Guten Morgen", exact: true }),
+  ).toBeVisible();
+  await hero
+    .getByRole("button", { name: "Zur Stundenplanung", exact: true })
+    .click();
+  await expect(
+    hero.getByText("Wählen Sie Ihren Jahrgang und Ihre Gruppe.", {
+      exact: true,
+    }),
+  ).toBeVisible();
+  await hero
+    .getByRole("button", { name: "Gruppe WI26 A öffnen", exact: true })
+    .click();
+  await expect(
+    hero.getByRole("heading", { name: "Stundenplanung", exact: true }),
+  ).toBeFocused();
+  await expect(
+    hero.getByRole("button", {
+      name: "Montag: Projektmanagement, 08:30–10:00",
+    }),
+  ).toBeVisible();
+  await expect(
+    hero.getByRole("button", { name: "Freitag: Statistik, 08:30–10:00" }),
+  ).toHaveCount(0);
+  await hero
+    .getByRole("button", { name: "Gruppe wechseln", exact: true })
+    .click();
+  await hero
+    .getByRole("button", { name: "Gruppe WI26 B öffnen", exact: true })
+    .click();
+  await expect(
+    hero.getByRole("button", { name: "Freitag: Statistik, 08:30–10:00" }),
+  ).toBeVisible();
+  await expect(
+    hero.getByRole("button", {
+      name: "Montag: Projektmanagement, 08:30–10:00",
+    }),
+  ).toHaveCount(0);
+});
+
+test("cohort and overall view keep both groups reachable", async ({ page }) => {
+  await page.goto("/#produkt");
+  const preview = page.getByRole("region", {
+    name: "Produktvorschau",
+    exact: true,
+  });
+  await preview
+    .getByRole("button", { name: "Jahrgang WI26 öffnen", exact: true })
+    .click();
+  await expect(
+    preview.getByText("6 Termine diese Woche", { exact: true }),
+  ).toBeVisible();
+  await preview
+    .getByRole("button", { name: "Gruppe wechseln", exact: true })
+    .click();
+  await preview
+    .getByRole("button", { name: "Gesamtübersicht öffnen", exact: true })
+    .click();
+  await expect(
+    preview.getByRole("button", { name: "Dienstag: Mathematik, 10:15–11:45" }),
+  ).toBeVisible();
+});
+
+test("mobile hero cohort overview keeps the second group visible", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto("/");
+  const hero = page.locator(".hero-product");
+  await hero
+    .getByRole("button", { name: "Zur Stundenplanung", exact: true })
+    .click();
+  await hero
+    .getByRole("button", { name: "Gesamtübersicht öffnen", exact: true })
+    .click();
+  await expect(
+    hero.getByRole("button", { name: "Freitag: Statistik, 08:30–10:00" }),
+  ).toBeVisible();
+  await expect(
+    hero.getByRole("button", {
+      name: "Montag: Projektmanagement, 08:30–10:00",
+    }),
+  ).toBeVisible();
 });

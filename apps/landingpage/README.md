@@ -102,7 +102,8 @@ Offizielle Referenzen: [Vercel-Projektkonfiguration](https://vercel.com/docs/pro
 ## Aufbau
 
 - `src/App.tsx`: Seiten, Navigation, Kontakt und Rechtsansichten.
-- `src/ProductPreview.tsx`: gemeinsame Anwendungsvorschau mit Stundenplan, Termindialog, Raumbelegung und getrennten Prüfungsbereichen.
+- `src/ProductPreview.tsx`: gemeinsame Anwendungsvorschau mit Navigation, Gruppenauswahl, gefiltertem Stundenplan, Termindialog, Raumbelegung und getrennten Prüfungsbereichen.
+- `src/PreviewOverview.tsx`: Dashboard und Jahrgangs-/Gruppenauswahl nach der aktuellen Anwendung.
 - `src/application-preview.css`: Gestaltung der Vorschau nach der aktuellen Anwendung, einschließlich Mobilansicht.
 - `src/content.ts`: fachlich überprüfte Produkttexte und FAQ.
 - `src/styles.css`: eigenständiges responsives Design.
