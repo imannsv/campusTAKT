@@ -5,6 +5,7 @@ import "./styles.css";
 import "./marketing.css";
 import "./application-preview.css";
 import "./contact.css";
+import "./theme.css";
 import "@fontsource/manrope/latin-600.css";
 import "@fontsource/manrope/latin-700.css";
 import "@fontsource/dm-sans/latin-400.css";

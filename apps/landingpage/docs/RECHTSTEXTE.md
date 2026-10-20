@@ -84,7 +84,7 @@ Für die tatsächlich eingesetzten Dienste gilt folgende Grundlage der Drittland
 
 ## 5. Cookies, lokale Speicherung und Schriftarten
 
-Die Landingpage selbst setzt keine Analyse- oder Marketing-Cookies ein und speichert keine Besucherdaten im lokalen Speicher des Browsers. Wir verwenden hier keine eingebetteten Analysewerkzeuge, Werbenetzwerke, Videos oder Social-Media-Plugins.
+Die Landingpage selbst setzt keine Analyse- oder Marketing-Cookies ein und speichert keine Besucherdaten zu Analyse- oder Marketingzwecken im lokalen Speicher des Browsers. Unter dem Schlüssel campuszeit-appearance speichern wir ausschließlich Ihre Auswahl für den hellen oder dunklen Modus der Website und der Produktvorschau auf Ihrem Gerät. Die Auswahl wird bei späteren Besuchen wiederverwendet und kann über die Schalter geändert oder durch Löschen der Website-Daten im Browser entfernt werden. Wir verwenden hier keine eingebetteten Analysewerkzeuge, Werbenetzwerke, Videos oder Social-Media-Plugins.
 
 Schriftarten und Grafiken werden über dieselbe Website ausgeliefert. Für die Schriftarten erfolgt keine Verbindung zu Google Fonts oder einem anderen externen Schriftanbieter.
 

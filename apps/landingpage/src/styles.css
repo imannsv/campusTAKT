@@ -3,15 +3,8 @@
   font-size: 16px;
   font-weight: 400;
   font-synthesis: none;
-  color: #24374c;
-  background: #f4f7fa;
-  --navy: #214b76;
-  --deep: #183b5e;
-  --ink: #24374c;
-  --muted: #52677b;
-  --line: #e5ebf1;
-  --pale: #f4f7fa;
-  --mint: #e4f2ed;
+  color: var(--ink);
+  background: var(--pale);
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -webkit-text-size-adjust: 100%;
@@ -41,7 +34,7 @@ summary {
   -webkit-tap-highlight-color: transparent;
 }
 :focus-visible {
-  outline: 3px solid #247e69;
+  outline: 3px solid var(--focus);
   outline-offset: 4px;
 }
 h1,
@@ -104,7 +97,7 @@ svg {
   left: 20px;
   z-index: 100;
   padding: 12px 18px;
-  background: #fff;
+  background: var(--surface);
 }
 .skip-link:focus {
   top: 14px;
@@ -129,8 +122,8 @@ svg {
 }
 .primary,
 .header-demo {
-  background: var(--navy);
-  color: #fff;
+  background: var(--brand);
+  color: var(--on-brand);
 }
 .primary:hover,
 .header-demo:hover {
@@ -157,7 +150,7 @@ svg {
   position: sticky;
   top: 0;
   z-index: 20;
-  background: #fff;
+  background: var(--surface);
   border-bottom: 1px solid var(--line);
 }
 .header-inner {
@@ -215,7 +208,7 @@ svg {
   align-items: center;
   justify-content: center;
   border: 1px solid var(--line);
-  background: #fff;
+  background: var(--surface);
   border-radius: 8px;
 }
 .js .menu-toggle {
@@ -274,10 +267,10 @@ svg {
 }
 .hero-window,
 .product-window {
-  border: 1px solid #d8e2ec;
+  border: 1px solid var(--line);
   border-radius: 12px;
   overflow: hidden;
-  background: #fff;
+  background: var(--surface);
 }
 .hero-window {
   box-shadow: 0 12px 40px #214b7610;
@@ -312,7 +305,7 @@ svg {
 }
 .hero-sidebar,
 .preview-sidebar {
-  background: #fff;
+  background: var(--surface);
   border-right: 1px solid var(--line);
   padding: 24px 12px;
   font-size: 12px;
@@ -334,8 +327,8 @@ svg {
   border-radius: 6px;
 }
 .hero-sidebar > strong {
-  background: var(--navy);
-  color: #fff;
+  background: var(--brand);
+  color: var(--on-brand);
   font-weight: 500;
 }
 .hero-sidebar .icon {
@@ -461,8 +454,8 @@ h2 {
   font-size: 13px;
 }
 .preview-switcher button[aria-pressed="true"] {
-  background: var(--navy);
-  color: #fff;
+  background: var(--brand);
+  color: var(--on-brand);
 }
 .preview-switcher button:hover:not([aria-pressed="true"]) {
   background: var(--pale);
@@ -526,7 +519,7 @@ h2 {
 .planning-preview-calendar,
 .term-details {
   min-width: 0;
-  background: #fff;
+  background: var(--surface);
   border: 1px solid var(--line);
   border-radius: 8px;
   overflow: hidden;
@@ -557,7 +550,7 @@ h2 {
   padding: 4px 8px;
   border-radius: 4px;
   background: var(--mint);
-  color: #315e4e;
+  color: var(--green-text);
   font-size: 11px;
 }
 .status-label .icon {
@@ -608,7 +601,7 @@ h2 {
 }
 .calendar-cell {
   border-left: 1px solid var(--line);
-  border-bottom: 1px solid #eef2f6;
+  border-bottom: 1px solid var(--line);
 }
 .event-position {
   min-width: 0;
@@ -654,18 +647,18 @@ h2 {
   opacity: 1;
 }
 .mint {
-  background: #e4f2ed;
+  background: var(--mint);
 }
 .blue {
-  background: #e7effa;
+  background: var(--blue);
   border-color: #80a9c5;
 }
 .lavender {
-  background: #efebf9;
+  background: var(--purple);
   border-color: #a59bc4;
 }
 .sand {
-  background: #fbf1dc;
+  background: var(--sand);
   border-color: #bba271;
 }
 .calendar-preview-footer {
@@ -682,7 +675,7 @@ h2 {
   display: flex;
   align-items: center;
   gap: 4px;
-  color: #315e4e;
+  color: var(--green-text);
 }
 .calendar-preview-footer .icon {
   width: 14px;
@@ -743,7 +736,7 @@ html:not(.js) .compact .calendar-preview-footer {
 .term-details-state {
   padding: 10px 8px;
   background: var(--mint);
-  color: #315e4e;
+  color: var(--green-text);
   font-size: 11px;
   line-height: 1.4;
   display: flex;
@@ -785,9 +778,9 @@ html:not(.js) .compact .calendar-preview-footer {
   font-size: 14px;
 }
 .workflow {
-  background: #eaf0f5;
+  background: var(--surface-section);
   padding-block: 88px;
-  border-block: 1px solid #dce6ed;
+  border-block: 1px solid var(--line);
 }
 .workflow-intro {
   display: grid;
@@ -808,7 +801,7 @@ html:not(.js) .compact .calendar-preview-footer {
   gap: 24px;
 }
 .workflow-steps li {
-  border-top: 2px solid #b9cbdc;
+  border-top: 2px solid var(--border-strong);
   padding-top: 20px;
 }
 .step-number {
@@ -831,14 +824,14 @@ html:not(.js) .compact .calendar-preview-footer {
   gap: 12px;
   margin-top: 32px;
   padding-top: 24px;
-  border-top: 1px solid #cad8e4;
+  border-top: 1px solid var(--border-strong);
   color: var(--muted);
   font-size: 14px;
 }
 .workflow-note .icon {
   width: 20px;
   height: 20px;
-  color: #315e4e;
+  color: var(--green-text);
 }
 .audience-grid {
   display: grid;
@@ -846,7 +839,7 @@ html:not(.js) .compact .calendar-preview-footer {
   gap: 24px;
 }
 .audience-grid article {
-  background: #fff;
+  background: var(--surface);
   border: 1px solid var(--line);
   border-radius: 10px;
   padding: 32px;
@@ -899,7 +892,7 @@ html:not(.js) .compact .calendar-preview-footer {
 .assistant-example {
   border: 1px solid var(--line);
   border-radius: 12px;
-  background: #fff;
+  background: var(--surface);
   padding: 32px;
 }
 .assistant-identity {
@@ -926,7 +919,7 @@ html:not(.js) .compact .calendar-preview-footer {
 .sample-question {
   margin: 24px 0 16px 24px;
   padding: 16px;
-  background: #e7effa;
+  background: var(--blue);
   border-radius: 8px;
   font-size: 14px;
 }
@@ -953,8 +946,8 @@ html:not(.js) .compact .calendar-preview-footer {
   font-size: 12px;
 }
 .contact-section {
-  background: var(--navy);
-  color: #fff;
+  background: var(--brand);
+  color: var(--on-brand);
   padding-block: 88px;
 }
 .contact-grid {
@@ -972,7 +965,7 @@ html:not(.js) .compact .calendar-preview-footer {
 }
 .contact-panel {
   border-radius: 10px;
-  background: #fff;
+  background: var(--surface);
   padding: 32px;
   color: var(--ink);
 }
@@ -1011,10 +1004,10 @@ html:not(.js) .compact .calendar-preview-footer {
   margin-top: 20px;
 }
 .faq-list {
-  border-top: 1px solid #ccd8e4;
+  border-top: 1px solid var(--border-strong);
 }
 .faq-list details {
-  border-bottom: 1px solid #ccd8e4;
+  border-bottom: 1px solid var(--border-strong);
 }
 .faq-list summary {
   display: flex;
@@ -1040,7 +1033,7 @@ html:not(.js) .compact .calendar-preview-footer {
 .faq-plus::after {
   content: "";
   position: absolute;
-  background: var(--navy);
+  background: var(--brand);
 }
 .faq-plus::before {
   width: 16px;
@@ -1073,7 +1066,7 @@ details[open] .faq-plus::after {
   padding-bottom: 32px;
 }
 .footer-top > a:first-child {
-  background: #fff;
+  background: var(--surface);
   padding: 10px 14px;
   border-radius: 6px;
   text-decoration: none;
@@ -1140,8 +1133,8 @@ details[open] .faq-plus::after {
   align-items: flex-start;
   gap: 16px;
   padding: 24px;
-  border: 1px solid #d8d5b5;
-  background: #fbf1dc;
+  border: 1px solid var(--warning-border);
+  background: var(--sand);
   border-radius: 8px;
   margin-top: 32px;
 }
@@ -1169,7 +1162,7 @@ details[open] .faq-plus::after {
 }
 .room-demo,
 .exam-demo {
-  background: #fff;
+  background: var(--surface);
   border: 1px solid var(--line);
   border-radius: 8px;
   overflow: hidden;
@@ -1199,7 +1192,7 @@ details[open] .faq-plus::after {
 }
 .room-drawing {
   height: 80px;
-  background: #e4f2ed;
+  background: var(--mint);
   border: 2px solid #a8cdbf;
   position: relative;
   border-radius: 4px;
@@ -1212,14 +1205,14 @@ details[open] .faq-plus::after {
   left: 21%;
   border: 2px solid #81b5a2;
   border-radius: 4px;
-  background: #fff;
+  background: var(--surface);
 }
 .room-drawing.lab {
-  background: #e7effa;
+  background: var(--blue);
   border-color: #a9c2d8;
 }
 .room-availability {
-  color: #315e4e;
+  color: var(--green-text);
   display: flex;
   align-items: center;
   gap: 6px;
@@ -1229,7 +1222,7 @@ details[open] .faq-plus::after {
 .status-dot {
   width: 6px;
   height: 6px;
-  background: #315e4e;
+  background: var(--green-text);
   border-radius: 50%;
 }
 .preview-note {
@@ -1275,11 +1268,11 @@ details[open] .faq-plus::after {
   padding: 4px 8px;
   border-radius: 4px;
   background: var(--mint);
-  color: #315e4e;
+  color: var(--green-text);
   font-size: 11px;
 }
 .muted-tag {
-  background: #e7effa;
+  background: var(--blue);
   color: var(--navy);
 }
 .exam-demo .preview-note {
@@ -1442,7 +1435,7 @@ details[open] .faq-plus::after {
     position: absolute;
     top: 72px;
     left: 0;
-    background: #fff;
+    background: var(--surface);
     border-bottom: 1px solid var(--line);
     padding: 16px 20px;
     flex-direction: column;

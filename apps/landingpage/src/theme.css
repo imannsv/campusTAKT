@@ -1,0 +1,187 @@
+/* Each preview defines its own palette so it can differ from the surrounding page. */
+:root,
+.application-preview[data-theme="light"] {
+  color-scheme: light;
+  --navy: #214b76;
+  --deep: #183b5e;
+  --ink: #24374c;
+  --muted: #52677b;
+  --subtle: #64778b;
+  --icon-blue: #6489aa;
+  --line: #e5ebf1;
+  --border-strong: #c4d0dc;
+  --pale: #f4f7fa;
+  --surface: #fff;
+  --surface-soft: #f8fafc;
+  --surface-section: #eaf0f5;
+  --blue: #e7effa;
+  --blue-hover: #edf3f8;
+  --blue-selected: #e5eef7;
+  --mint: #e4f2ed;
+  --mint-soft: #f0f7f4;
+  --green-text: #315e4e;
+  --purple: #efebf9;
+  --purple-text: #655084;
+  --sand: #fbf1dc;
+  --warning: #faf4df;
+  --warning-text: #6b592c;
+  --warning-border: #eadcba;
+  --disabled: #e5ebf1;
+  --focus: #247e69;
+}
+:root[data-theme="dark"],
+.application-preview[data-theme="dark"] {
+  color-scheme: dark;
+  --navy: #a7cbed;
+  --deep: #183b5e;
+  --ink: #e5edf6;
+  --muted: #b3c3d3;
+  --subtle: #9eb3c8;
+  --icon-blue: #a7cbed;
+  --line: #30465c;
+  --border-strong: #526b82;
+  --pale: #101e2d;
+  --surface: #172839;
+  --surface-soft: #1b3045;
+  --surface-section: #182c41;
+  --blue: #1c3650;
+  --blue-hover: #203c54;
+  --blue-selected: #294963;
+  --mint: #1d3a33;
+  --mint-soft: #192f2d;
+  --green-text: #afdbc9;
+  --purple: #302b48;
+  --purple-text: #d6c3ef;
+  --sand: #3a3221;
+  --warning: #362f20;
+  --warning-text: #eddaa7;
+  --warning-border: #746443;
+  --disabled: #293b4e;
+  --focus: #99d7c0;
+}
+:root {
+  --brand: #214b76;
+  --on-brand: #fff;
+  --on-brand-muted: #dce7f1;
+  --footer: #183b5e;
+}
+html {
+  background: var(--pale);
+  color: var(--ink);
+}
+.theme-toggle {
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  gap: 8px;
+  min-width: 44px;
+  min-height: 44px;
+  padding: 9px;
+  border: 1px solid var(--border-strong);
+  border-radius: 8px;
+  background: var(--surface);
+  color: var(--ink);
+  font-size: 14px;
+  line-height: 1.4;
+}
+.theme-toggle .icon {
+  width: 20px;
+  height: 20px;
+}
+.theme-toggle:hover {
+  background: var(--blue-hover);
+}
+.theme-toggle[aria-pressed="true"] {
+  color: var(--navy);
+}
+.theme-toggle:disabled {
+  cursor: default;
+}
+.theme-toggle-site {
+  order: 2;
+}
+.header-inner > .menu-toggle {
+  order: 3;
+}
+.header-inner > .nav-links {
+  margin-left: auto;
+}
+.theme-toggle-preview {
+  margin-left: auto;
+}
+.cz-topbar > .theme-toggle-preview + .window-avatar {
+  margin-left: 0;
+}
+/* Keep the original wordmark and its four squares on a light plaque. */
+.brand {
+  color: #214b76;
+}
+.footer-top > a:first-child {
+  background: #fff;
+}
+:root[data-theme="dark"] .logo-link,
+:root[data-theme="dark"] .application-preview:not([data-theme]) .brand,
+.application-preview[data-theme="dark"] .cz-brand .brand,
+.application-preview[data-theme="dark"] .cz-mobile-brand .brand {
+  background: #fff;
+  border-radius: 6px;
+  padding: 6px 8px;
+}
+:root[data-theme="dark"] .legal-notice {
+  color: var(--warning-text);
+}
+.site-footer {
+  background: var(--footer);
+}
+.faq-plus::before,
+.faq-plus::after {
+  background: var(--navy);
+}
+@media (max-width: 1199px) {
+  .theme-toggle-site > span {
+    display: none;
+  }
+}
+@media (max-width: 767px) {
+  .js .nav-links {
+    top: 100%;
+  }
+  .header-inner {
+    gap: 8px;
+  }
+  .header-inner > .logo-link {
+    margin-right: auto;
+  }
+  .header-inner > .nav-links {
+    order: 4;
+  }
+  .theme-toggle-site {
+    margin-left: auto;
+  }
+  .cz-topbar > .window-avatar {
+    display: none;
+  }
+  .cz-mobile-brand .brand {
+    font-size: 20px;
+    gap: 6px;
+  }
+  .cz-mobile-brand .brand svg {
+    width: 24px;
+    height: 24px;
+  }
+}
+@media (max-width: 389px) {
+  .site-header .brand {
+    font-size: 20px;
+    gap: 7px;
+  }
+  .site-header .brand svg {
+    width: 24px;
+    height: 24px;
+  }
+}
+@media print {
+  .theme-toggle {
+    display: none !important;
+  }
+}

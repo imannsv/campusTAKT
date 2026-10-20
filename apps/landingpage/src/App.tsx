@@ -10,6 +10,7 @@ import {
 import { faq, features, steps } from "./content";
 import { pageForPath, type SiteConfig } from "./site";
 import legal from "../content/legal.json";
+import { ThemeProvider, ThemeToggle } from "./Theme";
 
 function DemoLink({
   config,
@@ -55,6 +56,7 @@ function Header({ config, home }: { config: SiteConfig; home: boolean }) {
         <a className="logo-link" href="/" aria-label="CampusZeit Startseite">
           <Logo />
         </a>
+        <ThemeToggle target="site" />
         <button
           ref={button}
           className="menu-toggle enhanced-only"
@@ -463,7 +465,7 @@ export default function App({
 }) {
   const page = pageForPath(path);
   return (
-    <>
+    <ThemeProvider>
       <a className="skip-link" href="#main">
         Zum Inhalt
       </a>
@@ -489,6 +491,6 @@ export default function App({
         )}
       </main>
       <Footer config={config} />
-    </>
+    </ThemeProvider>
   );
 }

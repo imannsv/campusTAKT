@@ -1,5 +1,6 @@
 import { useEffect, useId, useRef, useState } from "react";
 import { Icon, Logo, type IconName } from "./Icon";
+import { ThemeToggle, useTheme } from "./Theme";
 import {
   PreviewDashboard,
   PreviewGroupSelection,
@@ -549,6 +550,7 @@ const views = {
   exams: "Prüfungen",
 };
 export function ApplicationPreview({ compact = false }: { compact?: boolean }) {
+  const theme = useTheme();
   const [view, setView] = useState<View>(compact ? "dashboard" : "schedule");
   const [scope, setScope] = useState<PreviewScope | null>(null);
   const contentRef = useRef<HTMLDivElement>(null);
@@ -593,6 +595,7 @@ export function ApplicationPreview({ compact = false }: { compact?: boolean }) {
   return (
     <div
       className={`product-window application-preview ${collapsed ? "cz-collapsed" : ""}`}
+      data-theme={theme.ready ? theme.preview : undefined}
     >
       <aside
         id={sidebarId}
@@ -686,6 +689,7 @@ export function ApplicationPreview({ compact = false }: { compact?: boolean }) {
             <strong>{views[view]}</strong>
           </div>
           <span className="cz-example">Fiktive Produktansicht</span>
+          <ThemeToggle target="preview" />
           <span className="window-avatar" aria-hidden="true">
             D
           </span>

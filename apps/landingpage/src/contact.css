@@ -2,7 +2,7 @@
   align-items: start;
 }
 .contact-grid .contact-demo {
-  background: white;
+  background: var(--surface);
   color: var(--navy);
   border: 1px solid white;
   margin-top: 28px;
@@ -43,14 +43,14 @@
   width: 100%;
   min-width: 0;
   min-height: 44px;
-  border: 1px solid #c4d0dc;
+  border: 1px solid var(--border-strong);
   border-radius: 6px;
   padding: 11px 12px;
   font: inherit;
   font-size: 14px;
   line-height: 1.5;
   color: var(--ink);
-  background: #fff;
+  background: var(--surface);
 }
 .contact-field textarea {
   resize: vertical;
@@ -85,11 +85,11 @@
 }
 .contact-form .pending-contact {
   margin-top: 18px;
-  border: 1px solid #eadcba;
+  border: 1px solid var(--warning-border);
   border-radius: 6px;
   padding: 12px;
-  background: #faf4df;
-  color: #6b592c;
+  background: var(--warning);
+  color: var(--warning-text);
   font-size: 12px;
   line-height: 1.6;
 }
@@ -99,9 +99,9 @@
 }
 .contact-form button:disabled {
   cursor: not-allowed;
-  background: #e5ebf1;
-  border-color: #d5dfe8;
-  color: #52677b;
+  background: var(--line);
+  border-color: var(--border-strong);
+  color: var(--muted);
 }
 .contact-draft-status {
   margin-top: 18px;
@@ -109,7 +109,7 @@
   border: 1px solid #c1dbd0;
   border-radius: 6px;
   background: var(--mint);
-  color: #315e4e;
+  color: var(--green-text);
   font-size: 13px;
 }
 @media (max-width: 767px) {

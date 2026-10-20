@@ -13,18 +13,18 @@ h2 {
   display: grid;
   grid-template-columns: 208px minmax(0, 1fr);
   overflow: hidden;
-  border: 1px solid #e5ebf1;
+  border: 1px solid var(--line);
   border-radius: 10px;
-  background: white;
-  color: #24374c;
+  background: var(--surface);
+  color: var(--ink);
   box-shadow: 0 12px 36px rgb(33 75 118 / 6%);
 }
 .cz-sidebar {
   min-width: 0;
   display: flex;
   flex-direction: column;
-  background: white;
-  border-right: 1px solid #e5ebf1;
+  background: var(--surface);
+  border-right: 1px solid var(--line);
   padding: 22px 12px 14px;
 }
 .cz-brand {
@@ -42,7 +42,7 @@ h2 {
   display: flex;
   gap: 10px;
   align-items: center;
-  border: 1px solid #e5ebf1;
+  border: 1px solid var(--line);
   border-radius: 7px;
   padding: 12px 9px;
   margin-bottom: 16px;
@@ -51,9 +51,9 @@ h2 {
   width: 26px;
   height: 26px;
   padding: 4px;
-  background: #edf3f8;
+  background: var(--blue-hover);
   border-radius: 5px;
-  color: #6489aa;
+  color: var(--icon-blue);
 }
 .cz-institution strong,
 .cz-profile strong {
@@ -65,7 +65,7 @@ h2 {
 .cz-profile small {
   display: block;
   font-size: 10px;
-  color: #64778b;
+  color: var(--subtle);
   margin-top: 3px;
 }
 .cz-navigation {
@@ -75,7 +75,7 @@ h2 {
 }
 .cz-nav-label {
   padding: 14px 9px 4px;
-  color: #64778b;
+  color: var(--subtle);
   font-size: 11px;
 }
 .cz-nav-item {
@@ -90,7 +90,7 @@ h2 {
   font-size: 12px;
   line-height: 1.4;
   text-align: left;
-  color: #52677b;
+  color: var(--muted);
   border: 0;
   border-radius: 6px;
   background: transparent;
@@ -102,8 +102,8 @@ h2 {
   flex-shrink: 0;
 }
 button.cz-nav-item[aria-pressed="true"] {
-  background: #e5eef7;
-  color: #214b76;
+  background: var(--blue-selected);
+  color: var(--navy);
   font-weight: 600;
 }
 button.cz-nav-item[aria-pressed="true"]::before {
@@ -113,13 +113,13 @@ button.cz-nav-item[aria-pressed="true"]::before {
   bottom: 9px;
   left: 0;
   width: 2px;
-  background: #214b76;
+  background: var(--brand);
 }
 button.cz-nav-item:hover {
-  background: #edf3f8;
+  background: var(--blue-hover);
 }
 .cz-static {
-  color: #64778b;
+  color: var(--subtle);
 }
 .cz-profile {
   display: flex;
@@ -127,19 +127,19 @@ button.cz-nav-item:hover {
   gap: 9px;
   margin-top: auto;
   padding: 18px 6px 0;
-  border-top: 1px solid #e5ebf1;
+  border-top: 1px solid var(--line);
 }
 .application-preview .window-avatar {
   width: 30px;
   height: 30px;
   flex-shrink: 0;
-  background: #deebf4;
-  color: #214b76;
+  background: var(--blue);
+  color: var(--navy);
   font-size: 11px;
 }
 .cz-main {
   min-width: 0;
-  background: #f3f7fa;
+  background: var(--pale);
 }
 .cz-topbar {
   display: flex;
@@ -147,8 +147,8 @@ button.cz-nav-item:hover {
   gap: 16px;
   min-height: 64px;
   padding: 12px 22px;
-  border-bottom: 1px solid #e5ebf1;
-  background: white;
+  border-bottom: 1px solid var(--line);
+  background: var(--surface);
 }
 .cz-topbar > .window-avatar {
   margin-left: auto;
@@ -162,10 +162,10 @@ button.cz-nav-item:hover {
   border: 0;
   border-radius: 5px;
   background: transparent;
-  color: #52677b;
+  color: var(--muted);
 }
 .cz-collapse:hover {
-  background: #edf3f8;
+  background: var(--blue-hover);
 }
 .cz-collapse .icon {
   width: 20px;
@@ -178,7 +178,7 @@ button.cz-nav-item:hover {
   font-size: 11px;
 }
 .cz-breadcrumb > span {
-  color: #64778b;
+  color: var(--subtle);
 }
 .cz-breadcrumb strong {
   font-weight: 500;
@@ -186,11 +186,11 @@ button.cz-nav-item:hover {
 .cz-breadcrumb .icon {
   width: 12px;
   height: 12px;
-  color: #64778b;
+  color: var(--subtle);
 }
 .cz-example {
   margin-left: auto;
-  color: #64778b;
+  color: var(--subtle);
   font-size: 10px;
 }
 .cz-topbar .cz-example + .window-avatar {
@@ -198,17 +198,17 @@ button.cz-nav-item:hover {
 }
 .application-preview .product-content {
   padding: 26px;
-  background: #f3f7fa;
+  background: var(--pale);
 }
 .cz-demo-note {
   display: flex;
   flex-wrap: wrap;
   gap: 4px 10px;
   align-items: center;
-  background: #faf4df;
-  border: 1px solid #f0e6c6;
+  background: var(--warning);
+  border: 1px solid var(--warning-border);
   border-radius: 8px;
-  color: #6b592c;
+  color: var(--warning-text);
   font-size: 10px;
   padding: 10px 12px;
   margin-bottom: 22px;
@@ -236,14 +236,14 @@ button.cz-nav-item:hover {
 }
 .application-preview .planning-preview-calendar {
   border-radius: 9px;
-  border-color: #e5ebf1;
+  border-color: var(--line);
 }
 .application-preview .schedule-toolbar {
   padding: 16px;
   min-height: 62px;
 }
 .application-preview .schedule-toolbar > span:not(.status-label) {
-  color: #52677b;
+  color: var(--muted);
   font-size: 11px;
 }
 .application-preview .schedule-toolbar strong {
@@ -264,12 +264,12 @@ button.cz-nav-item:hover {
 .application-preview .calendar-corner {
   display: grid;
   place-items: center;
-  color: #52677b;
+  color: var(--muted);
   font-size: 9px;
-  background: #f8fafc;
+  background: var(--surface-soft);
 }
 .application-preview .day-label {
-  background: #f8fafc;
+  background: var(--surface-soft);
   font-size: 10px;
 }
 .application-preview .day-label strong {
@@ -323,34 +323,34 @@ button.cz-nav-item:hover {
   display: flex;
   gap: 24px;
   margin-bottom: 20px;
-  border-bottom: 1px solid #dfe7ee;
+  border-bottom: 1px solid var(--line);
 }
 .cz-tabs button {
   min-height: 42px;
   padding: 6px 0 10px;
-  color: #52677b;
+  color: var(--muted);
   background: transparent;
   border: 0;
   border-bottom: 2px solid transparent;
   font-size: 12px;
 }
 .cz-tabs button[aria-pressed="true"] {
-  color: #214b76;
-  border-bottom-color: #214b76;
+  color: var(--navy);
+  border-bottom-color: var(--navy);
   font-weight: 600;
 }
 .cz-panel {
-  border: 1px solid #e5ebf1;
+  border: 1px solid var(--line);
   border-radius: 9px;
   overflow: hidden;
-  background: white;
+  background: var(--surface);
 }
 .cz-occupancy-legend {
   display: flex;
   justify-content: space-between;
   gap: 12px;
   padding: 12px 16px;
-  color: #52677b;
+  color: var(--muted);
   font-size: 11px;
 }
 .cz-occupancy-legend span:last-child {
@@ -361,7 +361,7 @@ button.cz-nav-item:hover {
 .cz-occupancy-legend i {
   width: 14px;
   height: 10px;
-  background: #e4f2ed;
+  background: var(--mint);
   border-left: 2px solid #81b5a2;
 }
 .cz-table-scroll {
@@ -382,10 +382,10 @@ button.cz-nav-item:hover {
 .cz-occupancy th:first-child {
   width: 165px;
   padding: 16px;
-  border-right: 1px solid #e5ebf1;
+  border-right: 1px solid var(--line);
 }
 .cz-occupancy thead {
-  background: #edf3f9;
+  background: var(--blue-hover);
 }
 .cz-occupancy thead th[colspan] {
   padding: 10px 14px;
@@ -396,17 +396,17 @@ button.cz-nav-item:hover {
   margin-top: 16px;
   font-size: 10px;
   font-weight: 400;
-  color: #52677b;
+  color: var(--muted);
 }
 .cz-occupancy tbody tr {
-  border-top: 1px solid #e5ebf1;
+  border-top: 1px solid var(--line);
   height: 110px;
 }
 .cz-occupancy small {
   display: block;
   font-size: 10px;
   font-weight: 400;
-  color: #52677b;
+  color: var(--muted);
   margin-top: 6px;
 }
 .cz-occupancy td {
@@ -419,8 +419,8 @@ button.cz-nav-item:hover {
     90deg,
     transparent 0,
     transparent calc(33.3333% - 1px),
-    #edf1f5 calc(33.3333% - 1px),
-    #edf1f5 33.3333%
+    var(--line) calc(33.3333% - 1px),
+    var(--line) 33.3333%
   );
 }
 .cz-booking {
@@ -441,7 +441,7 @@ button.cz-nav-item:hover {
   font-size: 10px;
 }
 .cz-free {
-  color: #64778b;
+  color: var(--subtle);
   font-size: 11px;
   margin-left: 12px;
 }
@@ -451,13 +451,13 @@ button.cz-nav-item:hover {
   gap: 12px;
 }
 .cz-room-catalog article {
-  border: 1px solid #e5ebf1;
+  border: 1px solid var(--line);
   border-radius: 8px;
-  background: white;
+  background: var(--surface);
   padding: 20px 16px;
 }
 .cz-room-catalog .icon {
-  color: #6489aa;
+  color: var(--icon-blue);
   margin-bottom: 18px;
 }
 .cz-room-catalog h4 {
@@ -465,7 +465,7 @@ button.cz-nav-item:hover {
   line-height: 1.5;
 }
 .cz-room-catalog p {
-  color: #52677b;
+  color: var(--muted);
   font-size: 12px;
   margin-top: 10px;
 }
@@ -473,7 +473,7 @@ button.cz-nav-item:hover {
 .cz-room-catalog small {
   display: block;
   font-size: 11px;
-  color: #52677b;
+  color: var(--muted);
   margin-top: 8px;
 }
 .application-preview .room-demo,
@@ -503,7 +503,7 @@ button.cz-nav-item:hover {
   padding: 26px 20px;
 }
 .cz-requirement > .icon {
-  color: #6489aa;
+  color: var(--icon-blue);
 }
 .cz-requirement h4 {
   font-size: 15px;
@@ -513,7 +513,7 @@ button.cz-nav-item:hover {
   margin-top: 8px;
 }
 .cz-requirement div > span {
-  color: #52677b;
+  color: var(--muted);
   font-size: 11px;
 }
 .cz-requirement .exam-tag {
@@ -530,7 +530,7 @@ button.cz-nav-item:hover {
   max-height: calc(100dvh - 40px);
   padding: 0;
   margin: auto;
-  color: #24374c;
+  color: var(--ink);
   box-shadow: 0 20px 80px rgb(18 36 57 / 22%);
   overflow-y: auto;
 }
@@ -548,8 +548,8 @@ button.cz-nav-item:hover {
   height: 32px;
   border: 0;
   border-radius: 5px;
-  background: #f1f5f9;
-  color: #52677b;
+  background: var(--surface-soft);
+  color: var(--muted);
 }
 .term-dialog .term-details-body {
   padding: 26px;
@@ -635,8 +635,8 @@ button.cz-nav-item:hover {
     display: flex;
     padding: 6px 16px;
     gap: 8px;
-    border-bottom: 1px solid #e5ebf1;
-    background: white;
+    border-bottom: 1px solid var(--line);
+    background: var(--surface);
   }
   .cz-mobile-nav .cz-nav-item {
     width: auto;
@@ -769,12 +769,12 @@ h4 {
   align-items: center;
   gap: 20px;
   padding: 28px;
-  border: 1px solid #dce6f1;
+  border: 1px solid var(--line);
   border-radius: 20px;
-  background: #e7effa;
+  background: var(--blue);
 }
 .cz-welcome > div:first-child > span {
-  color: #214b76;
+  color: var(--navy);
   font-size: 12px;
   font-weight: 600;
 }
@@ -786,7 +786,7 @@ h4 {
 }
 .cz-welcome p {
   font-size: 12px;
-  color: #52677b;
+  color: var(--muted);
   margin-bottom: 20px;
 }
 .cz-action {
@@ -796,10 +796,10 @@ h4 {
   gap: 8px;
   min-height: 40px;
   padding: 10px 14px;
-  border: 1px solid #214b76;
+  border: 1px solid var(--navy);
   border-radius: 7px;
-  background: #214b76;
-  color: white;
+  background: var(--brand);
+  color: var(--on-brand);
   font-size: 12px;
   font-weight: 600;
 }
@@ -812,8 +812,8 @@ h4 {
   gap: 6px;
   text-align: center;
   padding-left: 24px;
-  border-left: 1px solid #c6d7e7;
-  color: #214b76;
+  border-left: 1px solid var(--border-strong);
+  color: var(--navy);
   font-size: 11px;
   min-width: 118px;
   flex-shrink: 0;
@@ -833,7 +833,7 @@ h4 {
   grid-template-columns: 20px minmax(0, 1fr);
   gap: 2px 12px;
   padding: 8px 14px;
-  border-right: 1px solid #e5ebf1;
+  border-right: 1px solid var(--line);
 }
 .cz-metrics > div:last-child {
   border-right: 0;
@@ -843,7 +843,7 @@ h4 {
   align-self: center;
   width: 19px;
   height: 19px;
-  color: #214b76;
+  color: var(--navy);
 }
 .cz-metrics strong {
   font:
@@ -852,7 +852,7 @@ h4 {
 }
 .cz-metrics span {
   font-size: 10px;
-  color: #52677b;
+  color: var(--muted);
 }
 .cz-overview-columns {
   display: grid;
@@ -861,8 +861,8 @@ h4 {
   align-items: start;
 }
 .cz-overview-panel {
-  background: white;
-  border: 1px solid #e5ebf1;
+  background: var(--surface);
+  border: 1px solid var(--line);
   border-radius: 16px;
   overflow: hidden;
 }
@@ -877,7 +877,7 @@ h4 {
   line-height: 1.45;
 }
 .cz-overview-panel header p {
-  color: #52677b;
+  color: var(--muted);
   font-size: 10px;
   margin-top: 7px;
 }
@@ -885,13 +885,13 @@ h4 {
   display: flex;
   gap: 16px;
   padding: 12px 20px;
-  background: #f7f9fc;
-  border-block: 1px solid #e5ebf1;
+  background: var(--surface-soft);
+  border-block: 1px solid var(--line);
   font-size: 11px;
-  color: #52677b;
+  color: var(--muted);
 }
 .cz-day-summary strong {
-  color: #24374c;
+  color: var(--ink);
   margin-right: 4px;
 }
 .cz-agenda-item {
@@ -908,14 +908,14 @@ h4 {
   font-variant-numeric: tabular-nums;
 }
 .cz-agenda-item > div:first-child > span {
-  color: #52677b;
+  color: var(--muted);
 }
 .cz-agenda-item h4 {
   font-size: 13px;
 }
 .cz-agenda-item p {
   font-size: 11px;
-  color: #52677b;
+  color: var(--muted);
   margin-block: 6px 10px;
 }
 .cz-overview-panel > footer {
@@ -929,7 +929,7 @@ h4 {
   min-height: 28px;
   border: 0;
   background: transparent;
-  color: #214b76;
+  color: var(--navy);
   font-size: 11px;
   text-align: left;
 }
@@ -950,7 +950,7 @@ h4 {
 .cz-clear-notices > .icon {
   width: 18px;
   height: 18px;
-  color: #315e4e;
+  color: var(--green-text);
 }
 .cz-clear-notices strong {
   font-size: 12px;
@@ -959,20 +959,20 @@ h4 {
 .cz-clear-notices p {
   font-size: 10px;
   margin-top: 5px;
-  color: #52677b;
+  color: var(--muted);
 }
 .cz-upcoming {
   padding: 20px;
   border-left: 3px solid #aca0c5;
   border-radius: 0 12px 12px 0;
-  background: #efebf9;
+  background: var(--purple);
 }
 .cz-upcoming > span {
   display: flex;
   align-items: center;
   gap: 8px;
   margin-bottom: 12px;
-  color: #655084;
+  color: var(--purple-text);
   font-size: 10px;
 }
 .cz-upcoming > span .icon {
@@ -981,7 +981,7 @@ h4 {
 }
 .cz-upcoming p {
   font-size: 11px;
-  color: #52677b;
+  color: var(--muted);
   margin-block: 7px;
 }
 .cz-shortcuts > h4 {
@@ -999,16 +999,16 @@ h4 {
   padding: 16px;
   min-width: 0;
   min-height: 72px;
-  border: 1px solid #e5ebf1;
+  border: 1px solid var(--line);
   border-radius: 12px;
   text-align: left;
-  background: white;
-  color: #24374c;
+  background: var(--surface);
+  color: var(--ink);
 }
 .cz-shortcuts button .icon {
   width: 18px;
   height: 18px;
-  color: #214b76;
+  color: var(--navy);
   grid-row: span 2;
 }
 .cz-shortcuts strong {
@@ -1017,7 +1017,7 @@ h4 {
 }
 .cz-shortcuts button > span {
   font-size: 10px;
-  color: #52677b;
+  color: var(--muted);
 }
 .cz-selection-heading {
   display: flex;
@@ -1030,7 +1030,7 @@ h4 {
   display: flex;
   align-items: center;
   gap: 7px;
-  color: #214b76;
+  color: var(--navy);
   font-size: 11px;
   font-weight: 600;
   margin-bottom: 10px;
@@ -1046,7 +1046,7 @@ h4 {
 }
 .cz-selection-heading p {
   font-size: 12px;
-  color: #52677b;
+  color: var(--muted);
 }
 .cz-selection-all {
   display: inline-flex;
@@ -1055,10 +1055,10 @@ h4 {
   padding: 10px 14px;
   min-height: 40px;
   flex-shrink: 0;
-  border: 1px solid #e5ebf1;
+  border: 1px solid var(--line);
   border-radius: 7px;
-  background: white;
-  color: #24374c;
+  background: var(--surface);
+  color: var(--ink);
   font-size: 11px;
 }
 .cz-selection-all .icon {
@@ -1082,12 +1082,12 @@ h4 {
     sans-serif;
 }
 .cz-selection-year summary > span {
-  color: #52677b;
+  color: var(--muted);
   font-size: 11px;
 }
 .cz-selection-year summary > i {
   flex: 1;
-  border-top: 1px solid #e5ebf1;
+  border-top: 1px solid var(--line);
 }
 .cz-selection-year summary > .icon {
   width: 16px;
@@ -1104,9 +1104,9 @@ h4 {
 }
 .cz-selection-program {
   padding: 20px;
-  border: 1px solid #e5ebf1;
+  border: 1px solid var(--line);
   border-radius: 16px;
-  background: white;
+  background: var(--surface);
   box-shadow: 0 3px 12px rgb(16 42 86 / 3%);
 }
 .cz-selection-program h4 {
@@ -1121,8 +1121,8 @@ h4 {
   width: 36px;
   height: 36px;
   padding: 8px;
-  color: #6489aa;
-  background: #edf3f8;
+  color: var(--icon-blue);
+  background: var(--blue-hover);
   border-radius: 9px;
 }
 .cz-selection-cohort {
@@ -1132,7 +1132,7 @@ h4 {
   gap: 8px;
   margin-top: 24px;
   font-size: 11px;
-  color: #52677b;
+  color: var(--muted);
 }
 .cz-selection-cohort button {
   display: inline-flex;
@@ -1142,7 +1142,7 @@ h4 {
   min-height: 32px;
   background: transparent;
   border: 0;
-  color: #214b76;
+  color: var(--navy);
   font-size: 10px;
 }
 .cz-selection-cohort button > .icon {
@@ -1161,15 +1161,15 @@ h4 {
   text-align: left;
   padding: 14px 12px;
   min-width: 0;
-  border: 1px solid #e5ebf1;
+  border: 1px solid var(--line);
   border-radius: 12px;
-  color: #24374c;
-  background: #f7f9fc;
+  color: var(--ink);
+  background: var(--surface-soft);
 }
 .cz-selection-groups button:hover,
 .cz-shortcuts button:hover {
-  background: #edf3f8;
-  border-color: #c6d7e7;
+  background: var(--blue-hover);
+  border-color: var(--border-strong);
 }
 .cz-selection-groups button > strong {
   font-size: 12px;
@@ -1179,7 +1179,7 @@ h4 {
   display: flex;
   align-items: center;
   gap: 4px;
-  color: #52677b;
+  color: var(--muted);
   font-size: 10px;
 }
 .cz-selection-groups .icon {
@@ -1188,12 +1188,12 @@ h4 {
 }
 .cz-selection-groups .icon:last-child {
   margin-left: auto;
-  color: #214b76;
+  color: var(--navy);
 }
 .cz-selection-note {
   max-width: 75ch;
   font-size: 11px;
-  color: #52677b;
+  color: var(--muted);
   margin-top: 22px;
   line-height: 1.6;
 }
@@ -1205,9 +1205,9 @@ h4 {
   gap: 12px;
   margin-bottom: 22px;
   padding-bottom: 14px;
-  border-bottom: 1px solid #e5ebf1;
+  border-bottom: 1px solid var(--line);
   font-size: 11px;
-  color: #52677b;
+  color: var(--muted);
 }
 .cz-scope-bar button {
   display: inline-flex;
@@ -1215,7 +1215,7 @@ h4 {
   gap: 6px;
   padding: 0;
   min-height: 36px;
-  color: #214b76;
+  color: var(--navy);
   background: transparent;
   border: 0;
   font-size: 11px;

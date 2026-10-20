@@ -1,5 +1,14 @@
 # Prüf- und Übergabestand
 
+## Dark Mode für Website und Produktvorschau · 20.10.2026
+
+- Website-Schalter in der Kopfzeile, auf Mobilgeräten jederzeit erreichbar. Eigener Schalter in beiden eingebetteten Produktvorschauen; beide Vorschauen teilen eine Auswahl, unabhängig von der Website.
+- Getrennte Farbpaletten für Website und Demo, einschließlich Dashboard, Gruppenauswahl, Kalender, Räume, Prüfungen und Termindialog. Logo unverändert auf heller Fläche.
+- Auswahl bleibt nach Navigation und erneutem Besuch erhalten; ausschließlich ausdrücklich gewählte Darstellungspräferenzen werden lokal gespeichert. Datenschutzhinweis entsprechend ergänzt. Blockierter Browserspeicher verhindert die Bedienung nicht.
+- Kontaktadresse weiterhin leer; Entwurfsstatus, Zugriffsschutz und bestehende Funktionen bleiben bestehen.
+- Build, 9 Node-Tests und 22 Browsertests einschließlich getrennter Themen, Speicherung, blockiertem Speicher, Kontrastprüfung aller Demoansichten und schmaler mobiler Navigation geprüft.
+
+
 ## Designabgleich nach Git-Aktualisierung · 20.10.2026
 
 - Alle Remote-Branches und Tags von GitHub aktualisiert; `landingpage` war bereits aktuell. Neue Referenz der Anwendung: `origin/main` mit Commit `594aefc` (33 Commits nach der bisherigen Designreferenz). Die laufende Produkt-Demo zeigt die neue Oberfläche ebenfalls.

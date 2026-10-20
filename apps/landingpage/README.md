@@ -21,6 +21,10 @@ npm.cmd run preview
 
 Vorschau: `http://127.0.0.1:4180`. Der Build erzeugt vollständiges HTML für Startseite, Impressum, Datenschutz und 404. Die Produkttexte und FAQ bleiben ohne JavaScript lesbar. Produktansichten verwenden ausdrücklich fiktive Daten; die Demo verlinkt auf die bestehende Browser-Demo.
 
+## Heller und dunkler Modus
+
+Der Schalter in der Kopfzeile steuert die gesamte Website einschließlich Impressum und Datenschutz. Die Schalter in den beiden Produktvorschauen steuern gemeinsam ausschließlich die eingebetteten Vorschauen. Zunächst folgen diese der Website; nach einer eigenen Auswahl bleiben sie unabhängig. Die ausdrücklich gewählte Einstellung wird lokal unter `campuszeit-appearance` gespeichert. Ohne verfügbaren Browserspeicher funktionieren die Schalter für den aktuellen Seitenaufruf weiter. Ohne JavaScript sind die Schalter ausgeblendet. Die verlinkte eigenständige Browser-Demo wird dadurch nicht verändert.
+
 ## Tests
 
 ```powershell

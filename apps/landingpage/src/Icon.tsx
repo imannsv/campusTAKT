@@ -1,4 +1,6 @@
 const paths = {
+  sun: "M12 3V1m0 22v-2M3 12H1m22 0h-2M4.2 4.2l1.4 1.4m12.8 12.8 1.4 1.4m0-15.6-1.4 1.4M5.6 18.4l-1.4 1.4M17 12a5 5 0 1 1-10 0 5 5 0 0 1 10 0Z",
+  moon: "M21 13.1A9 9 0 0 1 10.9 3 9 9 0 1 0 21 13.1Z",
   dashboard: "M3 3h7v7H3zM14 3h7v5h-7zM14 12h7v9h-7zM3 14h7v7H3z",
   phone: "M7 2h10v20H7zM10 18h4",
   sidebar: "M3 4h18v16H3zM9 4v16m7-12-3 4 3 4",

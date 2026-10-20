@@ -7,12 +7,12 @@
   border: 1px solid var(--line);
   border-radius: 12px;
   overflow: hidden;
-  background: #fff;
+  background: var(--surface);
 }
 .practice-situation {
   padding: 32px;
-  background: var(--navy);
-  color: #fff;
+  background: var(--brand);
+  color: var(--on-brand);
 }
 .practice-situation > .icon {
   display: block;
@@ -32,8 +32,8 @@
   font-size: 14px;
 }
 .practice-blocked {
-  background: #fbf1dc;
-  color: #6c522c;
+  background: var(--sand);
+  color: var(--warning-text);
   padding: 12px 16px;
   border-radius: 6px;
   margin-top: 24px;
@@ -68,7 +68,7 @@
   max-width: 90ch;
 }
 .comparison-table {
-  background: #fff;
+  background: var(--surface);
   border: 1px solid var(--line);
   border-radius: 8px;
   overflow: hidden;
@@ -87,8 +87,8 @@
   border-bottom: 1px solid var(--line);
 }
 .comparison-table thead {
-  background: var(--navy);
-  color: #fff;
+  background: var(--brand);
+  color: var(--on-brand);
 }
 .comparison-table thead th:first-child {
   width: 24%;
@@ -100,7 +100,7 @@
   color: var(--muted);
 }
 .comparison-table tbody td:last-child {
-  background: #f0f7f4;
+  background: var(--mint-soft);
   color: var(--ink);
 }
 .comparison-table tbody tr:last-child > * {
@@ -111,8 +111,8 @@
 }
 .pilot-section {
   padding-block: 88px;
-  background: #eaf0f5;
-  border-block: 1px solid #dce6ed;
+  background: var(--surface-section);
+  border-block: 1px solid var(--line);
 }
 .pilot-steps {
   display: grid;
@@ -123,7 +123,7 @@
   padding: 0;
 }
 .pilot-steps li {
-  border-top: 2px solid #b9cbdc;
+  border-top: 2px solid var(--border-strong);
   padding-top: 20px;
 }
 .pilot-steps li > span {
@@ -146,7 +146,7 @@
   gap: 48px;
   margin-top: 48px;
   padding-top: 32px;
-  border-top: 1px solid #cad8e4;
+  border-top: 1px solid var(--border-strong);
 }
 .pilot-details h3 {
   font-size: 20px;
@@ -174,7 +174,7 @@
   gap: 32px;
   margin-top: 32px;
   padding-top: 24px;
-  border-top: 1px solid #cad8e4;
+  border-top: 1px solid var(--border-strong);
 }
 .pilot-next p {
   font-size: 14px;
